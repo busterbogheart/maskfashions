@@ -1,3 +1,7 @@
+
+DeepAR-Android-v2.4.1/
+
+
 # OSX
 #
 .DS_Store
@@ -57,3 +61,4 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+BanubaViewer (OPENGL VER NOT SUPPORTED).zip
