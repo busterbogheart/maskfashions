@@ -1,13 +1,24 @@
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  requireNativeComponent,
+} from "react-native";
 
-import { requireNativeComponent } from 'react-native';
-import { Component } from 'react';
+export default class DeepARView extends React.Component {
 
-class DeepARView extends Component {
-    render(){
-      return <p>Yup. </p>;
-    };
+  render() {
+    return(
+      <DeepARModule />
+    )
+  }
 }
 
-module.exports = requireNativeComponent('DeepARModule',);
+const DeepARModule = requireNativeComponent('DeepARModule',DeepARView);
 
-var DeepARView = 
+const styles = StyleSheet.create({
+  container : {
+    backgroundColor: "transparent"
+  }
+});
