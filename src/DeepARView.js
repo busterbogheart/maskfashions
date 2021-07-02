@@ -15,10 +15,4 @@ export default class DeepARView extends React.Component {
   }
 }
 
-const DeepARModule = requireNativeComponent('DeepARModule',DeepARView);
-
-const styles = StyleSheet.create({
-  container : {
-    backgroundColor: "transparent"
-  }
-});
+const DeepARModule = requireNativeComponent('DeepARModule', DeepARView);

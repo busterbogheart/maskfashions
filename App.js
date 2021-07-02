@@ -8,7 +8,8 @@ export default class App extends React.Component {
     const { width } = Dimensions.get('window')
     return (
       <View style={styles.container}>
-        <DeepARView style={{position: 'absolute', width: '100%', height: '100%'}} />
+        <Text>WHATT</Text>
+        <DeepARView style={{borderWidth:'2px', position: 'absolute', width: '100%', height: '100%'}} />
         <Button title="request" onPress={requestCameraPermission}></Button>
       </View>
     );
@@ -32,7 +33,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
   },
 
 });

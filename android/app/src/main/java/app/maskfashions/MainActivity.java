@@ -1,4 +1,4 @@
-package com.maskfashions;
+package app.maskfashions;
 
 import com.facebook.react.ReactActivity;
 
