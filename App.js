@@ -56,6 +56,10 @@ export default class App extends React.Component {
     console.info('component did update');
   }
 
+  switchCamera(){
+    this.deepARView.switchCamera();
+  }
+
   render(){
     console.info('render');
     const { permissionsGranted } = this.state
@@ -68,11 +72,11 @@ export default class App extends React.Component {
             style= {{width: width, height: '100%'}}
             ref={ ref => this.deepARView = ref }
           />
-          <Text>^ DeepAR should be above ^</Text>
         </View>
       : 
       <Text>permissions not granted</Text>
       }
+      <Button title="switch camera" onPress={()=>this.switchCamera()}></Button>
       </View>
     );
   }
