@@ -3,13 +3,11 @@ import { AppRegistry,StyleSheet,Text,View,Button, PermissionsAndroid, Dimensions
 import DeepARView from './src/DeepARView';
 
 export default class App extends React.Component {
-
   constructor(props){
     super(props)
 
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
-      currentEffectIndex: 0,
       switchCameraInProgress: false
     }
   }
@@ -36,18 +34,30 @@ export default class App extends React.Component {
   }
 
   didAppear() {
+    console.info('didappear');
     if (this.deepARView) {
       this.deepARView.resume();
     }
   }
 
   willDisappear(){
+    console.info('will disappear');
+
     if (this.deepARView) {
       this.deepARView.pause();
     }
   }
 
+  componentWillUnmount(){
+    console.info('component will unmount');
+  }
+
+  componentDidUpdate(){
+    console.info('component did update');
+  }
+
   render(){
+    console.info('render');
     const { permissionsGranted } = this.state
     const { width } = Dimensions.get('window')
     return (
@@ -55,7 +65,7 @@ export default class App extends React.Component {
       { permissionsGranted ? 
         <View>
           <DeepARView 
-            style={{width: width, height: '100%'}}
+            style= {{width: width, height: '100%'}}
             ref={ ref => this.deepARView = ref }
           />
           <Text>^ DeepAR should be above ^</Text>
@@ -63,7 +73,6 @@ export default class App extends React.Component {
       : 
       <Text>permissions not granted</Text>
       }
-        <Text>text here.</Text>
       </View>
     );
   }
@@ -75,7 +84,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'darksalmon',
   },
-
 });
-
