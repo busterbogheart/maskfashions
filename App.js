@@ -2,13 +2,27 @@ import React from 'react';
 import { AppRegistry,StyleSheet,Text,View,Button, PermissionsAndroid, Dimensions} from 'react-native';
 import DeepARView from './src/DeepARView';
 
+class AdItem {
+  name;
+  created_date;
+  creative_url;
+  id;
+
+  constructor(data){
+    Object.assign(this, data);
+  }
+}
+
+
+
 export default class App extends React.Component {
   constructor(props){
     super(props)
 
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
-      switchCameraInProgress: false
+      switchCameraInProgress: false,
+      displayText:''
     }
   }
 
@@ -31,6 +45,39 @@ export default class App extends React.Component {
         }
       })
     }
+
+    // TODO: wrap these up and get classes mapped per endpoint and per params
+    const expandAllParam = {expand:"all"};
+    this.adsAPI('placements', expandAllParam)
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(JSON.stringify(json));
+      });
+
+    this.adsAPI('ad-items')
+      .then((response) => response.json())
+      .then((json) => {
+        // console.log(json.data.length+" ad items fetched");
+        for (const k in json.data){
+          const e = new AdItem(json.data[k]);
+        }
+      })
+      .catch((err) => console.warn(err));
+  }
+
+  async adsAPI (endpoint, data = {}) {
+    const apiKey = 'da81d8cf585242c7818d43bdddcd0769';
+    const params = new URLSearchParams(data);
+    const url = "https://api.adbutler.com/v2/"+endpoint+"?"+params;
+    let response = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type' : 'application/json',
+        'Authorization': 'Basic '+apiKey,
+      },
+    });
+    return response;
   }
 
   didAppear() {
@@ -42,7 +89,6 @@ export default class App extends React.Component {
 
   willDisappear(){
     console.info('will disappear');
-
     if (this.deepARView) {
       this.deepARView.pause();
     }
@@ -63,26 +109,26 @@ export default class App extends React.Component {
   render(){
     console.info('render');
     const { permissionsGranted } = this.state
-    const { width } = Dimensions.get('window')
     return (
       <View style={styles.container}>
       { permissionsGranted ? 
         <View>
           <DeepARView 
-            style= {{width: width, height: '100%'}}
+            style= {styles.deeparview}
             ref={ ref => this.deepARView = ref }
           />
         </View>
       : 
       <Text>permissions not granted</Text>
       }
-      <Button title="switch camera" onPress={()=>this.switchCamera()}></Button>
+      <Text>{this.state.displayText}</Text>
       </View>
     );
   }
 }
 
 
+const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -90,4 +136,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'darksalmon',
   },
+  deeparview:{
+    width: 100, /*width, */
+    height: 100 /* '100%' */
+  }
 });
