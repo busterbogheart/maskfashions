@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "date-fns": "^2.22.1",
     "react": "16.11.0",
     "react-native": "0.62.1",
     "react-native-deepar-module": "file:../react-native-deepar-module"
