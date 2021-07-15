@@ -21,6 +21,14 @@ export default class DeepARView extends React.Component {
     );
   }
 
+  switchEffect = (maskName, slot) => {
+    UIManager.dispatchViewManagerCommand(
+      this.getDeepARViewHandle(),
+      UIManager.getViewManagerConfig('DeepARModule').Commands.switchEffect,
+      [maskName, slot]
+    );
+  }
+
   render() {
     var onEventSent = (event) => {
       const onEventSentCallback = this.props.onEventSent;
