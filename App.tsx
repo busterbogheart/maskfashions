@@ -1,16 +1,18 @@
 "use strict";
 
 import React from 'react';
-import { StyleSheet, Text, View, Button, PermissionsAndroid, Dimensions, Platform } from 'react-native';
+import { StyleSheet, Text, View, Button, PermissionsAndroid, Dimensions, Platform, AppState } from 'react-native';
 import DeepARView from './src/DeepARView';
 import { AdItem } from './src/AdsApiMapping';
 import { isPast,isFuture,parseJSON } from 'date-fns';
 
+export default class App extends React.Component<any, any> {
+  
+  private deeparview = React.createRef();
 
-export default class App extends React.Component {
   constructor(props:object) {
-    super(props)
-
+    super(props);
+    
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
@@ -19,16 +21,6 @@ export default class App extends React.Component {
     }
   }
   
-  didAppear = () => {
-    console.info('didappear');
-    if (this.deepARView) {
-      this.deepARView.resume();
-    }
-  }
-
-
-
-
   componentDidMount() {
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
@@ -56,30 +48,6 @@ export default class App extends React.Component {
       },
     ];
 
-    const loadEffect = () => {
-      if(this.deepARView){
-        this.deepARView.switchEffect(effects[0].name, 'effect')
-      }
-    }
-  }
-
-  willDisappear() {
-    console.info('will disappear');
-    if (this.deepARView) {
-      this.deepARView.pause();
-    }
-  }
-
-  componentWillUnmount() {
-    console.info('component will unmount');
-  }
-
-  componentDidUpdate() {
-    console.info('component did update');
-  }
-
-  switchCamera() {
-    this.deepARView.switchCamera();
   }
 
   render() {
@@ -91,7 +59,6 @@ export default class App extends React.Component {
           <View>
             <DeepARView
               style={styles.deeparview}
-              ref={ref => this.deepARView = ref}
             />
           </View>
           :
@@ -104,8 +71,6 @@ export default class App extends React.Component {
     );
   }
 }
-
-
 
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
