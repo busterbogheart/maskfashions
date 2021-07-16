@@ -74,23 +74,23 @@
 		9A476491240D551100E07300 /* RNTDeepAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTDeepAR.h; sourceTree = "<group>"; };
 		9A476492240D552100E07300 /* RNTDeepAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepAR.m; sourceTree = "<group>"; };
 		9A476494240D574B00E07300 /* DeepAR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DeepAR.framework; sourceTree = "<group>"; };
-		9A4764AF240E89A200E07300 /* tape_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = tape_face; sourceTree = "<group>"; };
-		9A4764B0240E89A200E07300 /* topology */ = {isa = PBXFileReference; lastKnownFileType = file; path = topology; sourceTree = "<group>"; };
-		9A4764B1240E89A200E07300 /* pumpkin */ = {isa = PBXFileReference; lastKnownFileType = file; path = pumpkin; sourceTree = "<group>"; };
-		9A4764B2240E89A200E07300 /* hair_segmentation */ = {isa = PBXFileReference; lastKnownFileType = file; path = hair_segmentation; sourceTree = "<group>"; };
-		9A4764B3240E89A200E07300 /* frankenstein */ = {isa = PBXFileReference; lastKnownFileType = file; path = frankenstein; sourceTree = "<group>"; };
-		9A4764B4240E89A200E07300 /* scuba */ = {isa = PBXFileReference; lastKnownFileType = file; path = scuba; sourceTree = "<group>"; };
-		9A4764B5240E89A200E07300 /* fairy_lights */ = {isa = PBXFileReference; lastKnownFileType = file; path = fairy_lights; sourceTree = "<group>"; };
-		9A4764B6240E89A200E07300 /* plastic_ocean */ = {isa = PBXFileReference; lastKnownFileType = file; path = plastic_ocean; sourceTree = "<group>"; };
-		9A4764B7240E89A200E07300 /* beard */ = {isa = PBXFileReference; lastKnownFileType = file; path = beard; sourceTree = "<group>"; };
-		9A4764B8240E89A200E07300 /* beauty */ = {isa = PBXFileReference; lastKnownFileType = file; path = beauty; sourceTree = "<group>"; };
-		9A4764B9240E89A200E07300 /* ball_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = ball_face; sourceTree = "<group>"; };
-		9A4764BA240E89A200E07300 /* manly_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = manly_face; sourceTree = "<group>"; };
-		9A4764BB240E89A200E07300 /* background_segmentation */ = {isa = PBXFileReference; lastKnownFileType = file; path = background_segmentation; sourceTree = "<group>"; };
-		9A4764BC240E89A200E07300 /* tiny_sunglasses */ = {isa = PBXFileReference; lastKnownFileType = file; path = tiny_sunglasses; sourceTree = "<group>"; };
+		9A4764AF240E89A200E07300 /* tape_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = tape_face; sourceTree = "<group>"; };
+		9A4764B0240E89A200E07300 /* topology */ = {isa = PBXFileReference; lastKnownFileType = text; path = topology; sourceTree = "<group>"; };
+		9A4764B1240E89A200E07300 /* pumpkin */ = {isa = PBXFileReference; lastKnownFileType = text; path = pumpkin; sourceTree = "<group>"; };
+		9A4764B2240E89A200E07300 /* hair_segmentation */ = {isa = PBXFileReference; lastKnownFileType = text; path = hair_segmentation; sourceTree = "<group>"; };
+		9A4764B3240E89A200E07300 /* frankenstein */ = {isa = PBXFileReference; lastKnownFileType = text; path = frankenstein; sourceTree = "<group>"; };
+		9A4764B4240E89A200E07300 /* scuba */ = {isa = PBXFileReference; lastKnownFileType = text; path = scuba; sourceTree = "<group>"; };
+		9A4764B5240E89A200E07300 /* fairy_lights */ = {isa = PBXFileReference; lastKnownFileType = text; path = fairy_lights; sourceTree = "<group>"; };
+		9A4764B6240E89A200E07300 /* plastic_ocean */ = {isa = PBXFileReference; lastKnownFileType = text; path = plastic_ocean; sourceTree = "<group>"; };
+		9A4764B7240E89A200E07300 /* beard */ = {isa = PBXFileReference; lastKnownFileType = text; path = beard; sourceTree = "<group>"; };
+		9A4764B8240E89A200E07300 /* beauty */ = {isa = PBXFileReference; lastKnownFileType = text; path = beauty; sourceTree = "<group>"; };
+		9A4764B9240E89A200E07300 /* ball_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = ball_face; sourceTree = "<group>"; };
+		9A4764BA240E89A200E07300 /* manly_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = manly_face; sourceTree = "<group>"; };
+		9A4764BB240E89A200E07300 /* background_segmentation */ = {isa = PBXFileReference; lastKnownFileType = text; path = background_segmentation; sourceTree = "<group>"; };
+		9A4764BC240E89A200E07300 /* tiny_sunglasses */ = {isa = PBXFileReference; lastKnownFileType = text; path = tiny_sunglasses; sourceTree = "<group>"; };
 		9A4764BD240E89A200E07300 /* aviators */ = {isa = PBXFileReference; lastKnownFileType = file; path = aviators; sourceTree = "<group>"; };
-		9A4764BE240E89A200E07300 /* flower_crown */ = {isa = PBXFileReference; lastKnownFileType = file; path = flower_crown; sourceTree = "<group>"; };
-		9A4764BF240E89A200E07300 /* lion */ = {isa = PBXFileReference; lastKnownFileType = file; path = lion; sourceTree = "<group>"; };
+		9A4764BE240E89A200E07300 /* flower_crown */ = {isa = PBXFileReference; lastKnownFileType = text; path = flower_crown; sourceTree = "<group>"; };
+		9A4764BF240E89A200E07300 /* lion */ = {isa = PBXFileReference; lastKnownFileType = text; path = lion; sourceTree = "<group>"; };
 		A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E268D7AFB3C9CD246118801F /* Pods-deeparRNExample-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -265,7 +265,7 @@
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 339454YJJ4;
+						DevelopmentTeam = HAA6PX3CPR;
 					};
 				};
 			};
@@ -401,7 +401,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = 339454YJJ4;
+				DEVELOPMENT_TEAM = HAA6PX3CPR;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -414,8 +414,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.deepar.rnexample;
+				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
 				PRODUCT_NAME = "DeepAR RN Example";
+				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -439,8 +440,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.deepar.rnexample;
+				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
 				PRODUCT_NAME = "DeepAR RN Example";
+				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
