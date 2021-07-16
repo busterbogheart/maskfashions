@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, Button, PermissionsAndroid, Dimensions, Platfor
 import DeepARView from './src/DeepARView';
 import { AdItem } from './src/AdsApiMapping';
 import { isPast,isFuture,parseJSON } from 'date-fns';
+import MapModule from './src/MapModule';
 
 export default class App extends React.Component<any, any> {
   
@@ -66,6 +67,7 @@ export default class App extends React.Component<any, any> {
         }
         <Text>{this.state.displayText}</Text>
         <Button title="Load Effect" onPress={()=>{return true;}}></Button>
+        <MapModule />
 
       </View>
     );
