@@ -1,0 +1,571 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
+		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
+		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		9A476490240D54D700E07300 /* RNTDeepARViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */; };
+		9A476493240D552100E07300 /* RNTDeepAR.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A476492240D552100E07300 /* RNTDeepAR.m */; };
+		9A476496240D5E6400E07300 /* DeepAR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A476494240D574B00E07300 /* DeepAR.framework */; };
+		9A476497240D5E6400E07300 /* DeepAR.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A476494240D574B00E07300 /* DeepAR.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9A4764C0240E89A200E07300 /* tape_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764AF240E89A200E07300 /* tape_face */; };
+		9A4764C1240E89A200E07300 /* topology in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B0240E89A200E07300 /* topology */; };
+		9A4764C2240E89A200E07300 /* pumpkin in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B1240E89A200E07300 /* pumpkin */; };
+		9A4764C3240E89A200E07300 /* hair_segmentation in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B2240E89A200E07300 /* hair_segmentation */; };
+		9A4764C4240E89A200E07300 /* frankenstein in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B3240E89A200E07300 /* frankenstein */; };
+		9A4764C5240E89A200E07300 /* scuba in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B4240E89A200E07300 /* scuba */; };
+		9A4764C6240E89A200E07300 /* fairy_lights in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B5240E89A200E07300 /* fairy_lights */; };
+		9A4764C7240E89A200E07300 /* plastic_ocean in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B6240E89A200E07300 /* plastic_ocean */; };
+		9A4764C8240E89A200E07300 /* beard in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B7240E89A200E07300 /* beard */; };
+		9A4764C9240E89A200E07300 /* beauty in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B8240E89A200E07300 /* beauty */; };
+		9A4764CA240E89A200E07300 /* ball_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B9240E89A200E07300 /* ball_face */; };
+		9A4764CB240E89A200E07300 /* manly_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BA240E89A200E07300 /* manly_face */; };
+		9A4764CC240E89A200E07300 /* background_segmentation in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BB240E89A200E07300 /* background_segmentation */; };
+		9A4764CD240E89A200E07300 /* tiny_sunglasses in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BC240E89A200E07300 /* tiny_sunglasses */; };
+		9A4764CE240E89A200E07300 /* aviators in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BD240E89A200E07300 /* aviators */; };
+		9A4764CF240E89A200E07300 /* flower_crown in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BE240E89A200E07300 /* flower_crown */; };
+		9A4764D0240E89A200E07300 /* lion in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BF240E89A200E07300 /* lion */; };
+		F64A4285E28C7D90CA231636 /* libPods-deeparRNExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9A476498240D5E6400E07300 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9A476497240D5E6400E07300 /* DeepAR.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
+		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* deeparRNExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = deeparRNExampleTests.m; sourceTree = "<group>"; };
+		03C1A6FF75A359C1ED890996 /* Pods-deeparRNExample-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DeepAR RN Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = deeparRNExample/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = deeparRNExample/AppDelegate.m; sourceTree = "<group>"; };
+		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = deeparRNExample/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = deeparRNExample/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = deeparRNExample/main.m; sourceTree = "<group>"; };
+		32EA201765DB0CB20C90D109 /* Pods-deeparRNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExampleTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExampleTests/Pods-deeparRNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		46FFC3B3BEB97C447B660A09 /* Pods-deeparRNExample-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		61448146BD890182BDA32513 /* libPods-deeparRNExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample/Pods-deeparRNExample.release.xcconfig"; sourceTree = "<group>"; };
+		7AA8FB96774543A76C6318BB /* Pods-deeparRNExample-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		8202DB50049704C0AA425441 /* Pods-deeparRNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExampleTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExampleTests/Pods-deeparRNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		8642A8BF848F36D583566093 /* libPods-deeparRNExample-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A04F1DB12B231F7A9A51BDF /* libPods-deeparRNExample-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A47648E240D54C000E07300 /* RNTDeepARViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTDeepARViewManager.h; sourceTree = "<group>"; };
+		9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepARViewManager.m; sourceTree = "<group>"; };
+		9A476491240D551100E07300 /* RNTDeepAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTDeepAR.h; sourceTree = "<group>"; };
+		9A476492240D552100E07300 /* RNTDeepAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepAR.m; sourceTree = "<group>"; };
+		9A476494240D574B00E07300 /* DeepAR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DeepAR.framework; sourceTree = "<group>"; };
+		9A4764AF240E89A200E07300 /* tape_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = tape_face; sourceTree = "<group>"; };
+		9A4764B0240E89A200E07300 /* topology */ = {isa = PBXFileReference; lastKnownFileType = file; path = topology; sourceTree = "<group>"; };
+		9A4764B1240E89A200E07300 /* pumpkin */ = {isa = PBXFileReference; lastKnownFileType = file; path = pumpkin; sourceTree = "<group>"; };
+		9A4764B2240E89A200E07300 /* hair_segmentation */ = {isa = PBXFileReference; lastKnownFileType = file; path = hair_segmentation; sourceTree = "<group>"; };
+		9A4764B3240E89A200E07300 /* frankenstein */ = {isa = PBXFileReference; lastKnownFileType = file; path = frankenstein; sourceTree = "<group>"; };
+		9A4764B4240E89A200E07300 /* scuba */ = {isa = PBXFileReference; lastKnownFileType = file; path = scuba; sourceTree = "<group>"; };
+		9A4764B5240E89A200E07300 /* fairy_lights */ = {isa = PBXFileReference; lastKnownFileType = file; path = fairy_lights; sourceTree = "<group>"; };
+		9A4764B6240E89A200E07300 /* plastic_ocean */ = {isa = PBXFileReference; lastKnownFileType = file; path = plastic_ocean; sourceTree = "<group>"; };
+		9A4764B7240E89A200E07300 /* beard */ = {isa = PBXFileReference; lastKnownFileType = file; path = beard; sourceTree = "<group>"; };
+		9A4764B8240E89A200E07300 /* beauty */ = {isa = PBXFileReference; lastKnownFileType = file; path = beauty; sourceTree = "<group>"; };
+		9A4764B9240E89A200E07300 /* ball_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = ball_face; sourceTree = "<group>"; };
+		9A4764BA240E89A200E07300 /* manly_face */ = {isa = PBXFileReference; lastKnownFileType = file; path = manly_face; sourceTree = "<group>"; };
+		9A4764BB240E89A200E07300 /* background_segmentation */ = {isa = PBXFileReference; lastKnownFileType = file; path = background_segmentation; sourceTree = "<group>"; };
+		9A4764BC240E89A200E07300 /* tiny_sunglasses */ = {isa = PBXFileReference; lastKnownFileType = file; path = tiny_sunglasses; sourceTree = "<group>"; };
+		9A4764BD240E89A200E07300 /* aviators */ = {isa = PBXFileReference; lastKnownFileType = file; path = aviators; sourceTree = "<group>"; };
+		9A4764BE240E89A200E07300 /* flower_crown */ = {isa = PBXFileReference; lastKnownFileType = file; path = flower_crown; sourceTree = "<group>"; };
+		9A4764BF240E89A200E07300 /* lion */ = {isa = PBXFileReference; lastKnownFileType = file; path = lion; sourceTree = "<group>"; };
+		A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E268D7AFB3C9CD246118801F /* Pods-deeparRNExample-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		FDA6A134E236DD8BF2B8EABD /* Pods-deeparRNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample/Pods-deeparRNExample.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F64A4285E28C7D90CA231636 /* libPods-deeparRNExample.a in Frameworks */,
+				9A476496240D5E6400E07300 /* DeepAR.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00E356EF1AD99517003FC87E /* deeparRNExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				00E356F21AD99517003FC87E /* deeparRNExampleTests.m */,
+				00E356F01AD99517003FC87E /* Supporting Files */,
+			);
+			path = deeparRNExampleTests;
+			sourceTree = "<group>";
+		};
+		00E356F01AD99517003FC87E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				00E356F11AD99517003FC87E /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		13B07FAE1A68108700A75B9A /* deeparRNExample */ = {
+			isa = PBXGroup;
+			children = (
+				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
+				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
+				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				13B07FB61A68108700A75B9A /* Info.plist */,
+				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				13B07FB71A68108700A75B9A /* main.m */,
+				9A47648E240D54C000E07300 /* RNTDeepARViewManager.h */,
+				9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */,
+				9A476491240D551100E07300 /* RNTDeepAR.h */,
+				9A476492240D552100E07300 /* RNTDeepAR.m */,
+			);
+			name = deeparRNExample;
+			sourceTree = "<group>";
+		};
+		234E91298EA77127B4900F27 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FDA6A134E236DD8BF2B8EABD /* Pods-deeparRNExample.debug.xcconfig */,
+				6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */,
+				7AA8FB96774543A76C6318BB /* Pods-deeparRNExample-tvOS.debug.xcconfig */,
+				46FFC3B3BEB97C447B660A09 /* Pods-deeparRNExample-tvOS.release.xcconfig */,
+				E268D7AFB3C9CD246118801F /* Pods-deeparRNExample-tvOSTests.debug.xcconfig */,
+				03C1A6FF75A359C1ED890996 /* Pods-deeparRNExample-tvOSTests.release.xcconfig */,
+				32EA201765DB0CB20C90D109 /* Pods-deeparRNExampleTests.debug.xcconfig */,
+				8202DB50049704C0AA425441 /* Pods-deeparRNExampleTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
+				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
+				A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */,
+				8642A8BF848F36D583566093 /* libPods-deeparRNExample-tvOS.a */,
+				9A04F1DB12B231F7A9A51BDF /* libPods-deeparRNExample-tvOSTests.a */,
+				61448146BD890182BDA32513 /* libPods-deeparRNExampleTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		83CBB9F61A601CBA00E9B192 = {
+			isa = PBXGroup;
+			children = (
+				9A4764AE240E89A200E07300 /* effects */,
+				9A476494240D574B00E07300 /* DeepAR.framework */,
+				13B07FAE1A68108700A75B9A /* deeparRNExample */,
+				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				00E356EF1AD99517003FC87E /* deeparRNExampleTests */,
+				83CBBA001A601CBA00E9B192 /* Products */,
+				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				234E91298EA77127B4900F27 /* Pods */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
+		};
+		83CBBA001A601CBA00E9B192 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9A4764AE240E89A200E07300 /* effects */ = {
+			isa = PBXGroup;
+			children = (
+				9A4764AF240E89A200E07300 /* tape_face */,
+				9A4764B0240E89A200E07300 /* topology */,
+				9A4764B1240E89A200E07300 /* pumpkin */,
+				9A4764B2240E89A200E07300 /* hair_segmentation */,
+				9A4764B3240E89A200E07300 /* frankenstein */,
+				9A4764B4240E89A200E07300 /* scuba */,
+				9A4764B5240E89A200E07300 /* fairy_lights */,
+				9A4764B6240E89A200E07300 /* plastic_ocean */,
+				9A4764B7240E89A200E07300 /* beard */,
+				9A4764B8240E89A200E07300 /* beauty */,
+				9A4764B9240E89A200E07300 /* ball_face */,
+				9A4764BA240E89A200E07300 /* manly_face */,
+				9A4764BB240E89A200E07300 /* background_segmentation */,
+				9A4764BC240E89A200E07300 /* tiny_sunglasses */,
+				9A4764BD240E89A200E07300 /* aviators */,
+				9A4764BE240E89A200E07300 /* flower_crown */,
+				9A4764BF240E89A200E07300 /* lion */,
+			);
+			name = effects;
+			path = ../assets/effects;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13B07F861A680F5B00A75B9A /* deeparRNExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "deeparRNExample" */;
+			buildPhases = (
+				003CDCD62E906F12C1DA007F /* [CP] Check Pods Manifest.lock */,
+				FD10A7F022414F080027D42C /* Start Packager */,
+				13B07F871A680F5B00A75B9A /* Sources */,
+				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				13B07F8E1A680F5B00A75B9A /* Resources */,
+				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				9A476498240D5E6400E07300 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = deeparRNExample;
+			productName = deeparRNExample;
+			productReference = 13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		83CBB9F71A601CBA00E9B192 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Facebook;
+				TargetAttributes = {
+					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 339454YJJ4;
+					};
+				};
+			};
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "deeparRNExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+				Base,
+			);
+			mainGroup = 83CBB9F61A601CBA00E9B192;
+			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				13B07F861A680F5B00A75B9A /* deeparRNExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		13B07F8E1A680F5B00A75B9A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A4764C8240E89A200E07300 /* beard in Resources */,
+				9A4764C2240E89A200E07300 /* pumpkin in Resources */,
+				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				9A4764C7240E89A200E07300 /* plastic_ocean in Resources */,
+				9A4764C1240E89A200E07300 /* topology in Resources */,
+				9A4764C5240E89A200E07300 /* scuba in Resources */,
+				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				9A4764C3240E89A200E07300 /* hair_segmentation in Resources */,
+				9A4764C9240E89A200E07300 /* beauty in Resources */,
+				9A4764CE240E89A200E07300 /* aviators in Resources */,
+				9A4764CC240E89A200E07300 /* background_segmentation in Resources */,
+				9A4764CD240E89A200E07300 /* tiny_sunglasses in Resources */,
+				9A4764CB240E89A200E07300 /* manly_face in Resources */,
+				9A4764C0240E89A200E07300 /* tape_face in Resources */,
+				9A4764C6240E89A200E07300 /* fairy_lights in Resources */,
+				9A4764CF240E89A200E07300 /* flower_crown in Resources */,
+				9A4764C4240E89A200E07300 /* frankenstein in Resources */,
+				9A4764D0240E89A200E07300 /* lion in Resources */,
+				9A4764CA240E89A200E07300 /* ball_face in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		003CDCD62E906F12C1DA007F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-deeparRNExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		FD10A7F022414F080027D42C /* Start Packager */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Start Packager";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		13B07F871A680F5B00A75B9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				9A476490240D54D700E07300 /* RNTDeepARViewManager.m in Sources */,
+				9A476493240D552100E07300 /* RNTDeepAR.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				13B07FB21A68108700A75B9A /* Base */,
+			);
+			name = LaunchScreen.xib;
+			path = deeparRNExample;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		13B07F941A680F5B00A75B9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FDA6A134E236DD8BF2B8EABD /* Pods-deeparRNExample.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = 339454YJJ4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = deeparRNExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.deepar.rnexample;
+				PRODUCT_NAME = "DeepAR RN Example";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		13B07F951A680F5B00A75B9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 339454YJJ4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = deeparRNExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.deepar.rnexample;
+				PRODUCT_NAME = "DeepAR RN Example";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		83CBBA201A601CBA00E9B192 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		83CBBA211A601CBA00E9B192 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "deeparRNExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13B07F941A680F5B00A75B9A /* Debug */,
+				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "deeparRNExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83CBBA201A601CBA00E9B192 /* Debug */,
+				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
+}
