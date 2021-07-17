@@ -29,7 +29,6 @@
     
     
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    [_arview initializeWithCaptureSessionPreset:AVCaptureSessionPreset1280x720 orientation:orientation cameraPosition:AVCaptureDevicePositionFront];
   }
   
   return self;
@@ -43,8 +42,7 @@
 
 -(void)switchCamera {
   if (_arview) {
-    AVCaptureDevicePosition position =  [_arview getCameraPosition] == AVCaptureDevicePositionBack ? AVCaptureDevicePositionFront : AVCaptureDevicePositionBack;
-    [_arview switchCamera:position];
+    AVCaptureDevicePosition position =  AVCaptureDevicePositionFront;
     
     NSString* message;
     if (position == AVCaptureDevicePositionBack) {
@@ -77,7 +75,7 @@
 
 
 -(void)startRecording {
-  if (self.flashOn && [_arview getCameraPosition] == AVCaptureDevicePositionBack) {
+  if (self.flashOn) {
     Class captureDeviceClass = NSClassFromString(@"AVCaptureDevice");
     if (captureDeviceClass != nil) {
       AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
@@ -123,12 +121,12 @@
   }
   
   if(_arview) {
-    [_arview finishRecording];
+    [_arview finishVideoRecording];
   }
 }
 
 -(void)takeScreenshot {
-  if (self.flashOn && [_arview getCameraPosition] == AVCaptureDevicePositionBack) {
+  if (self.flashOn) {
     Class captureDeviceClass = NSClassFromString(@"AVCaptureDevice");
     if (captureDeviceClass != nil) {
       AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
@@ -158,6 +156,10 @@
   [_arview switchEffectWithSlot:slot path:path];
 }
 
+
+- (void)setFlashOn:(BOOL)flashOn{
+  
+}
 
 #pragma mark - ARViewDelegate methods
 
