@@ -117,9 +117,9 @@ export default class App extends React.Component<any, any> {
         ]
       ).then(result => {
         if (
-          result['android.permission.CAMERA'] === 'granted' &&
-          result['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted' &&
-          result['android.permission.RECORD_AUDIO'] === 'granted') {
+          result['android.permission.CAMERA'].match(/^granted|never_ask_again$/) &&
+          result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/) &&
+          result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) ) {
           this.setState({ permissionsGranted: true, showPermsAlert: false });
         } else {
           this.setState({ permissionsGranted: false, showPermsAlert: true });
@@ -151,13 +151,12 @@ export default class App extends React.Component<any, any> {
     let {...props} = {...this.props};
     delete props.onEventSent;
 
-
     let deepArElement;
     if (Platform.OS === 'android')
-      deepArElement = <DeepARView style={styles.deeparview} onEventSent={this.onEventSent} ref={ ref => this.deepARView = ref }/>
+    deepArElement = <DeepARView style={styles.deeparview} onEventSent={this.onEventSent} ref={ ref => this.deepARView = ref }/>
     else if (Platform.OS === 'ios')
-      deepArElement = <DeepARViewiOS />;
-
+    deepArElement = <DeepARViewiOS />;
+    
     const { permissionsGranted } = this.state;
 
     return (
@@ -227,7 +226,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333'//'moccasin',
   },
   deeparview: {
-    // flex: 1,
+    flex: 1,
     width: 100,//width,
     height: 100,//'100%'
   }

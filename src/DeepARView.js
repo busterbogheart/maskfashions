@@ -46,7 +46,7 @@ export default class DeepARView extends React.Component {
         ref={ ref => this.deepARView = ref }
         {...this.props}  
         onEventSent={onEventSent} 
-        style={{flex:1}} 
+        style={{width:200,height:300}} //flex:1 here? 
       />
     )
   }

@@ -13,8 +13,7 @@
     "core-util-is": "^1.0.2",
     "date-fns": "^2.22.1",
     "react": "16.11.0",
-    "react-native": "0.62.1",
-    "react-native-deepar-module": "file:../react-native-deepar-module"
+    "react-native": "0.62.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -30,9 +29,9 @@
     "metro": "^0.59.0",
     "metro-core": "^0.59.0",
     "metro-react-native-babel-preset": "^0.58.0",
+    "react-native": "0.62.1",
     "react-test-renderer": "16.11.0",
-    "typescript": "^4.3.5",
-    "react-native": "0.62.1"
+    "typescript": "^4.3.5"
   },
   "jest": {
     "preset": "react-native"
