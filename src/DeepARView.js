@@ -1,9 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import {
-  findNodeHandle,
-  requireNativeComponent, UIManager
-} from "react-native";
+import { findNodeHandle, requireNativeComponent, UIManager} from "react-native";
 
 export default class DeepARView extends React.Component {
   constructor(props){
@@ -22,6 +19,7 @@ export default class DeepARView extends React.Component {
   }
 
   switchEffect = (maskName, slot) => {
+    console.log('switcheffect deeparview',this.getDeepARViewHandle());
     UIManager.dispatchViewManagerCommand(
       this.getDeepARViewHandle(),
       UIManager.getViewManagerConfig('DeepARModule').Commands.switchEffect,
@@ -30,6 +28,7 @@ export default class DeepARView extends React.Component {
   }
 
   render() {
+    console.log('render deeparview');
     var onEventSent = (event) => {
       const onEventSentCallback = this.props.onEventSent;
       console.log("RECEIVED message from native", event.nativeEvent, onEventSentCallback);
@@ -43,7 +42,12 @@ export default class DeepARView extends React.Component {
     delete props.onEventSent;
 
     return(
-      <DeepARModule onEventSent={onEventSent} {...this.props} ref={this.deeparref} />
+      <DeepARModule 
+        ref={ ref => this.deepARView = ref }
+        {...this.props}  
+        onEventSent={onEventSent} 
+        style={{flex:1}} 
+      />
     )
   }
 }

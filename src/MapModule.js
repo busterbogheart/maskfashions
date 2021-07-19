@@ -1,11 +1,15 @@
 import React, { Component } from "react";
-import { requireNativeComponent } from "react-native";
-import { View } from "react-native";
+import { Dimensions, requireNativeComponent, View } from "react-native";
 
-const RNTMapComponent = requireNativeComponent('RNTMap', RNTMapView, {});
+const DeepARViewiOS = requireNativeComponent('DeepAR', RNTMapView, {});
 
 export default class RNTMapView extends React.Component{
     render(){
-        return <RNTMapComponent style={{flex:1}} />
+        const {width} = Dimensions.get('window');
+        return (
+        <View style={{backgroundColor:"#000", width:width, flex:1}}>
+            <DeepARViewiOS style={{flex:1}} />
+        </View>
+        )
     }
 }
