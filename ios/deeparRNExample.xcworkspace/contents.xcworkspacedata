@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:deeparRNExample.xcodeproj">
+      location = "group:/Users/ethankemp/maskfashions/maskfashions-rn/ios/maskfashions.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">

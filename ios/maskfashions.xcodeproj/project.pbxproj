@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,8 +13,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		9A476490240D54D700E07300 /* RNTDeepARViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */; };
 		9A476493240D552100E07300 /* RNTDeepAR.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A476492240D552100E07300 /* RNTDeepAR.m */; };
-		9A476496240D5E6400E07300 /* DeepAR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A476494240D574B00E07300 /* DeepAR.framework */; };
-		9A476497240D5E6400E07300 /* DeepAR.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A476494240D574B00E07300 /* DeepAR.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A4764C0240E89A200E07300 /* tape_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764AF240E89A200E07300 /* tape_face */; };
 		9A4764C1240E89A200E07300 /* topology in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B0240E89A200E07300 /* topology */; };
 		9A4764C2240E89A200E07300 /* pumpkin in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B1240E89A200E07300 /* pumpkin */; };
@@ -32,17 +30,20 @@
 		9A4764CE240E89A200E07300 /* aviators in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BD240E89A200E07300 /* aviators */; };
 		9A4764CF240E89A200E07300 /* flower_crown in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BE240E89A200E07300 /* flower_crown */; };
 		9A4764D0240E89A200E07300 /* lion in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BF240E89A200E07300 /* lion */; };
-		F64A4285E28C7D90CA231636 /* libPods-deeparRNExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */; };
+		9E595ED79AA2A52DD43D7D92 /* libPods-maskfashions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6962E4594CC60C5584B498DD /* libPods-maskfashions.a */; };
+		D07E470F26A72E2A00D0E9E7 /* DeepAR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07E470E26A72E2A00D0E9E7 /* DeepAR.framework */; };
+		D07E471026A72E2A00D0E9E7 /* DeepAR.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D07E470E26A72E2A00D0E9E7 /* DeepAR.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0B28FAD26A61BB6001BA533 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D0B28FAC26A61BB5001BA533 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9A476498240D5E6400E07300 /* Embed Frameworks */ = {
+		D07E471126A72E2A00D0E9E7 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9A476497240D5E6400E07300 /* DeepAR.framework in Embed Frameworks */,
+				D07E471026A72E2A00D0E9E7 /* DeepAR.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,7 +55,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* deeparRNExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = deeparRNExampleTests.m; sourceTree = "<group>"; };
 		03C1A6FF75A359C1ED890996 /* Pods-deeparRNExample-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DeepAR RN Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Mask Fashions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mask Fashions.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = deeparRNExample/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = deeparRNExample/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -64,8 +65,11 @@
 		32EA201765DB0CB20C90D109 /* Pods-deeparRNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExampleTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExampleTests/Pods-deeparRNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		46FFC3B3BEB97C447B660A09 /* Pods-deeparRNExample-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		61448146BD890182BDA32513 /* libPods-deeparRNExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6765C89C2527DF19CDE1D727 /* Pods-maskfashions.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maskfashions.release.xcconfig"; path = "Pods/Target Support Files/Pods-maskfashions/Pods-maskfashions.release.xcconfig"; sourceTree = "<group>"; };
+		6962E4594CC60C5584B498DD /* libPods-maskfashions.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maskfashions.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample/Pods-deeparRNExample.release.xcconfig"; sourceTree = "<group>"; };
 		7AA8FB96774543A76C6318BB /* Pods-deeparRNExample-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		7B68300F7D1265157139E25C /* Pods-maskfashions.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maskfashions.debug.xcconfig"; path = "Pods/Target Support Files/Pods-maskfashions/Pods-maskfashions.debug.xcconfig"; sourceTree = "<group>"; };
 		8202DB50049704C0AA425441 /* Pods-deeparRNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExampleTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExampleTests/Pods-deeparRNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		8642A8BF848F36D583566093 /* libPods-deeparRNExample-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A04F1DB12B231F7A9A51BDF /* libPods-deeparRNExample-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,7 +77,6 @@
 		9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepARViewManager.m; sourceTree = "<group>"; };
 		9A476491240D551100E07300 /* RNTDeepAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTDeepAR.h; sourceTree = "<group>"; };
 		9A476492240D552100E07300 /* RNTDeepAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepAR.m; sourceTree = "<group>"; };
-		9A476494240D574B00E07300 /* DeepAR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DeepAR.framework; sourceTree = "<group>"; };
 		9A4764AF240E89A200E07300 /* tape_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = tape_face; sourceTree = "<group>"; };
 		9A4764B0240E89A200E07300 /* topology */ = {isa = PBXFileReference; lastKnownFileType = text; path = topology; sourceTree = "<group>"; };
 		9A4764B1240E89A200E07300 /* pumpkin */ = {isa = PBXFileReference; lastKnownFileType = text; path = pumpkin; sourceTree = "<group>"; };
@@ -91,9 +94,10 @@
 		9A4764BD240E89A200E07300 /* aviators */ = {isa = PBXFileReference; lastKnownFileType = file; path = aviators; sourceTree = "<group>"; };
 		9A4764BE240E89A200E07300 /* flower_crown */ = {isa = PBXFileReference; lastKnownFileType = text; path = flower_crown; sourceTree = "<group>"; };
 		9A4764BF240E89A200E07300 /* lion */ = {isa = PBXFileReference; lastKnownFileType = text; path = lion; sourceTree = "<group>"; };
-		A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-deeparRNExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D078565A26A245640000F659 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		D078565C26A245AA0000F659 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		D07E470E26A72E2A00D0E9E7 /* DeepAR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DeepAR.framework; sourceTree = "<group>"; };
+		D0B28FAC26A61BB5001BA533 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E268D7AFB3C9CD246118801F /* Pods-deeparRNExample-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -105,8 +109,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F64A4285E28C7D90CA231636 /* libPods-deeparRNExample.a in Frameworks */,
-				9A476496240D5E6400E07300 /* DeepAR.framework in Frameworks */,
+				9E595ED79AA2A52DD43D7D92 /* libPods-maskfashions.a in Frameworks */,
+				D07E470F26A72E2A00D0E9E7 /* DeepAR.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,12 +134,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* deeparRNExample */ = {
+		13B07FAE1A68108700A75B9A /* maskfashions */ = {
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				D0B28FAC26A61BB5001BA533 /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
@@ -145,7 +150,7 @@
 				9A476491240D551100E07300 /* RNTDeepAR.h */,
 				9A476492240D552100E07300 /* RNTDeepAR.m */,
 			);
-			name = deeparRNExample;
+			name = maskfashions;
 			sourceTree = "<group>";
 		};
 		234E91298EA77127B4900F27 /* Pods */ = {
@@ -159,6 +164,8 @@
 				03C1A6FF75A359C1ED890996 /* Pods-deeparRNExample-tvOSTests.release.xcconfig */,
 				32EA201765DB0CB20C90D109 /* Pods-deeparRNExampleTests.debug.xcconfig */,
 				8202DB50049704C0AA425441 /* Pods-deeparRNExampleTests.release.xcconfig */,
+				7B68300F7D1265157139E25C /* Pods-maskfashions.debug.xcconfig */,
+				6765C89C2527DF19CDE1D727 /* Pods-maskfashions.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -166,14 +173,15 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D07E470E26A72E2A00D0E9E7 /* DeepAR.framework */,
 				D078565C26A245AA0000F659 /* CoreServices.framework */,
 				D078565A26A245640000F659 /* libswiftWebKit.tbd */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				A91440B24BC2C7C9F8CE07DC /* libPods-deeparRNExample.a */,
 				8642A8BF848F36D583566093 /* libPods-deeparRNExample-tvOS.a */,
 				9A04F1DB12B231F7A9A51BDF /* libPods-deeparRNExample-tvOSTests.a */,
 				61448146BD890182BDA32513 /* libPods-deeparRNExampleTests.a */,
+				6962E4594CC60C5584B498DD /* libPods-maskfashions.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -189,8 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				9A4764AE240E89A200E07300 /* effects */,
-				9A476494240D574B00E07300 /* DeepAR.framework */,
-				13B07FAE1A68108700A75B9A /* deeparRNExample */,
+				13B07FAE1A68108700A75B9A /* maskfashions */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* deeparRNExampleTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -205,7 +212,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */,
+				13B07F961A680F5B00A75B9A /* Mask Fashions.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -238,9 +245,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* deeparRNExample */ = {
+		13B07F861A680F5B00A75B9A /* maskfashions */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "deeparRNExample" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "maskfashions" */;
 			buildPhases = (
 				003CDCD62E906F12C1DA007F /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -248,15 +255,16 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				9A476498240D5E6400E07300 /* Embed Frameworks */,
+				BA73784209927AFBF45B0F52 /* [CP] Copy Pods Resources */,
+				D07E471126A72E2A00D0E9E7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = deeparRNExample;
+			name = maskfashions;
 			productName = deeparRNExample;
-			productReference = 13B07F961A680F5B00A75B9A /* DeepAR RN Example.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Mask Fashions.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -267,14 +275,9 @@
 			attributes = {
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Facebook;
-				TargetAttributes = {
-					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = HAA6PX3CPR;
-					};
-				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "deeparRNExample" */;
-			compatibilityVersion = "Xcode 3.2";
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "maskfashions" */;
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -287,7 +290,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* deeparRNExample */,
+				13B07F861A680F5B00A75B9A /* maskfashions */,
 			);
 		};
 /* End PBXProject section */
@@ -314,6 +317,7 @@
 				9A4764C6240E89A200E07300 /* fairy_lights in Resources */,
 				9A4764CF240E89A200E07300 /* flower_crown in Resources */,
 				9A4764C4240E89A200E07300 /* frankenstein in Resources */,
+				D0B28FAD26A61BB6001BA533 /* GoogleService-Info.plist in Resources */,
 				9A4764D0240E89A200E07300 /* lion in Resources */,
 				9A4764CA240E89A200E07300 /* ball_face in Resources */,
 			);
@@ -333,7 +337,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-deeparRNExample-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-maskfashions-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -353,6 +357,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		BA73784209927AFBF45B0F52 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-maskfashions/Pods-maskfashions-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-maskfashions/Pods-maskfashions-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-maskfashions/Pods-maskfashions-resources.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -400,7 +421,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FDA6A134E236DD8BF2B8EABD /* Pods-deeparRNExample.debug.xcconfig */;
+			baseConfigurationReference = 7B68300F7D1265157139E25C /* Pods-maskfashions.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
@@ -412,7 +433,10 @@
 				);
 				INFOPLIST_FILE = deeparRNExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
@@ -423,7 +447,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
-				PRODUCT_NAME = "DeepAR RN Example";
+				PRODUCT_NAME = "Mask Fashions";
 				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -431,18 +455,21 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */;
+			baseConfigurationReference = 6765C89C2527DF19CDE1D727 /* Pods-maskfashions.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 339454YJJ4;
+				DEVELOPMENT_TEAM = HAA6PX3CPR;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = deeparRNExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
@@ -453,7 +480,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
-				PRODUCT_NAME = "DeepAR RN Example";
+				PRODUCT_NAME = "Mask Fashions";
 				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -561,7 +588,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "deeparRNExample" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "maskfashions" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -570,7 +597,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "deeparRNExample" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "maskfashions" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
