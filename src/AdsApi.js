@@ -11,7 +11,7 @@ export default class AdsApi {
             for (const k in json.data) {
               // const e = new AdItem(json.data[k]);
             }
-            console.log(JSON.stringify(json,2));
+            console.log(JSON.stringify(json));
           })
           .catch((err) => console.warn(err));
       }

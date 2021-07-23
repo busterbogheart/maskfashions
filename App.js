@@ -1,13 +1,15 @@
 "use strict";
 
 import React from 'react';
-import { StyleSheet, Text, View, Button, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
+import { StyleSheet, Linking, Text, View, Button, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
 import DeepARView from './src/DeepARView';
 import DeepARIOS from './src/DeepARIOSView';
 import { AdItem,CampaignAssignment } from './src/AdsApiMapping';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import AdsApi from './src/AdsApi';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 
 
 const items = [
@@ -164,7 +166,6 @@ export default class App extends React.Component {
 
   }
 
-
   selectItem = (selectedItems) => {
     this.setState({ selectedItems });
   };
@@ -192,10 +193,11 @@ export default class App extends React.Component {
     
     const { permissionsGranted } = this.state;
 
-    new AdsApi().adApiAditems();
-
     return (
       <SafeAreaView style={styles.container}>
+        
+        <Button title="in app browser" onPress={ () => InAppBrowserWrapper.onLogin() }></Button>
+
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}
           onSelectedItemsChange={this.selectItem}  /> */}
@@ -204,17 +206,20 @@ export default class App extends React.Component {
           <View>{deepArElement}</View> : 
           <Text>permissions not granted</Text> }
 
-        {/* <FlatList 
+
+        <FlatList 
           contentContainerStyle={{alignItems:'center',}} 
           keyExtractor={(item, index) => item.id+item.picUrl}
-          horizontal={true} style={styles.flatlist} data={listData} renderItem={renderItem} /> */}
+          horizontal={true} style={styles.flatlist} data={listData} renderItem={renderItem} />
 
-        {/* <Button title="Load Effect" onPress={ () => this.onChangeEffect() }></Button> */}
 
       </SafeAreaView>
     );
   }
+
 }
+
+
 
 
 let listData = [
