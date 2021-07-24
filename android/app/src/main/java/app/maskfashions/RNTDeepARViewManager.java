@@ -21,6 +21,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
 
     private static final int SWITCH_CAMERA = 1;
     private static final int SWITCH_EFFECT = 3;
+    private static final int SWITCH_TEXTURE = 10;
     private static final int SET_FLASH_ON = 4;
     private static final int PAUSE = 5;
     private static final int RESUME = 6;
@@ -35,7 +36,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
 
     @Override
     protected RNTDeepAR createViewInstance(ThemedReactContext reactContext) {
-        Log.w("DEEPAR","createviewinstance rntdeepar");
+        Log.w(RNTDeepAR.LOG,"createviewinstance rntdeepar");
         return new RNTDeepAR(reactContext);
     }
 
@@ -47,6 +48,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
               {
                   put("switchCamera", SWITCH_CAMERA );
                   put("switchEffect", SWITCH_EFFECT);
+                  put("switchTexture", SWITCH_TEXTURE);
                   put("setFlashOn", SET_FLASH_ON);
                   put("pause", PAUSE);
                   put("resume", RESUME);
@@ -58,7 +60,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
     }
 
     public void receiveCommand(RNTDeepAR deepARView, int commandId, @Nullable ReadableArray args) {
-      Log.w("DEEPAR", "receivecommand: "+commandId);
+      Log.w(RNTDeepAR.LOG, "receivecommand: "+commandId);
         Assertions.assertNotNull(deepARView);
         switch (commandId) {
             case SWITCH_CAMERA: {
@@ -73,7 +75,17 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
                 }
                 return;
             }
-
+            case SWITCH_TEXTURE: {
+                if (args != null) {
+                    String texture = args.getString(0);
+                    try{
+                        deepARView.switchTexture(texture);
+                    } catch (Exception e){
+                        Log.e(RNTDeepAR.LOG,"whoa: couldn't get texture at "+texture+" ... err: "+e.toString());
+                    }
+                }
+                return;
+            }
             case SET_FLASH_ON: {
                 if (args != null) {
                     boolean isFlashOn = args.getBoolean(0);

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.media.Image;
 import android.os.Environment;
@@ -25,6 +26,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,10 +38,12 @@ import ai.deepar.ar.ARErrorType;
 import ai.deepar.ar.AREventListener;
 import ai.deepar.ar.CameraResolutionPreset;
 import ai.deepar.ar.DeepAR;
+import cz.msebera.android.httpclient.Header;
 
 public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHolder.Callback, LifecycleObserver {
 
     private static final String TAG = "RNTDeepAR";
+    public static final String LOG = "DEEPAR";
     private DeepAR deepAr;
     private CameraGrabber cameraGrabber;
     private int defaultCameraDevice = Camera.CameraInfo.CAMERA_FACING_FRONT;
@@ -63,7 +68,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
   @Override
   public void error(ARErrorType arErrorType, String s) {
     //TODO: implement error handling
-    Log.e("DEEPAR", s);
+    Log.e(RNTDeepAR.LOG, s);
   }
 
   public RNTDeepAR(Context context) {
@@ -435,5 +440,25 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         }
 
         return tempPath.getAbsolutePath();
+    }
+
+    public void switchTexture(String textureUrl) throws Exception {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(textureUrl, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                if(statusCode == 200){
+                  Bitmap bitmap = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
+                  // 'parameter' varies based on shader's json
+                  deepAr.changeParameterTexture("mask-itself","MeshRenderer",
+                          "s_texDiffuse", bitmap);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e(RNTDeepAR.LOG,"switchTexture failed w "+String.valueOf(statusCode)+", err: "+error.toString());
+            }
+        });
     }
 }

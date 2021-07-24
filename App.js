@@ -94,12 +94,23 @@ export default class App extends React.Component {
       }
   }
 
+  onChangeTexture = () => {
+    console.debug('switch texture');
+    let textureList = [
+      'https://img.freepik.com/free-photo/dark-texture-watercolor_125540-769.jpg?size=626&ext=jpg',
+      "https://en.freejpg.com.ar/asset/900/60/6046/F100006093.jpg",
+      'https://cdn.pixabay.com/photo/2015/12/03/08/50/paper-1074131__480.jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNFrME08yn7jpJvIhsSLpVgHgB1OvIBRiOaoxYC4EzTrT7SPNzFY8g2nRBOqJXt9re-CM16L-CBbKbdg&usqp=CAU',
+    ];
+    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)]);
+  }
+
   onChangeEffect = (direction) => {
     if (!this.deepARView) {
       return
     }
 
-    this.deepARView.switchEffect('aviators');
+    this.deepARView.switchEffect('puma-w-straps');
 
     return;
 
@@ -201,6 +212,7 @@ export default class App extends React.Component {
         <Button title="in app browser" onPress={ () => InAppBrowserWrapper.onLogin() }></Button>
         <Button title="switch camera" onPress={ () => this.switchCamera() }></Button>
         <Button title="switch effect" onPress={ () => this.onChangeEffect() }></Button>
+        <Button title="switch texture" onPress={ () => this.onChangeTexture() }></Button>
 
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}

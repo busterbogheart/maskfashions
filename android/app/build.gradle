@@ -193,6 +193,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation files('lib\\deepar.aar')
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'com.loopj.android:android-async-http:1.4.9'
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

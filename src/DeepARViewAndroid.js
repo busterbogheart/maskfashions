@@ -18,6 +18,14 @@ export default class DeepARViewAndroid extends React.Component {
     );
   }
 
+  switchTexture = (textureUrl) => {
+    UIManager.dispatchViewManagerCommand(
+      this.getDeepARViewHandle(),
+      UIManager.getViewManagerConfig('DeepARModule').Commands.switchTexture,
+      [textureUrl]
+    );
+  }
+
   switchEffect = (maskName, slot) => {
     console.debug('switcheffect deeparview');
     UIManager.dispatchViewManagerCommand(

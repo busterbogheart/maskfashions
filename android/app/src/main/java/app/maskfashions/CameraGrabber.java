@@ -54,7 +54,7 @@ public class CameraGrabber
     public void initCamera(CameraGrabberListener listener) {
         if (mThread == null) {
             mThread = new CameraHandlerThread(listener, width, height, screenOrientation);
-            Log.w("DEEPAR","cam init");
+            Log.w("RNTDeepAR.TAG","cam init");
         }
 
         mThread.listener = listener;
@@ -225,7 +225,7 @@ public class CameraGrabber
                 @Override
                 public void run() {
                     if (camera == null) {
-                      Log.w("DEEPAR", "camera null.");
+                      Log.w("RNTDeepAR.TAG", "camera null.");
                         return;
                     }
                     camera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
@@ -261,7 +261,7 @@ public class CameraGrabber
                 surface = new SurfaceTexture(0);
             }
 
-            Log.w("DEEPAR","new surface texture");
+            Log.w("RNTDeepAR.TAG","new surface texture");
             Camera.CameraInfo info = new Camera.CameraInfo();
             int cameraId = -1;
             int numberOfCameras = Camera.getNumberOfCameras();
@@ -291,7 +291,7 @@ public class CameraGrabber
 
             try {
                 camera = Camera.open(cameraId);
-                Log.w("DEEPAR","camera open");
+                Log.w("RNTDeepAR.TAG","camera open");
             } catch (Exception e) {
                 // event error
                 if (listener != null) {
@@ -371,7 +371,7 @@ public class CameraGrabber
 
             try {
                 camera.setPreviewTexture(surface);
-                Log.w("DEEPAR","Camera set as surface texture");
+                Log.w("RNTDeepAR.TAG","Camera set as surface texture");
             } catch(IOException ioe)  {
                 if (listener != null) {
                     listener.onCameraError("Error setting preview texture.");
@@ -414,7 +414,7 @@ public class CameraGrabber
                 wait();
             }
             catch (InterruptedException e) {
-                Log.w("DEEPAR", "wait was interrupted "+e.getMessage());
+                Log.w("RNTDeepAR.TAG", "wait was interrupted "+e.getMessage());
             }
         }
 
