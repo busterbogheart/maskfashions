@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, Linking, Text, View, Button, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
-import DeepARView from './src/DeepARView';
+import DeepARViewAndroid from './src/DeepARViewAndroid';
 import DeepARIOS from './src/DeepARIOSView';
 import { AdItem,CampaignAssignment } from './src/AdsApiMapping';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
@@ -50,7 +50,7 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-
+    
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
@@ -59,14 +59,16 @@ export default class App extends React.Component {
       selectedItems: [],
     }
   }
-
+  
   didAppear() {
+    console.debug('didappear');
     if (this.deepARView) {
       this.deepARView.resume();
     }
   }
 
   willDisappear(){
+    console.debug('willdisappear');
     if (this.deepARView) {
       this.deepARView.pause();
     }
@@ -138,6 +140,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    console.debug('componentdidmount');
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -163,7 +166,6 @@ export default class App extends React.Component {
         title: 'Sick Sunnies'
       },
     ];
-
   }
 
   selectItem = (selectedItems) => {
@@ -187,7 +189,7 @@ export default class App extends React.Component {
 
     let deepArElement;
     if (Platform.OS === 'android')
-    deepArElement = <DeepARView style={styles.deeparview} onEventSent={this.onEventSent} ref={ ref => this.deepARView = ref }/>
+    deepArElement = <DeepARViewAndroid style={styles.deeparview} onEventSent={this.onEventSent} ref={ ref => this.deepARView = ref }/>
     else if (Platform.OS === 'ios')
     deepArElement = <DeepARIOS />;
     
@@ -197,6 +199,8 @@ export default class App extends React.Component {
       <SafeAreaView style={styles.container}>
         
         <Button title="in app browser" onPress={ () => InAppBrowserWrapper.onLogin() }></Button>
+        <Button title="switch camera" onPress={ () => this.switchCamera() }></Button>
+        <Button title="switch effect" onPress={ () => this.onChangeEffect() }></Button>
 
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}
@@ -206,12 +210,10 @@ export default class App extends React.Component {
           <View>{deepArElement}</View> : 
           <Text>permissions not granted</Text> }
 
-
         <FlatList 
           contentContainerStyle={{alignItems:'center',}} 
           keyExtractor={(item, index) => item.id+item.picUrl}
           horizontal={true} style={styles.flatlist} data={listData} renderItem={renderItem} />
-
 
       </SafeAreaView>
     );
@@ -257,15 +259,15 @@ let renderItem = ({item, index, sep}) => {
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   flatlist: {
-    height: 200,
+    height: 100,
     flexDirection: 'row',
     backgroundColor: '#666',
-    padding: 20,
+    padding: 10,
     position: 'absolute',
-    bottom: 50,
+    bottom: 10,
   },
   flatlistItem:{
-    padding: 10,
+    padding: 5,
   },
   container: {
     flex: 1,
