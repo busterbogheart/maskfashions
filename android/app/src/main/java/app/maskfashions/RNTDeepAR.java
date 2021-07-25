@@ -407,7 +407,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         File cacheDir = cw.getCacheDir();
         // Create imageDir
         CharSequence now = DateFormat.format("yyyy_MM_dd_hh_mm_ss", new Date());
-        File tempPath=new File(cacheDir,"deepar_" + now +".jpg");
+        File tempPath=new File(cacheDir,"maskfashions_" + now +".jpg");
         if(!tempPath.exists()){
             try {
                 tempPath.createNewFile();
@@ -443,6 +443,16 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
     }
 
     public void switchTexture(String textureUrl) throws Exception {
+        ReactContext rc = (ReactContext) getContext();
+        // /data/user/0/app.maskfashions/files + /textures
+        // need more research on Android filesystem; whether this will change, etc
+        // also how does caching and cache checking factor in
+        String path = rc.getApplicationContext().getFilesDir().getAbsolutePath()+"/textures";
+        Log.w(RNTDeepAR.LOG,"PATH! "+path);
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        // 'parameter' varies based on shader's json
+        deepAr.changeParameterTexture("mask-itself","MeshRenderer",
+                "s_texDiffuse", bitmap);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(textureUrl, new AsyncHttpResponseHandler() {
             @Override

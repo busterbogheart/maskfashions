@@ -10,6 +10,7 @@ import AdsApi from './src/AdsApi';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
+import Share from 'react-native-share';
 
 
 const items = [
@@ -75,6 +76,7 @@ export default class App extends React.Component {
   }
 
   onEventSent = (event) => {
+    console.debug(`event sent from native: ${event.type}`);
       if (event.type === 'cameraSwitch') {
         this.setState({switchCameraInProgress: false})
       } else if (event.type === 'initialized') {
@@ -94,15 +96,17 @@ export default class App extends React.Component {
       }
   }
 
+
+  // CDN urls should be parsed and pre-loaded, then made available to Java and objc on the local filesystem
+  // try https://github.com/itinance/react-native-fs
   onChangeTexture = () => {
-    console.debug('switch texture');
     let textureList = [
-      'https://img.freepik.com/free-photo/dark-texture-watercolor_125540-769.jpg?size=626&ext=jpg',
-      "https://en.freejpg.com.ar/asset/900/60/6046/F100006093.jpg",
-      'https://cdn.pixabay.com/photo/2015/12/03/08/50/paper-1074131__480.jpg',
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNFrME08yn7jpJvIhsSLpVgHgB1OvIBRiOaoxYC4EzTrT7SPNzFY8g2nRBOqJXt9re-CM16L-CBbKbdg&usqp=CAU',
+      {adId: '442', url:'https://img.freepik.com/free-photo/dark-texture-watercolor_125540-769.jpg?size=626&ext=jpg'},
+      {adId: '411', url: "https://en.freejpg.com.ar/asset/900/60/6046/F100006093.jpg"},
+      {adId: '134', url: 'https://cdn.pixabay.com/photo/2015/12/03/08/50/paper-1074131__480.jpg'},
+      {adId: '313', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNFrME08yn7jpJvIhsSLpVgHgB1OvIBRiOaoxYC4EzTrT7SPNzFY8g2nRBOqJXt9re-CM16L-CBbKbdg&usqp=CAU'},
     ];
-    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)]);
+    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)].url);
   }
 
   onChangeEffect = (direction) => {
@@ -138,8 +142,14 @@ export default class App extends React.Component {
 
   screenshotTaken = (screenshotPath) => {
     const path ='file://'+screenshotPath;
-    const transition = slideTransitionDefinition({ isVertical: true, direction: 1, duration: 200 })
-    this.props.push('preview', transition, { screenshotPath: path})
+    console.debug(`screenshot at ${path}`);
+    Share.open({
+      url: path,
+      title: "Share your mask fashion.",      
+      message: 'It\'s a message\n\n',
+    })
+      .then( res => console.debug(res))
+      .catch( err => console.info(err));
   }
 
   switchCamera = () => {
@@ -208,11 +218,11 @@ export default class App extends React.Component {
 
     return (
       <SafeAreaView style={styles.container}>
-        
         <Button title="in app browser" onPress={ () => InAppBrowserWrapper.onLogin() }></Button>
         <Button title="switch camera" onPress={ () => this.switchCamera() }></Button>
         <Button title="switch effect" onPress={ () => this.onChangeEffect() }></Button>
         <Button title="switch texture" onPress={ () => this.onChangeTexture() }></Button>
+        <Button title="capture photo" onPress={ () => this.takeScreenshot() }></Button>
 
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}
@@ -284,12 +294,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: '#333'//'moccasin',
   },
   deeparview: {
     flex: 1,
     width: 100,//width,
-    height: 100,//'100%'
+    height: 100,//'100%',
   }
 });
