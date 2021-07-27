@@ -424,6 +424,8 @@
 			baseConfigurationReference = 7B68300F7D1265157139E25C /* Pods-maskfashions.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = HAA6PX3CPR;
@@ -448,6 +450,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
 				PRODUCT_NAME = "Mask Fashions";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -458,6 +461,8 @@
 			baseConfigurationReference = 6765C89C2527DF19CDE1D727 /* Pods-maskfashions.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HAA6PX3CPR;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -481,6 +486,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.maskfashions;
 				PRODUCT_NAME = "Mask Fashions";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
