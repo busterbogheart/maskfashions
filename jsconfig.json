@@ -1,5 +1,9 @@
 {
     "compilerOptions": {
-        "checkJs": true
-    }
-}
+      "target": "ES6",
+      "module": "commonjs",
+      "allowSyntheticDefaultImports": true,
+      "jsx": "react-native"
+    },
+    "exclude": ["node_modules"]
+  }
