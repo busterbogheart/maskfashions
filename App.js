@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import { StyleSheet, Linking, Text, View, Button, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
+import { StyleSheet, Linking, Text, View, TouchableOpacity, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
 import DeepARViewAndroid from './src/DeepARViewAndroid';
 import DeepARIOS from './src/DeepARIOSView';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
@@ -11,6 +11,7 @@ import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import { AdsApiAdserverOnline } from './src/AdsApiAdserverOnline';
 import AdButler from './src/AdsApiAdButler';
+import MaskedView from '@react-native-masked-view/masked-view';
 
 const items = [
   {
@@ -59,7 +60,7 @@ export default class App extends React.Component {
       selectedItems: [],
     }
   }
-  
+
   didAppear() {
     console.debug('didappear');
     if (this.deepARView) {
@@ -67,7 +68,7 @@ export default class App extends React.Component {
     }
   }
 
-  willDisappear(){
+  willDisappear() {
     console.debug('willdisappear');
     if (this.deepARView) {
       this.deepARView.pause();
@@ -76,35 +77,23 @@ export default class App extends React.Component {
 
   onEventSent = (event) => {
     console.debug(`event sent from native: ${event.type}`);
-      if (event.type === 'cameraSwitch') {
-        this.setState({switchCameraInProgress: false})
-      } else if (event.type === 'initialized') {
-        
-      } else if (event.type === 'didStartVideoRecording') {
-        
-      } else if (event.type === 'didFinishVideoRecording') {
-        
-      } else if (event.type === 'recordingFailedWithError') {
-       
-      } else if(event.type === 'screenshotTaken') {
-        this.screenshotTaken(event.value)
-      } else if (event.type === 'didSwitchEffect') {
-       
-      } else if (event.type === 'imageVisibilityChanged') {
+    if (event.type === 'cameraSwitch') {
+      this.setState({ switchCameraInProgress: false })
+    } else if (event.type === 'initialized') {
 
-      }
-  }
+    } else if (event.type === 'didStartVideoRecording') {
 
-  // CDN urls should be parsed and pre-loaded, then made available to Java and objc on the local filesystem
-  // try https://github.com/itinance/react-native-fs
-  onChangeTexture = () => {
-    let textureList = [
-      {adId: '442', url:'https://img.freepik.com/free-photo/dark-texture-watercolor_125540-769.jpg?size=626&ext=jpg'},
-      {adId: '411', url: "https://en.freejpg.com.ar/asset/900/60/6046/F100006093.jpg"},
-      {adId: '134', url: 'https://cdn.pixabay.com/photo/2015/12/03/08/50/paper-1074131__480.jpg'},
-      {adId: '313', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNFrME08yn7jpJvIhsSLpVgHgB1OvIBRiOaoxYC4EzTrT7SPNzFY8g2nRBOqJXt9re-CM16L-CBbKbdg&usqp=CAU'},
-    ];
-    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)].url);
+    } else if (event.type === 'didFinishVideoRecording') {
+
+    } else if (event.type === 'recordingFailedWithError') {
+
+    } else if (event.type === 'screenshotTaken') {
+      this.screenshotTaken(event.value)
+    } else if (event.type === 'didSwitchEffect') {
+
+    } else if (event.type === 'imageVisibilityChanged') {
+
+    }
   }
 
   onChangeEffect = (direction) => {
@@ -112,13 +101,13 @@ export default class App extends React.Component {
       return
     }
 
-    this.deepARView.switchEffect('puma-w-straps');
+    this.deepARView.switchEffect('mask-08');
 
     return;
 
     const { currentEffectIndex } = this.state
     var newIndex = direction > 0 ? currentEffectIndex + 1 : currentEffectIndex - 1
-    if ( newIndex >= effectsData.length ) {
+    if (newIndex >= effectsData.length) {
       newIndex = 0
     }
     if (newIndex < 0) {
@@ -133,25 +122,25 @@ export default class App extends React.Component {
   }
 
   takeScreenshot = () => {
-    if(this.deepARView) {
+    if (this.deepARView) {
       this.deepARView.takeScreenshot()
     }
   }
 
   screenshotTaken = (screenshotPath) => {
-    const path ='file://'+screenshotPath;
+    const path = 'file://' + screenshotPath;
     console.debug(`screenshot at ${path}`);
     Share.open({
       url: path,
-      title: "Share your mask fashion.",      
+      title: "Share your mask fashion.",
       message: 'It\'s a message\n\n',
     })
-      .then( res => console.debug(res))
-      .catch( err => console.info(err));
+      .then(res => console.debug(res))
+      .catch(err => console.info(err));
   }
 
   switchCamera = () => {
-    const { switchCameraInProgress} = this.state;
+    const { switchCameraInProgress } = this.state;
     if (!switchCameraInProgress && this.deepARView) {
       this.setState({ switchCameraInProgress: true });
       this.deepARView.switchCamera();
@@ -171,7 +160,7 @@ export default class App extends React.Component {
         if (
           result['android.permission.CAMERA'].match(/^granted|never_ask_again$/) &&
           result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/) &&
-          result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) ) {
+          result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/)) {
           this.setState({ permissionsGranted: true, showPermsAlert: false });
         } else {
           this.setState({ permissionsGranted: false, showPermsAlert: true });
@@ -179,20 +168,22 @@ export default class App extends React.Component {
       })
     }
 
-    const effects = [
-      {
-        name: 'aviators',
-        title: 'Sick Sunnies'
-      },
-    ];
-
-    new AdButler();
-
+    // new AdButler();
   }
 
   selectItem = (selectedItems) => {
     this.setState({ selectedItems });
   };
+
+  // CDN urls should be parsed and pre-loaded, then made available to Java and objc on the local filesystem
+  // try https://github.com/itinance/react-native-fs
+  onChangeTexture = () => {
+    let textureList = [
+      { adId: '491', url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg' },
+      { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
+    ];
+    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)].url);
+  }
 
   render() {
     console.info('render');
@@ -201,41 +192,48 @@ export default class App extends React.Component {
       const onEventSentCallback = this.props.onEventSent;
       console.log("RECEIVED message from native", event.nativeEvent, onEventSentCallback);
 
-      if(onEventSentCallback) {
+      if (onEventSentCallback) {
         onEventSentCallback(event.nativeEvent);
       }
     }
 
-    let {...props} = {...this.props};
+    let { ...props } = { ...this.props };
     delete props.onEventSent;
 
     let deepArElement;
     if (Platform.OS === 'android')
-    deepArElement = <DeepARViewAndroid style={styles.deeparview} onEventSent={this.onEventSent} ref={ ref => this.deepARView = ref }/>
+      deepArElement = <DeepARViewAndroid style={styles.deeparview} onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
     else if (Platform.OS === 'ios')
-    deepArElement = <DeepARIOS />;
-    
+      deepArElement = <DeepARIOS />;
+
     const { permissionsGranted } = this.state;
 
     return (
       <SafeAreaView style={styles.container}>
-        <Button title="in app browser" onPress={ () => InAppBrowserWrapper.onLogin() }></Button>
-        <Button title="switch camera" onPress={ () => this.switchCamera() }></Button>
-        <Button title="switch effect" onPress={ () => this.onChangeEffect() }></Button>
-        <Button title="switch texture" onPress={ () => this.onChangeTexture() }></Button>
-        <Button title="capture photo" onPress={ () => this.takeScreenshot() }></Button>
+        <TouchableOpacity style={styles.button} onPress={() => InAppBrowserWrapper.onLogin()}>
+          <Text>in app browser</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.onChangeEffect()}>
+          <Text>change mask</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.onChangeTexture()}>
+          <Text>switch texture</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.takeScreenshot()}>
+          <Text>capture photo</Text>
+        </TouchableOpacity>
 
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}
           onSelectedItemsChange={this.selectItem}  /> */}
 
-          {permissionsGranted ? 
-          <View>{deepArElement}</View> : 
-          <Text>permissions not granted</Text> }
+        {permissionsGranted ?
+          <View>{deepArElement}</View> :
+          <Text>permissions not granted</Text>}
 
-        <FlatList 
-          contentContainerStyle={{alignItems:'center',}} 
-          keyExtractor={(item, index) => item.id+item.picUrl}
+        <FlatList
+          contentContainerStyle={{ alignItems: 'center', }}
+          keyExtractor={(item, index) => item.id + item.picUrl}
           horizontal={true} style={styles.flatlist} data={listData} renderItem={renderItem} />
 
       </SafeAreaView>
@@ -243,9 +241,6 @@ export default class App extends React.Component {
   }
 
 }
-
-
-
 
 let listData = [
   {
@@ -268,35 +263,63 @@ let listData = [
     id: 5,
     picUrl: 'https://picsum.photos/100?5',
   },
+  {
+    id: 6,
+    picUrl: 'https://picsum.photos/100?6',
+  },
+  {
+    id: 7,
+    picUrl: 'https://picsum.photos/100?7',
+  },
 ];
-// destructuring the object passed in... to rename use item:myItem.  how to type them though?
-let renderItem = ({item, index, sep}) => {
+
+let renderItem = ({ item, index, sep }) => {
   return (
-  <View key={item.id} style={styles.flatlistItem}>
-    <Text>{item.id}</Text>
-    <Image source={{uri:item.picUrl, cache:"reload"}} style={{width:100,height:100}}   />
-  </View>
+    <MaskedView key={item.id} style={styles.flatlistItem}
+      maskElement={
+        <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+          <Image style={{ width: 100, height: 100 }} source={require('./assets/images/maskmask.png')} ></Image>
+        </View>
+      }>
+      <View style={{ flex: 1, height: '100%', backgroundColor: getRandomColor() }} >
+        <Image style={{width: 100, height: 100}} source={{uri:item.picUrl}} />
+      </View>
+    </MaskedView>
   )
 };
 
+let getRandomColor = () => { return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')'; }
+
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  flatlist: {
-    height: 100,
-    flexDirection: 'row',
-    backgroundColor: '#666',
-    padding: 10,
-    position: 'absolute',
-    bottom: 10,
-  },
-  flatlistItem:{
-    padding: 5,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'stretch',
     backgroundColor: '#333'//'moccasin',
+  },
+  button: {
+    backgroundColor: '#cfc',
+    width: 130,
+    padding: 10,
+    margin: 4,
+    alignItems: 'center',
+  },
+  flatlist: {
+    height: 120,
+    flexDirection: 'row',
+    backgroundColor: '#666',
+    position: 'absolute',
+    bottom: 0,
+  },
+  flatlistItem: {
+    marginRight: 20,
+    height: 100,
+    width: 100,
+    shadowColor: '#444',
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 1,
   },
   deeparview: {
     flex: 1,

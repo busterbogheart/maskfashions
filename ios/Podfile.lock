@@ -241,6 +241,8 @@ PODS:
     - React-cxxreact (= 0.62.1)
     - React-jsi (= 0.62.1)
     - ReactCommon/callinvoker (= 0.62.1)
+  - RNCMaskedView (0.2.6):
+    - React-Core
   - RNInAppBrowser (3.6.3):
     - React-Core
   - RNShare (6.4.0):
@@ -277,6 +279,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -335,6 +338,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-masked-view/masked-view"
   RNInAppBrowser:
     :path: "../node_modules/react-native-inappbrowser-reborn"
   RNShare:
@@ -370,6 +375,7 @@ SPEC CHECKSUMS:
   React-RCTText: 239e040f401505001327a109f9188a4e6dad1bd2
   React-RCTVibration: 072c3b427dd29e730c2ee5bfc509cf5054741a50
   ReactCommon: 3585806280c51d5c2c0d3aa5a99014c3badb629d
+  RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNInAppBrowser: 3ff3a3b8f458aaf25aaee879d057352862edf357
   RNShare: 129b187a54301c9f32ec7249fb4431e30a8d6ab8
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4

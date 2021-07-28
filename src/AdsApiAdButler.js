@@ -3,7 +3,6 @@ import { AdCampaign, AdItem } from "./AdsApiMapping";
 
 export default class AdsApiAdButler {
 
-  #adItemsByCampaign = {};
   #activeAdItems = [];
   #campaignsById = new Map();
 
