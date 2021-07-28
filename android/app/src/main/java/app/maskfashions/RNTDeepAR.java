@@ -89,21 +89,18 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
 
 
     private void init() {
-        Log.w("DEEPAR", "DEEPAR INIT");
+        Log.i(RNTDeepAR.LOG, "DEEPAR INIT");
         View view = inflate(getContext(), R.layout.deeparview, null);
         addView(view);
 
         deepAr = new DeepAR(getContext());
         deepAr.setLicenseKey("fb5b518b5f4fd9e77cb4304abd18c01bb3a5a933fd2ff1c73be5904290d215129a7333eea0d8f49a");
         deepAr.initialize(this.getContext(), this);
-        Log.w("DEEPAR", "OK 2 ");
         setupDeepAR();
-        Log.w("DEEPAR ", "OK 3 ");
 
         if (getActivity() instanceof MainActivity) {
             MainActivity ma = (MainActivity)getActivity();
             ma.setDeepArView(this);
-            Log.w("DEEPAR","got activity: "+ma.toString());
         }
     }
 
@@ -137,14 +134,13 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
 
     private void setupDeepAR() {
         if (started) {
-            Log.w("DEEPAR", "setupdeepar() already started");
+            Log.i(RNTDeepAR.LOG, "setupdeepar() already started");
             return;
         }
 
         started = true;
 
         surface = findViewById(R.id.surface);
-        Log.w("DEEPAR", "surface? "+surface.toString());
         surface.getHolder().addCallback(this);
 
         // Surface might already be initialized, so we force the call to onSurfaceChanged
@@ -160,14 +156,15 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         cameraGrabber.initCamera(new CameraGrabberListener() {
             @Override
             public void onCameraInitialized() {
+                Log.i(RNTDeepAR.LOG, " { oncamerainitialized");
                 cameraGrabber.setFrameReceiver(deepAr);
                 cameraGrabber.startPreview();
-
+                Log.i(RNTDeepAR.LOG, " } oncamerainitialized");
             }
 
             @Override
             public void onCameraError(String errorMsg) {
-                Log.e("DEEPAR", errorMsg);
+                Log.e(RNTDeepAR.LOG, "camera error: "+errorMsg);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Camera error");
@@ -191,7 +188,6 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         Context context = getContext();
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {
-              Log.w("DEEPAR","context: "+context.getPackageName());
               return (Activity)context;
             }
             context = ((ContextWrapper)context).getBaseContext();
@@ -448,7 +444,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         // need more research on Android filesystem; whether this will change, etc
         // also how does caching and cache checking factor in
         String path = rc.getApplicationContext().getFilesDir().getAbsolutePath()+"/textures";
-        Log.w(RNTDeepAR.LOG,"PATH! "+path);
+        Log.i(RNTDeepAR.LOG,"PATH! "+path);
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         // 'parameter' varies based on shader's json
         deepAr.changeParameterTexture("mask-itself","MeshRenderer",

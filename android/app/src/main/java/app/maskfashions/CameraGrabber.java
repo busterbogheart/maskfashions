@@ -48,13 +48,16 @@ public class CameraGrabber
     public void setFrameReceiver(DeepAR receiver) {
         if (mThread != null) {
             mThread.setFrameReceiver(receiver, currentCameraDevice);
+            Log.i(RNTDeepAR.LOG,"frame receiver set, cam: "+currentCameraDevice);
+        } else if(mThread == null) {
+            Log.w(RNTDeepAR.LOG, "frame receiver null in setframereceiver");
         }
     }
 
     public void initCamera(CameraGrabberListener listener) {
         if (mThread == null) {
             mThread = new CameraHandlerThread(listener, width, height, screenOrientation);
-            Log.w("RNTDeepAR.TAG","cam init");
+            Log.i(RNTDeepAR.LOG,"camera mthread init");
         }
 
         mThread.listener = listener;
@@ -67,7 +70,10 @@ public class CameraGrabber
 
     public void startPreview() {
         if (mThread != null && mThread.camera != null) {
+            Log.i(RNTDeepAR.LOG,"starting preview");
             mThread.camera.startPreview();
+        } else if(mThread == null){
+            Log.w(RNTDeepAR.LOG,"thread null");
         }
     }
 
@@ -78,6 +84,7 @@ public class CameraGrabber
     }
 
     public void changeCameraDevice(int cameraDevice, CameraSwitchedListener listener) {
+        Log.i(RNTDeepAR.LOG,"changecameradevice");
         currentCameraDevice = cameraDevice;
         initCamera(new CameraGrabberListener() {
             @Override
@@ -225,7 +232,7 @@ public class CameraGrabber
                 @Override
                 public void run() {
                     if (camera == null) {
-                      Log.w("RNTDeepAR.TAG", "camera null.");
+                      Log.w(RNTDeepAR.LOG, "camera null.");
                         return;
                     }
                     camera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
@@ -235,12 +242,19 @@ public class CameraGrabber
                                 buffers[currentBuffer].position(0);
                                 if (frameReceiver != null) {
                                     frameReceiver.receiveFrame(buffers[currentBuffer],width,height, cameraOrientation,
-                                      cameraDevice == Camera.CameraInfo.CAMERA_FACING_FRONT,DeepARImageFormat.YUV_NV21,1);
+                                      cameraDevice == Camera.CameraInfo.CAMERA_FACING_FRONT,
+                                            DeepARImageFormat.YUV_NV21,1);
+                                } else {
+                                    Log.w(RNTDeepAR.LOG, "framereceiver null inner");
                                 }
                                 currentBuffer = ( currentBuffer + 1 ) % NUMBER_OF_BUFFERS;
+                            } else {
+                                Log.w(RNTDeepAR.LOG, "framereceiver null");
                             }
                             if (camera != null) {
                                 camera.addCallbackBuffer(data);
+                            } else {
+                                Log.w(RNTDeepAR.LOG, "camera null");
                             }
                         }
                     });
@@ -261,10 +275,10 @@ public class CameraGrabber
                 surface = new SurfaceTexture(0);
             }
 
-            Log.w("RNTDeepAR.TAG","new surface texture");
             Camera.CameraInfo info = new Camera.CameraInfo();
             int cameraId = -1;
             int numberOfCameras = Camera.getNumberOfCameras();
+            Log.i(RNTDeepAR.LOG,"found "+numberOfCameras+" cameras");
             for(int i = 0; i < numberOfCameras; i++)
             {
                 Camera.getCameraInfo(i, info);
@@ -285,16 +299,18 @@ public class CameraGrabber
             if(cameraId == -1) {
                 if (listener != null) {
                     listener.onCameraError("Camera not found error.");
+                    Log.w(RNTDeepAR.LOG,"camera not found");
                 }
                 return;
             }
 
             try {
                 camera = Camera.open(cameraId);
-                Log.w("RNTDeepAR.TAG","camera open");
+                Log.i(RNTDeepAR.LOG,"camera open");
             } catch (Exception e) {
                 // event error
                 if (listener != null) {
+                    Log.w(RNTDeepAR.LOG, "camera error, could no open: "+e.toString());
                     listener.onCameraError("Could not open camera device. Could be used by another process.");
                 }
                 return;
@@ -371,10 +387,11 @@ public class CameraGrabber
 
             try {
                 camera.setPreviewTexture(surface);
-                Log.w("RNTDeepAR.TAG","Camera set as surface texture");
+                Log.i(RNTDeepAR.LOG,"Camera set as preview texture");
             } catch(IOException ioe)  {
                 if (listener != null) {
                     listener.onCameraError("Error setting preview texture.");
+                    Log.w(RNTDeepAR.LOG,"error setting preview texture");
                 }
                 return;
             }
@@ -414,7 +431,7 @@ public class CameraGrabber
                 wait();
             }
             catch (InterruptedException e) {
-                Log.w("RNTDeepAR.TAG", "wait was interrupted "+e.getMessage());
+                Log.w(RNTDeepAR.LOG, "camera wait was interrupted: "+e.getMessage());
             }
         }
 

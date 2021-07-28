@@ -36,7 +36,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
 
     @Override
     protected RNTDeepAR createViewInstance(ThemedReactContext reactContext) {
-        Log.w(RNTDeepAR.LOG,"createviewinstance rntdeepar");
+        Log.i(RNTDeepAR.LOG,"createviewinstance rntdeepar");
         return new RNTDeepAR(reactContext);
     }
 
@@ -60,7 +60,7 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
     }
 
     public void receiveCommand(RNTDeepAR deepARView, int commandId, @Nullable ReadableArray args) {
-      Log.w(RNTDeepAR.LOG, "receivecommand: "+commandId);
+      Log.i(RNTDeepAR.LOG, "receivecommand: "+commandId);
         Assertions.assertNotNull(deepARView);
         switch (commandId) {
             case SWITCH_CAMERA: {
