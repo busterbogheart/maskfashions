@@ -1,19 +1,20 @@
 import { isFuture, isPast } from "date-fns";
 import { AdCampaign, AdItem } from "./AdsApiMapping";
 
+//('creatives') //file names, ids, "media_group"? 
+//('campaigns') //all campaigns aka "advertisement" in JSON, gives Advertiser name, id
+//('schedules') //schedules only gives start/end, no link to ads, advertisers
+//('zones') // just gives publisher, metadata
+//('ad-items') // just all creatives and data, no links
 export default class AdsApiAdButler {
 
   #activeAdItems = [];
   #campaignsById = new Map();
+  #apiKeyTest = 'da81d8cf585242c7818d43bdddcd0769';
+  #apiKeyLive = 'b87ea9fb1559cbea91d941f0be63ce9b';
 
   constructor() {
-    this.fetchAll().then( val => {
-          // console.debug(JSON.stringify(this.#activeAdItems,null,2));
-          for (const [k,v] of this.#campaignsById){
-            // console.debug(k)
-            // console.debug(v)
-          }
-    });
+    this.jsonApi_example();
   }
 
   async fetchAll() {
@@ -32,10 +33,6 @@ export default class AdsApiAdButler {
       })
   }
 
-  //('campaigns') //all campaigns aka "advertisement" in JSON, gives Advertiser name, id
-  //('schedules') //schedules only gives start/end, no link to ads, advertisers
-  //('zones') // just gives publisher, metadata
-  //('ad-items') // just all creatives and data, no links
 
   //basically just for getting schedule data
   // this.adsAPI('placements', true, { limit: 9999 })
@@ -67,7 +64,7 @@ export default class AdsApiAdButler {
 
   //wrapper, utility
   async #adbutlerFetch(apiUrl = API_URLS.REST, params = {}, endpoint = '') {
-    const apiKey = 'da81d8cf585242c7818d43bdddcd0769';
+    const apiKey = this.#apiKeyLive;
     console.log(`fetching ${apiUrl} with ${JSON.stringify(params)} to ${endpoint}`);
     if (apiUrl == API_URLS.REST) {
       const data = params ? new URLSearchParams(params) : '';
@@ -113,17 +110,20 @@ export default class AdsApiAdButler {
       .catch((err) => console.warn(err));
   }
 
+  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json
+  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
+  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
+  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=0x0;     setID=491503; type=json //dynamic zone
   jsonApi_example = () => {
+    // each successful call registers an impression
     this.#jsonApi({
-      setID: '491503', //set = zone
+      setID: '491194',
       type: 'json',
       ID: '181925',
-      size: '0x0',
-    })
-      .then(response => response.json())
-      .then(json => console.log(JSON.stringify(json)))
+    }) 
+      .then(response => response.json(), reason => console.warn(reason))
+      .then(json => console.log(JSON.stringify(json,null,1), reason => console.warn(reason)))
       .catch(err => {
-        console.warn("WOOOOPS");
         console.warn(err);
       });
   }

@@ -9,7 +9,6 @@ import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
-import { AdsApiAdserverOnline } from './src/AdsApiAdserverOnline';
 import AdButler from './src/AdsApiAdButler';
 import MaskedView from '@react-native-masked-view/masked-view';
 
@@ -56,7 +55,7 @@ export default class App extends React.Component {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
       displayText: '',
-      currentEffectIndex: 0,
+      currentTexture: 0,
       selectedItems: [],
     }
   }
@@ -105,7 +104,7 @@ export default class App extends React.Component {
 
     return;
 
-    const { currentEffectIndex } = this.state
+    const { currentTexture: currentEffectIndex } = this.state
     var newIndex = direction > 0 ? currentEffectIndex + 1 : currentEffectIndex - 1
     if (newIndex >= effectsData.length) {
       newIndex = 0
@@ -168,7 +167,7 @@ export default class App extends React.Component {
       })
     }
 
-    // new AdButler();
+    new AdButler();
   }
 
   selectItem = (selectedItems) => {
@@ -182,7 +181,9 @@ export default class App extends React.Component {
       { adId: '491', url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg' },
       { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
     ];
-    this.deepARView.switchTexture(textureList[Math.floor(Math.random() * textureList.length)].url);
+    let tex = textureList[this.state.currentTexture];
+    this.state.currentTexture = this.state.currentTexture+1 == textureList.length ? 0 : this.state.currentTexture+1;
+    this.deepARView.switchTexture(tex.url);
   }
 
   render() {
@@ -204,7 +205,7 @@ export default class App extends React.Component {
     if (Platform.OS === 'android')
       deepArElement = <DeepARViewAndroid style={styles.deeparview} onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
     else if (Platform.OS === 'ios')
-      deepArElement = <DeepARIOS />;
+      deepArElement = <DeepARIOS style={styles.deeparview}/>;
 
     const { permissionsGranted } = this.state;
 
@@ -212,6 +213,9 @@ export default class App extends React.Component {
       <SafeAreaView style={styles.container}>
         <TouchableOpacity style={styles.button} onPress={() => InAppBrowserWrapper.onLogin()}>
           <Text>in app browser</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.switchCamera()}>
+          <Text>switch camera</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => this.onChangeEffect()}>
           <Text>change mask</Text>
