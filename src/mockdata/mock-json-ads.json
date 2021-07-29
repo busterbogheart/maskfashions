@@ -1,0 +1,25 @@
+{
+    "status": "SUCCESS",
+    "placements": {
+        "placement_1": {
+            "banner_id": "520458581",
+            "width": "1588",
+            "height": "772",
+            "alt_text": "",
+            "accompanied_html": "",
+            "target": "_blank",
+            "tracking_pixel": "",
+            "body": "",
+            "redirect_url": "https://servedbyadbutler.com/redirect.spark?MID=181925&plid=1556845&setID=491503&channelID=0&CID=566869&banID=520458581&PID=0&textadID=0&tc=1&mt=1627591302407998&spr=1&hc=97bff86843a156d008eccf468102ddbe330ae0f2&location=",
+            "refresh_url": "",
+            "rct": "",
+            "rcb": "",
+            "refresh_time": "",
+            "placement_id": "1556845",
+            "user_frequency_views": "",
+            "user_frequency_start": "",
+            "user_frequency_expiry": "",
+            "image_url": "https://servedbyadbutler.com/getad.img/;libID=3185174"
+        }
+    }
+}
