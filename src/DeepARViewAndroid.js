@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { findNodeHandle, requireNativeComponent, UIManager} from "react-native";
+import { Dimensions, findNodeHandle, requireNativeComponent, UIManager} from "react-native";
 
 export default class DeepARViewAndroid extends React.Component {
   constructor(props){
@@ -103,12 +103,14 @@ export default class DeepARViewAndroid extends React.Component {
     let {...props} = {...this.props};
     delete props.onEventSent;
 
+    const { width } = Dimensions.get('window');
+
     return(
       <DeepARModuleAndroid 
         ref = "deepARView"
         {...this.props}  
         onEventSent={onEventSent} 
-        style={{width:200,height:300}} //flex:1 here? 
+        style={{width:250, height:350}} //flex:1 here? 
       />
     )
   }

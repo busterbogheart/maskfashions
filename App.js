@@ -6,7 +6,6 @@ import DeepARViewAndroid from './src/DeepARViewAndroid';
 import DeepARIOS from './src/DeepARIOSView';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
-import InAppBrowser from 'react-native-inappbrowser-reborn';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
@@ -167,7 +166,7 @@ export default class App extends React.Component {
       })
     }
 
-    new AdButler();
+    // new AdButler();
   }
 
   selectItem = (selectedItems) => {
@@ -182,7 +181,7 @@ export default class App extends React.Component {
       { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
     ];
     let tex = textureList[this.state.currentTexture];
-    this.state.currentTexture = this.state.currentTexture+1 == textureList.length ? 0 : this.state.currentTexture+1;
+    this.state.currentTexture = this.state.currentTexture + 1 == textureList.length ? 0 : this.state.currentTexture + 1;
     this.deepARView.switchTexture(tex.url);
   }
 
@@ -203,42 +202,37 @@ export default class App extends React.Component {
 
     let deepArElement;
     if (Platform.OS === 'android')
-      deepArElement = <DeepARViewAndroid style={styles.deeparview} onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
+      deepArElement = <DeepARViewAndroid onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
     else if (Platform.OS === 'ios')
-      deepArElement = <DeepARIOS style={styles.deeparview}/>;
+      deepArElement = <DeepARIOS />;
 
     const { permissionsGranted } = this.state;
 
     return (
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity style={styles.button} onPress={() => InAppBrowserWrapper.onLogin()}>
-          <Text>in app browser</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => this.switchCamera()}>
-          <Text>switch camera</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => this.onChangeEffect()}>
-          <Text>change mask</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => this.onChangeTexture()}>
-          <Text>switch texture</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => this.takeScreenshot()}>
-          <Text>capture photo</Text>
-        </TouchableOpacity>
+        {permissionsGranted ?
+        <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
+        <Text>permissions not granted</Text>}
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => InAppBrowserWrapper.onLogin()}><Text>in app browser</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => this.switchCamera()}><Text>switch camera</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => this.onChangeEffect()}><Text>change mask</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => this.onChangeTexture()}><Text>switch texture</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => this.takeScreenshot()}><Text>take photo</Text></TouchableOpacity>
+        </View>
 
         {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
          items={items} uniqueKey="id" IconRenderer={Icon}
           onSelectedItemsChange={this.selectItem}  /> */}
 
-        {permissionsGranted ?
-          <View>{deepArElement}</View> :
-          <Text>permissions not granted</Text>}
+        <View style={styles.flatlist}>
+          <FlatList
+            contentContainerStyle={{ alignItems: 'center', }}
+            keyExtractor={(item, index) => item.id + item.picUrl}
+            horizontal={true} data={listData} renderItem={renderItem} />
+        </View>
 
-        <FlatList
-          contentContainerStyle={{ alignItems: 'center', }}
-          keyExtractor={(item, index) => item.id + item.picUrl}
-          horizontal={true} style={styles.flatlist} data={listData} renderItem={renderItem} />
 
       </SafeAreaView>
     );
@@ -286,7 +280,7 @@ let renderItem = ({ item, index, sep }) => {
         </View>
       }>
       <View style={{ flex: 1, height: '100%', backgroundColor: getRandomColor() }} >
-        <Image style={{width: 100, height: 100}} source={{uri:item.picUrl}} />
+        <Image style={{ width: 100, height: 100 }} source={{ uri: item.picUrl }} />
       </View>
     </MaskedView>
   )
@@ -298,32 +292,36 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
+    flexDirection: 'column',
+    // alignContent: 'flex-end', //cross axis with flexWrap on, overrides alignContent of parent
+    // flexWrap: 'wrap',
+    justifyContent: 'flex-end',   // main axis
+    alignItems: 'center', // cross axis
     backgroundColor: '#333'//'moccasin',
   },
+  buttonContainer:{
+    height: 200,
+    flexWrap: 'wrap',  //set on container,
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignSelf: 'stretch', // overrides parent's alignItems
+  },
   button: {
-    backgroundColor: '#cfc',
+    backgroundColor: '#cfe',
     width: 130,
     padding: 10,
     margin: 4,
     alignItems: 'center',
   },
   flatlist: {
-    height: 120,
+    height: 110,
     flexDirection: 'row',
     backgroundColor: '#666',
-    position: 'absolute',
-    bottom: 0,
   },
   flatlistItem: {
     marginRight: 20,
     height: 100,
     width: 100,
-    shadowColor: '#444',
-    shadowRadius: 10,
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 1,
   },
   deeparview: {
     flex: 1,
