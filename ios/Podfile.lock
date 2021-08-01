@@ -245,7 +245,7 @@ PODS:
     - React-Core
   - RNInAppBrowser (3.6.3):
     - React-Core
-  - RNShare (6.4.0):
+  - RNShare (6.5.0):
     - React-Core
   - RNVectorIcons (8.1.0):
     - React-Core
@@ -377,10 +377,10 @@ SPEC CHECKSUMS:
   ReactCommon: 3585806280c51d5c2c0d3aa5a99014c3badb629d
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNInAppBrowser: 3ff3a3b8f458aaf25aaee879d057352862edf357
-  RNShare: 129b187a54301c9f32ec7249fb4431e30a8d6ab8
+  RNShare: 047d42214f875d731bde73a2b67418638af85ad9
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   Yoga: 50fb6eb13d2152e7363293ff603385db380815b1
 
-PODFILE CHECKSUM: 9bf49b00aed85fa1d2dc20a162118902d82d1c9c
+PODFILE CHECKSUM: 9aac7492744fec454e88d8f727aaffaeb4a9c1f2
 
 COCOAPODS: 1.10.1

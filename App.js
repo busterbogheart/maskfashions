@@ -1,49 +1,15 @@
 "use strict";
 
 import React from 'react';
-import { StyleSheet, Linking, Text, View, TouchableOpacity, PermissionsAndroid, Dimensions, Platform, AppState, SafeAreaView, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, PermissionsAndroid, Dimensions, Platform, SafeAreaView, FlatList, Image } from 'react-native';
 import DeepARViewAndroid from './src/DeepARViewAndroid';
 import DeepARIOS from './src/DeepARIOSView';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import MaskedView from '@react-native-masked-view/masked-view';
-
-const items = [
-  {
-    name: 'Fruits',
-    id: 0,
-    // these are the children or 'sub items'
-    children: [
-      {
-        name: 'Apple',
-        id: 10,
-      },
-      {
-        name: 'Strawberry',
-        id: 17,
-      },
-      {
-        name: 'Pineapple',
-        id: 13,
-      },
-      {
-        name: 'Banana',
-        id: 14,
-      },
-      {
-        name: 'Watermelon',
-        id: 15,
-      },
-      {
-        name: 'Kiwi fruit',
-        id: 16,
-      },
-    ],
-  },
-];
+import { Button } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/Feather';
 
 export default class App extends React.Component {
 
@@ -169,11 +135,8 @@ export default class App extends React.Component {
     // new AdButler();
   }
 
-  selectItem = (selectedItems) => {
-    this.setState({ selectedItems });
-  };
-
-  // CDN urls should be parsed and pre-loaded, then made available to Java and objc on the local filesystem
+  // CDN urls should be parsed and pre-loaded, then made available to Java and objc
+  // on the local filesystem for the deepar native switchTexture method
   // try https://github.com/itinance/react-native-fs
   onChangeTexture = () => {
     let textureList = [
@@ -214,17 +177,16 @@ export default class App extends React.Component {
         <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
         <Text>permissions not granted</Text>}
 
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => InAppBrowserWrapper.onLogin()}><Text>in app browser</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => this.switchCamera()}><Text>switch camera</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => this.onChangeEffect()}><Text>change mask</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => this.onChangeTexture()}><Text>switch texture</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => this.takeScreenshot()}><Text>take photo</Text></TouchableOpacity>
+          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.switchCamera} >change camera</Icon.Button>
+          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={InAppBrowserWrapper.onLogin} >browser</Icon.Button>
+          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.onChangeEffect}>change mask</Icon.Button>
+          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.onChangeTexture}>switch texture</Icon.Button>
+          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.takeScreenshot}>take photo</Icon.Button>
         </View>
 
-        {/* <SectionedMultiSelect styles={{backgroundColor:"#ff0"}} 
-         items={items} uniqueKey="id" IconRenderer={Icon}
-          onSelectedItemsChange={this.selectItem}  /> */}
+        {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
 
         <View style={styles.flatlist}>
           <FlatList
@@ -233,60 +195,33 @@ export default class App extends React.Component {
             horizontal={true} data={listData} renderItem={renderItem} />
         </View>
 
-
       </SafeAreaView>
     );
   }
 
 }
 
-let listData = [
-  {
-    id: 1,
-    picUrl: 'https://picsum.photos/100?',
-  },
-  {
-    id: 2,
-    picUrl: 'https://picsum.photos/100?2',
-  },
-  {
-    id: 3,
-    picUrl: 'https://picsum.photos/100?3',
-  },
-  {
-    id: 4,
-    picUrl: 'https://picsum.photos/100?4',
-  },
-  {
-    id: 5,
-    picUrl: 'https://picsum.photos/100?5',
-  },
-  {
-    id: 6,
-    picUrl: 'https://picsum.photos/100?6',
-  },
-  {
-    id: 7,
-    picUrl: 'https://picsum.photos/100?7',
-  },
-];
+let maskSize = 135;
+
+let listData = new Array(20).fill(null).map(
+  (v,i) => ({key:i, picUrl: `https://picsum.photos/${maskSize}?${i}`})
+);
+console.debug(listData)
 
 let renderItem = ({ item, index, sep }) => {
   return (
-    <MaskedView key={item.id} style={styles.flatlistItem}
+    <MaskedView key={item.key} style={styles.flatlistItem}
       maskElement={
         <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-          <Image style={{ width: 100, height: 100 }} source={require('./assets/images/maskmask.png')} ></Image>
+          <Image style={{ width: maskSize, height: maskSize }} source={require('./assets/images/maskmask.png')} ></Image>
         </View>
       }>
-      <View style={{ flex: 1, height: '100%', backgroundColor: getRandomColor() }} >
-        <Image style={{ width: 100, height: 100 }} source={{ uri: item.picUrl }} />
+      <View style={{ flex: 1, height: '100%', }} >
+        <Image style={{ width: maskSize, height: maskSize, }} source={{ uri: item.picUrl }} />
       </View>
     </MaskedView>
   )
 };
-
-let getRandomColor = () => { return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')'; }
 
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -297,35 +232,31 @@ const styles = StyleSheet.create({
     // flexWrap: 'wrap',
     justifyContent: 'flex-end',   // main axis
     alignItems: 'center', // cross axis
-    backgroundColor: '#333'//'moccasin',
+    backgroundColor: '#aaa',
   },
   buttonContainer:{
-    height: 200,
+    height: 160,
     flexWrap: 'wrap',  //set on container,
     flexDirection: 'column',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     alignSelf: 'stretch', // overrides parent's alignItems
   },
   button: {
-    backgroundColor: '#cfe',
-    width: 130,
-    padding: 10,
+    width: 160,
+    height: 40,
+    padding: 5,
     margin: 4,
     alignItems: 'center',
   },
   flatlist: {
-    height: 110,
+    height: maskSize - 10,
     flexDirection: 'row',
-    backgroundColor: '#666',
+    backgroundColor: '#ccc',
   },
   flatlistItem: {
-    marginRight: 20,
-    height: 100,
-    width: 100,
+    marginHorizontal: 8,
+    marginBottom: 25,
+    height: maskSize,
+    width: maskSize,
   },
-  deeparview: {
-    flex: 1,
-    width: 100,//width,
-    height: 100,//'100%',
-  }
 });
