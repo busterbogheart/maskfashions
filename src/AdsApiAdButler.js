@@ -14,7 +14,8 @@ export default class AdsApiAdButler {
   #apiKeyLive = 'b87ea9fb1559cbea91d941f0be63ce9b';
 
   constructor() {
-    this.jsonApi_example();
+    // this.jsonApi_example();
+    // this.restAPI_AdItems();
   }
 
   async fetchAll() {
@@ -32,7 +33,6 @@ export default class AdsApiAdButler {
         }
       })
   }
-
 
   //basically just for getting schedule data
   // this.adsAPI('placements', true, { limit: 9999 })
@@ -101,25 +101,25 @@ export default class AdsApiAdButler {
     this.#restAPI('ad-items', true)
       .then(response => response.json())
       .then(json => {
-        // console.log(json.data.length+" ad items fetched");
+        console.log(json.data.length+" ad items fetched");
         for (const k in json.data) {
           // const e = new AdItem(json.data[k]);
         }
-        console.log(JSON.stringify(json));
+        console.log(JSON.stringify(json,null,1));
       })
       .catch((err) => console.warn(err));
   }
 
-  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json
+  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json //standard dynamic w/ Versace
   //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
   //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
   //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=0x0;     setID=491503; type=json //dynamic zone
   jsonApi_example = () => {
     // each successful call registers an impression
     this.#jsonApi({
-      setID: '491194',
-      type: 'json',
-      ID: '181925',
+      setID: '492969',
+      type: 'jsonr', //jsonr for all
+      ID: '181924',
     }) 
       .then(response => response.json(), reason => console.warn(reason))
       .then(json => console.log(JSON.stringify(json,null,1), reason => console.warn(reason)))
