@@ -13,6 +13,7 @@
     "@react-native-masked-view/masked-view": "^0.2.6",
     "core-util-is": "^1.0.2",
     "date-fns": "^2.22.1",
+    "prop-types": "^15.7.2",
     "react": "16.11.0",
     "react-native": "0.62.1",
     "react-native-inappbrowser-reborn": "^3.6.3",

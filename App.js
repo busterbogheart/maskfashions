@@ -1,15 +1,18 @@
 "use strict";
 
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, PermissionsAndroid, Dimensions, Platform, SafeAreaView, FlatList, Image } from 'react-native';
+import { View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image } from 'react-native';
 import DeepARViewAndroid from './src/DeepARViewAndroid';
 import DeepARIOS from './src/DeepARIOSView';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
+import styles from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button } from 'react-native-paper';
+import { Appbar, Button, Divider, Snackbar }  from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
+import { ListContainer } from './src/List';
+import MFDropdown from './src/MFDropdown';
 
 export default class App extends React.Component {
 
@@ -22,6 +25,7 @@ export default class App extends React.Component {
       displayText: '',
       currentTexture: 0,
       selectedItems: [],
+      alertVisible: false,
     }
   }
 
@@ -111,6 +115,10 @@ export default class App extends React.Component {
     }
   }
 
+  showAlert = (text='') => {
+    this.setState({alertVisible:true});
+  }
+
   componentDidMount() {
     console.debug('componentdidmount');
     if (Platform.OS === 'android') {
@@ -160,8 +168,7 @@ export default class App extends React.Component {
       }
     }
 
-    let { ...props } = { ...this.props };
-    delete props.onEventSent;
+    let { ...props } = { ...this.props }; delete props.onEventSent;
 
     let deepArElement;
     if (Platform.OS === 'android')
@@ -171,29 +178,58 @@ export default class App extends React.Component {
 
     const { permissionsGranted } = this.state;
 
+    const MyButton = (props) => {
+      // also can use Icon.Button
+      return <Button style={styles.button} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
+        {props.text}
+      </Button>
+    };
+    const data = [
+      {label:'caqqqw', value:'1'},
+      {label:'few', value:'2'},
+      {label:'fcweeeeeeee q', value:'3'},
+      {label:'qwdd ', value:'4', custom: <Icon name='cpu' /> },
+      {label:'eeq eqw', value:'5', custom: <Icon name='box' /> },
+    ];
+
     return (
       <SafeAreaView style={styles.container}>
-        {permissionsGranted ?
-        <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
-        <Text>permissions not granted</Text>}
+        <Snackbar 
+          visible={this.state.alertVisible}  duration={2000}
+          onDismiss={()=>{console.debug('dismiss?'); this.setState({alertVisible:false})}} 
+          // action={{label:'',onPress:()=>{}}} 
+          >this is only a test
+        </Snackbar>
 
+
+        <MFDropdown data={data} ></MFDropdown>
+
+
+        {/* {permissionsGranted ? <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
+        <Text>permissions not granted</Text>} */}
 
         <View style={styles.buttonContainer}>
-          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.switchCamera} >change camera</Icon.Button>
-          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={InAppBrowserWrapper.onLogin} >browser</Icon.Button>
-          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.onChangeEffect}>change mask</Icon.Button>
-          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.onChangeTexture}>switch texture</Icon.Button>
-          <Icon.Button style={styles.button} name='cpu' size={26} backgroundColor='#555' onPress={this.takeScreenshot}>take photo</Icon.Button>
+          <MyButton iconName='camera' text='camera' onPress={this.switchCamera} />
+          <MyButton iconName='external-link' text='browser' onPress={InAppBrowserWrapper.onLogin} />
+          <MyButton iconName='anchor' text='change mask' onPress={this.onChangeEffect} />
+          <MyButton iconName='activity' text='change texture' onPress={this.onChangeTexture} />
+          <MyButton iconName='maximize' text='screenshot' onPress={this.takeScreenshot} />
+          <MyButton iconName='gift' text='alert' onPress={this.showAlert} />
         </View>
 
-        {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
-
-        <View style={styles.flatlist}>
+        <View style={styles.flatlist(maskSize)}>
           <FlatList
             contentContainerStyle={{ alignItems: 'center', }}
             keyExtractor={(item, index) => item.id + item.picUrl}
             horizontal={true} data={listData} renderItem={renderItem} />
         </View>
+
+
+        {/* <Appbar style={styles.appbar}>
+          <Appbar.Action icon='book-open' onPress={()=>{}} />
+        </Appbar> */}
+
+        {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
 
       </SafeAreaView>
     );
@@ -206,11 +242,10 @@ let maskSize = 135;
 let listData = new Array(20).fill(null).map(
   (v,i) => ({key:i, picUrl: `https://picsum.photos/${maskSize}?${i}`})
 );
-console.debug(listData)
 
 let renderItem = ({ item, index, sep }) => {
   return (
-    <MaskedView key={item.key} style={styles.flatlistItem}
+    <MaskedView key={item.key} style={styles.flatlistItem(maskSize)}
       maskElement={
         <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
           <Image style={{ width: maskSize, height: maskSize }} source={require('./assets/images/maskmask.png')} ></Image>
@@ -222,41 +257,3 @@ let renderItem = ({ item, index, sep }) => {
     </MaskedView>
   )
 };
-
-const { width } = Dimensions.get('window');
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    // alignContent: 'flex-end', //cross axis with flexWrap on, overrides alignContent of parent
-    // flexWrap: 'wrap',
-    justifyContent: 'flex-end',   // main axis
-    alignItems: 'center', // cross axis
-    backgroundColor: '#aaa',
-  },
-  buttonContainer:{
-    height: 160,
-    flexWrap: 'wrap',  //set on container,
-    flexDirection: 'column',
-    justifyContent: 'space-evenly',
-    alignSelf: 'stretch', // overrides parent's alignItems
-  },
-  button: {
-    width: 160,
-    height: 40,
-    padding: 5,
-    margin: 4,
-    alignItems: 'center',
-  },
-  flatlist: {
-    height: maskSize - 10,
-    flexDirection: 'row',
-    backgroundColor: '#ccc',
-  },
-  flatlistItem: {
-    marginHorizontal: 8,
-    marginBottom: 25,
-    height: maskSize,
-    width: maskSize,
-  },
-});

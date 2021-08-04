@@ -3,22 +3,27 @@ import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
 import { configureFonts, Provider as Paper } from 'react-native-paper';
-import color from 'color';
+import Feather from 'react-native-vector-icons/Feather';
 
 const theme = {
     dark: false,
     roundness: 4,
     colors: {
+        // most frequent 
         primary: '#ccf',
+        secondary: '#66f',
         accent: '#03dac4',
-        background: '#f6f6f6',
-        surface: 'ghostwhite',
+        background: '#f0f0e6',
+        // drop down bg
+        surface: '#caf',
         error: '#B00020',
-        text: 'rebeccapurple',
-        onSurface: '#000000',
-        disabled: color('#000').alpha(0.26).rgb().string(),
-        placeholder: color('#000').alpha(0.54).rgb().string(),
-        backdrop: color('#000').alpha(0.5).rgb().string(),
+        onPrimary: '#ccf7',
+        onSurface: '#ffa',
+        text: '#444',
+        // alerts
+        disabled: '#777',
+        placeholder: '#777',
+        backdrop: '#8f8',
         notification: '#ca5',
     },
     fonts: configureFonts(),
@@ -29,7 +34,11 @@ const theme = {
 
 export default function Main() {
     return (
-        <Paper theme={theme}><App /></Paper>
+        <Paper 
+            settings={{icon: props => <Feather {...props}/>}} 
+            theme={theme}>
+            <App />
+        </Paper>
     );
 }
 
