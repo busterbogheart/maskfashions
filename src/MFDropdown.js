@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Button, IconButton } from "react-native-paper";
 import DropDown from "./components/DropDown";
 
@@ -15,15 +15,15 @@ export default class MFDropdown extends Component {
 
     render() {
         return (
-            <View style={{ flexDirection: 'row', justifyContent:'center', width:300, alignItems:'stretch', backgroundColor: '#fff'}}>
+            <View style={{ flexDirection: 'row', justifyContent:'center', 
+                alignItems:'stretch', backgroundColor: 'transparent'}}>
                 <DropDown
-                    inputProps={{ style: { backgroundColor: '#ffc'} }}
+                    inputProps={{ style: { backgroundColor: '#ffc', width:200, height:40} }}
                     // dropDownContainerHeight={400}
                     dropDownItemSelectedStyle={{backgroundColor:'#ffffff44'}}
                     dropDownStyle={{ backgroundColor: 'transparent',}}
                     dropDownItemStyle={{ backgroundColor: 'transparent', }}
                     dropDownItemTextStyle={{ color: '#000', }}
-                    menuStyles={{backgroundColor:'#90f', width:200}}
                     activeColor='#00f' 
                     label='categories.'
                     mode='outlined'
@@ -43,7 +43,8 @@ export default class MFDropdown extends Component {
                     }}
                     multiSelect
                 />
-                <Button onPress={()=>{this.setState({selectedValues:'',showDropDown:false})}} icon='x-circle' style={{width:40,height:40,position:'absolute'}} color='#020' />
+                <IconButton size={26} onPress={()=>{this.setState({selectedValues:'',showDropDown:false})}} icon='x-circle' 
+                    style={{}} color='#020' />
             </View>
         )
 
