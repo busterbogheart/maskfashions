@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1002061255353",
+    "firebase_url": "https://mask-fashions-default-rtdb.firebaseio.com",
+    "project_id": "mask-fashions",
+    "storage_bucket": "mask-fashions.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002061255353:android:ab82c0f104e384a439c168",
+        "android_client_info": {
+          "package_name": "app.maskfashions"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002061255353-a34prtdqkglkh29obgtfrm4an3rk2tkm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAUSuaF6bCcYXZbLbBVaddgC67Ko1anYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002061255353-a34prtdqkglkh29obgtfrm4an3rk2tkm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1002061255353-si0nj1sjj12tr1ljha02mmlci1ie3ur8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.maskfashions"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
