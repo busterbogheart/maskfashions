@@ -9,10 +9,11 @@ import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import styles from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Appbar, Button, Divider, Snackbar }  from 'react-native-paper';
+import { Button, Snackbar }  from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
-import { ListContainer } from './src/List';
 import MFDropdown from './src/MFDropdown';
+import DeviceInfo from 'react-native-device-info';
+import firestore from '@react-native-firebase/firestore';
 
 export default class App extends React.Component {
 
@@ -140,10 +141,37 @@ export default class App extends React.Component {
       })
     }
 
-    // new AdButler();
+    //new AdButler();
+    const userId = this.setupUserId(); 
+    this.firebaseUserInfo(userId);
+    //adItems();
+    //preloadAdItemImages();
+    //adItemTagSchema();
+
+    const adData = [
+      {bannerId:555225, creative_url:'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg',},
+      {bannerId:442225, creative_url:'https://servedbyadbutler.com/getad.img/;libID=3185174',},
+      {bannerId:742110, creative_url:'https://servedbyadbutler.com/getad.img/;libID=3185097',},
+      {bannerId:844044, creative_url:'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg',},
+    ];
+
   }
 
-  // CDN urls should be parsed and pre-loaded, then made available to Java and objc
+  setupUserId = () => {
+    // check local first
+    const userId = DeviceInfo.getUniqueId();
+    console.log(`userId from ${Platform.OS} device`,userId);
+
+    return userId;
+  }
+
+  firebaseUserInfo = (userId) => {
+    const user = firestore().collection('users').doc(userId);
+    console.log(`user?`,user);
+  }
+  
+
+  // CDN urls should be parsed and pre-loaded, then also made available to Java and objc
   // on the local filesystem for the deepar native switchTexture method
   // try https://github.com/itinance/react-native-fs
   onChangeTexture = () => {
@@ -184,6 +212,7 @@ export default class App extends React.Component {
         {props.text}
       </Button>
     };
+
     const data = [
       {label:'caqqqw', value:'1'},
       {label:'few', value:'2'},
@@ -201,10 +230,6 @@ export default class App extends React.Component {
           >this is only a test
         </Snackbar>
 
-
-        <MFDropdown data={data} ></MFDropdown>
-
-
         {/* {permissionsGranted ? <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
         <Text>permissions not granted</Text>} */}
 
@@ -216,6 +241,8 @@ export default class App extends React.Component {
           <MyButton iconName='maximize' text='screenshot' onPress={this.takeScreenshot} />
           <MyButton iconName='gift' text='alert' onPress={this.showAlert} />
         </View>
+
+        <MFDropdown data={data} ></MFDropdown>
 
         <View style={styles.flatlist(maskSize)}>
           <FlatList
