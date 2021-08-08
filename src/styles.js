@@ -28,11 +28,11 @@ export default StyleSheet.create({
     // alignSelf: 'stretch', // overrides parent's alignItems
   },
   button: {
-    width: 120,
-    height: 34,
+    width: 110,
+    height: 30,
     paddingVertical: 0,
-    margin: 3,
-    alignItems: 'flex-start',
+    margin: 5,
+    alignItems: 'center',
   },
   maskScroll: (maskSize='') => ({
     height: maskSize - 10,

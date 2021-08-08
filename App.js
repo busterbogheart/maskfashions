@@ -12,7 +12,8 @@ import { Button, Snackbar, Appbar, BottomNavigation } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { firebase } from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { differenceInHours, differenceInSeconds } from 'date-fns';
 
@@ -24,13 +25,14 @@ export default class App extends React.Component {
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
-      displayText: '',
       currentTexture: 0,
       selectedItems: [],
       alertVisible: false,
+      userLoggedIn: false,
     }
 
     this.userId = null;
+    this.authUnsub = null;
   }
 
   didAppear() {
@@ -73,7 +75,7 @@ export default class App extends React.Component {
       return
     }
 
-    this.deepARView.switchEffect('aviators','effect');
+    this.deepARView.switchEffect('mask-08','effect');
 
     return;
 
@@ -146,36 +148,89 @@ export default class App extends React.Component {
 
     //new AdButler();
 
-    // userId only necessary for favorites
-    // and auth required for persisting favorite storage
+    this.setupAuthListener();
     this.setupUserLocal().then(
       uid => {
         if (uid != null) {
-          this.userId = uid;
           console.debug(`got user: ${uid}`);
-          // this.firebaseUserInfo(userId);
+          this.userId = uid;
         } else {
           // TODO ??
+          console.warn('uid null from setuplocaluser');
         }
       }, reason => console.warn('failed: ' + reason));
+      
+      //adItems();
+      //preloadAdItemImages();
+      //adItemTagSchema();
+      
+      const adData = [
+        { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
+        { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
+        { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
+        { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
+      ];
+    }
+    
+    // authed user and device unique id required for favorites.  
+    // device unique id not required for auth.
+    // get them separately but ensure both exist later for r/w favorites.
+    checkFavorites = () => {
+      if(this.state.userLoggedIn === false || this.userId == null){
+        console.debug(`checkfavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
+        return;
+      }
 
-    //adItems();
-    //preloadAdItemImages();
-    //adItemTagSchema();
+      console.debug(`checking favs for ${this.userId}`);
+      const favsData = firestore().collection('users').doc(this.userId).get()
+        .then( doc => {
+          console.debug(`favs for ${this.userId}?`);
+          if(doc.exists){
+            console.debug('got user doc', doc.data());
+          } else {
+            //TODO
+            // show tutorial, cta to add
+            console.info('doc no existo for ',this.userId)
+          }
+        })
+        .catch( e => console.warn(`doc get failed for ${this.userId}`,e));
+  }
 
-    const adData = [
-      { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
-      { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
-      { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
-      { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
-    ];
 
+  addToFavorites = () => {
+    if(this.state.userLoggedIn === false || this.userId == null){
+      console.debug(`addtofavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
+      return;
+    }
+
+    console.debug(`setting favorites for ${this.userId}`)
+    const adItemId = String(Math.floor(Math.random()*99999));
+    let userDoc = firestore().collection('users').doc(this.userId);
+    userDoc.get()
+      .then(doc => {
+        // update; will also create favorites field if it doesnt exist
+        if(doc.exists){
+          userDoc.update({
+            favorites: firestore.FieldValue.arrayUnion(adItemId),
+          })
+          .then(()=> console.log('firestore update successful'))
+          .catch( e => console.error(e));
+          // create
+        } else {
+          userDoc.set({
+            favorites: [adItemId],
+          })
+            .then(()=> console.log('firestore set successful'))
+            .catch( e => console.error(e));
+        }
+      })
+      .catch( e => console.error(e));
   }
 
   setupUserLocal = async () => {
-    // awaits exit the async function
+    // awaits exit the async function, giving control elsewhere until promise returns
     let userId = await AsyncStorage.getItem('userId')
-    console.log('userId from local ', userId);
+    console.log('userId from local ', userId, `authed? ${this.state.userLoggedIn}`);
     if (userId == null) {
       try {
         userId = DeviceInfo.getUniqueId();
@@ -191,6 +246,7 @@ export default class App extends React.Component {
         }
       }
     }
+    this.userId = userId;
     console.log(`userId from ${Platform.OS} device`, userId);
 
     let lastLogin = await AsyncStorage.getItem('userLastLogin');
@@ -198,7 +254,6 @@ export default class App extends React.Component {
     console.debug('last login from local:', lastLogin, `is first? ${isFirstLogin}`);
 
     if (!isFirstLogin) {
-      // do something with lastLogin date
       let lastLoginDate = new Date(JSON.parse(lastLogin));
       // let hoursSinceLast = differenceInHours(Date.now(), lastLoginDate);
       // console.log(`last login: ${lastLoginDate}, been ${hoursSinceLast}h`);
@@ -222,9 +277,28 @@ export default class App extends React.Component {
     return userId;
   }
 
-  firebaseUserInfo = (userId) => {
-    const user = firestore().collection('users').doc(userId);
-    console.log(`user?`, user);
+  setupAuthListener = () => {
+    // returns unsub function
+    this.authUnsub = firebase.auth().onAuthStateChanged( authUser => {
+      if(this.state.userLoggedIn===true && !authUser){
+        console.debug(`auth state change, logged out`);
+        this.setState({userLoggedIn: false});
+      } else if ( this.state.userLoggedIn===false && authUser){
+        console.debug(`auth state change, logged in:`, authUser);
+        this.setState({userLoggedIn: true});
+      }
+    });
+  }
+
+  loginAnon = () => {
+    console.log('loginanon');
+    firebase.auth().signInAnonymously()
+      .then(()=>{console.debug('user signed in anon')})
+      .catch(e => {
+        console.error('unable to auth anon, trying again',e);
+        firebase.auth().signInAnonymously()
+          .then(()=> console.debug('user signed in anon second time') )
+      });
   }
 
   // CDN urls should be parsed and pre-loaded, then also made available to Java and objc
@@ -260,7 +334,8 @@ export default class App extends React.Component {
 
     const MyButton = (props) => {
       // also can use Icon.Button
-      return <Button style={styles.button} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
+      return <Button 
+        style={[styles.button, props.style]} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
         {props.text}
       </Button>
     };
@@ -294,12 +369,6 @@ export default class App extends React.Component {
       { key: 'ere6', title: 'ert', icon: 'codesandbox' },
     ];
 
-    // let deepArElement;
-    // if (Platform.OS === 'android')
-    //   deepArElement = <DeepARViewAndroid onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />;
-    // else if (Platform.OS === 'ios')
-     const deepArElement = <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />;
-
     return (
       <SafeAreaView style={styles.container}>
 
@@ -323,17 +392,24 @@ export default class App extends React.Component {
 
         <View name="belt nav" style={styles.buttonContainer}>
           <MyButton iconName='camera' text='camera' onPress={this.switchCamera} />
-          <MyButton iconName='external-link' text='browser' onPress={InAppBrowserWrapper.onLogin} />
           <MyButton iconName='anchor' text='change mask' onPress={this.onChangeEffect} />
           <MyButton iconName='activity' text='change texture' onPress={this.onChangeTexture} />
           <MyButton iconName='maximize' text='screenshot' onPress={this.takeScreenshot} />
           <MyButton iconName='gift' text='alert' onPress={this.showAlert} />
+          {this.state.userLoggedIn ? <MyButton style={{backgroundColor:'#aea'}} iconName='thumbs-up' text='authed' onPress={()=>{}} /> 
+          : <MyButton iconName='log-in' text='login' onPress={this.loginAnon} />
+          }
+          <MyButton iconName='heart' text='+fav' onPress={this.addToFavorites} />
+          <MyButton iconName='list' text='view favs' onPress={this.checkFavorites} />
         </View>
 
         {/* <MFDropdown data={data} ></MFDropdown> */}
 
         <View name="DeepAR container" >
-          {permissionsGranted ? deepArElement : <Text>permissions not granted</Text>}
+          {permissionsGranted ? 
+            <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} /> 
+            : 
+            <Text>permissions not granted</Text> }
         </View>
 
         <View name="mask scroll" style={styles.maskScroll(maskSize)}>

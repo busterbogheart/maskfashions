@@ -30,9 +30,11 @@
 		9A4764CE240E89A200E07300 /* aviators in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BD240E89A200E07300 /* aviators */; };
 		9A4764CF240E89A200E07300 /* flower_crown in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BE240E89A200E07300 /* flower_crown */; };
 		9A4764D0240E89A200E07300 /* lion in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BF240E89A200E07300 /* lion */; };
+		A9C4556DF5176AB71DAF2F64 /* libPods-maskfashions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76517B9676D168F3E52BC495 /* libPods-maskfashions.a */; };
 		D02A43FC26B4BA4200F9884D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D02A43FB26B4BA4200F9884D /* GoogleService-Info.plist */; };
 		D075792D26BF4ED700A3ACBB /* DeepAR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D075792B26BF4ED000A3ACBB /* DeepAR.framework */; };
 		D075792E26BF4ED700A3ACBB /* DeepAR.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D075792B26BF4ED000A3ACBB /* DeepAR.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0C440AD26C046C2002B882B /* mask-08 in Resources */ = {isa = PBXBuildFile; fileRef = D0C440AC26C046C2002B882B /* mask-08 */; };
 		D0D8D5B426B7369900E6692A /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D0D8D5B326B7369900E6692A /* fonts */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +67,7 @@
 		46FFC3B3BEB97C447B660A09 /* Pods-deeparRNExample-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		6765C89C2527DF19CDE1D727 /* Pods-maskfashions.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maskfashions.release.xcconfig"; path = "Pods/Target Support Files/Pods-maskfashions/Pods-maskfashions.release.xcconfig"; sourceTree = "<group>"; };
 		6E6B962A9701B4A4B76178D6 /* Pods-deeparRNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample/Pods-deeparRNExample.release.xcconfig"; sourceTree = "<group>"; };
+		76517B9676D168F3E52BC495 /* libPods-maskfashions.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maskfashions.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AA8FB96774543A76C6318BB /* Pods-deeparRNExample-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOS/Pods-deeparRNExample-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		7B68300F7D1265157139E25C /* Pods-maskfashions.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maskfashions.debug.xcconfig"; path = "Pods/Target Support Files/Pods-maskfashions/Pods-maskfashions.debug.xcconfig"; sourceTree = "<group>"; };
 		8202DB50049704C0AA425441 /* Pods-deeparRNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExampleTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExampleTests/Pods-deeparRNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -93,6 +96,7 @@
 		D075792B26BF4ED000A3ACBB /* DeepAR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DeepAR.framework; sourceTree = "<group>"; };
 		D078565A26A245640000F659 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		D078565C26A245AA0000F659 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		D0C440AC26C046C2002B882B /* mask-08 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-08"; sourceTree = "<group>"; };
 		D0D8D5B326B7369900E6692A /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fonts; sourceTree = "<group>"; };
 		D0F7198A26B4C92B00F7C3A4 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		D0F7198C26B4CAE700F7C3A4 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
@@ -121,6 +125,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D075792D26BF4ED700A3ACBB /* DeepAR.framework in Frameworks */,
+				A9C4556DF5176AB71DAF2F64 /* libPods-maskfashions.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +214,7 @@
 				D078565C26A245AA0000F659 /* CoreServices.framework */,
 				D078565A26A245640000F659 /* libswiftWebKit.tbd */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
+				76517B9676D168F3E52BC495 /* libPods-maskfashions.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -249,6 +255,7 @@
 		9A4764AE240E89A200E07300 /* effects */ = {
 			isa = PBXGroup;
 			children = (
+				D0C440AC26C046C2002B882B /* mask-08 */,
 				9A4764AF240E89A200E07300 /* tape_face */,
 				9A4764B0240E89A200E07300 /* topology */,
 				9A4764B1240E89A200E07300 /* pumpkin */,
@@ -342,6 +349,7 @@
 				9A4764C9240E89A200E07300 /* beauty in Resources */,
 				9A4764CE240E89A200E07300 /* aviators in Resources */,
 				9A4764CC240E89A200E07300 /* background_segmentation in Resources */,
+				D0C440AD26C046C2002B882B /* mask-08 in Resources */,
 				9A4764CD240E89A200E07300 /* tiny_sunglasses in Resources */,
 				9A4764CB240E89A200E07300 /* manly_face in Resources */,
 				9A4764C0240E89A200E07300 /* tape_face in Resources */,
