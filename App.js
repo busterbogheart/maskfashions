@@ -73,7 +73,7 @@ export default class App extends React.Component {
       return
     }
 
-    this.deepARView.switchEffect('mask-08');
+    this.deepARView.switchEffect('aviators','effect');
 
     return;
 
