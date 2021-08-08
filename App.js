@@ -1,19 +1,20 @@
 "use strict";
 
 import React from 'react';
-import { View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image } from 'react-native';
-import DeepARViewAndroid from './src/DeepARViewAndroid';
-import DeepARIOS from './src/DeepARIOSView';
+import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions } from 'react-native';
+import DeepARModuleWrapper from './src/DeepARModuleWrapper';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import styles from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button, Snackbar }  from 'react-native-paper';
+import { Button, Snackbar, Appbar, BottomNavigation } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { differenceInHours, differenceInSeconds } from 'date-fns';
 
 export default class App extends React.Component {
 
@@ -28,6 +29,8 @@ export default class App extends React.Component {
       selectedItems: [],
       alertVisible: false,
     }
+
+    this.userId = null;
   }
 
   didAppear() {
@@ -116,8 +119,8 @@ export default class App extends React.Component {
     }
   }
 
-  showAlert = (text='') => {
-    this.setState({alertVisible:true});
+  showAlert = (text = '') => {
+    this.setState({ alertVisible: true });
   }
 
   componentDidMount() {
@@ -142,34 +145,87 @@ export default class App extends React.Component {
     }
 
     //new AdButler();
-    const userId = this.setupUserId(); 
-    this.firebaseUserInfo(userId);
+
+    // userId only necessary for favorites
+    // and auth required for persisting favorite storage
+    this.setupUserLocal().then(
+      uid => {
+        if (uid != null) {
+          this.userId = uid;
+          console.debug(`got user: ${uid}`);
+          // this.firebaseUserInfo(userId);
+        } else {
+          // TODO ??
+        }
+      }, reason => console.warn('failed: ' + reason));
+
     //adItems();
     //preloadAdItemImages();
     //adItemTagSchema();
 
     const adData = [
-      {bannerId:555225, creative_url:'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg',},
-      {bannerId:442225, creative_url:'https://servedbyadbutler.com/getad.img/;libID=3185174',},
-      {bannerId:742110, creative_url:'https://servedbyadbutler.com/getad.img/;libID=3185097',},
-      {bannerId:844044, creative_url:'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg',},
+      { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
+      { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
+      { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
+      { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
     ];
 
   }
 
-  setupUserId = () => {
-    // check local first
-    const userId = DeviceInfo.getUniqueId();
-    console.log(`userId from ${Platform.OS} device`,userId);
+  setupUserLocal = async () => {
+    // awaits exit the async function
+    let userId = await AsyncStorage.getItem('userId')
+    console.log('userId from local ', userId);
+    if (userId == null) {
+      try {
+        userId = DeviceInfo.getUniqueId();
+        console.log('userId from device ', userId);
+        await AsyncStorage.setItem('userId', userId);
+      } catch (e) {
+        console.warn(e);
+        try {
+          userId = DeviceInfo.getUniqueId();
+          await AsyncStorage.setItem('userId', userId);
+        } catch (e) {
+          console.warn('second setItem failed', e);
+        }
+      }
+    }
+    console.log(`userId from ${Platform.OS} device`, userId);
+
+    let lastLogin = await AsyncStorage.getItem('userLastLogin');
+    let isFirstLogin = Boolean(lastLogin) == false;
+    console.debug('last login from local:', lastLogin, `is first? ${isFirstLogin}`);
+
+    if (!isFirstLogin) {
+      // do something with lastLogin date
+      let lastLoginDate = new Date(JSON.parse(lastLogin));
+      // let hoursSinceLast = differenceInHours(Date.now(), lastLoginDate);
+      // console.log(`last login: ${lastLoginDate}, been ${hoursSinceLast}h`);
+      console.log(`last login: ${lastLoginDate}, been ${differenceInSeconds(Date.now(), lastLoginDate)}s`);
+    }
+
+    // record current login for all users
+    let now = JSON.stringify(Date.parse(new Date()));
+    try {
+      await AsyncStorage.setItem('userLastLogin', now);
+    } catch (e) {
+      console.warn(e);
+      // do it again!
+      try {
+        await AsyncStorage.setItem('userLastLogin', now);
+      } catch (e) {
+        console.warn('double failed setItem', e);
+      }
+    }
 
     return userId;
   }
 
   firebaseUserInfo = (userId) => {
     const user = firestore().collection('users').doc(userId);
-    console.log(`user?`,user);
+    console.log(`user?`, user);
   }
-  
 
   // CDN urls should be parsed and pre-loaded, then also made available to Java and objc
   // on the local filesystem for the deepar native switchTexture method
@@ -198,13 +254,9 @@ export default class App extends React.Component {
 
     let { ...props } = { ...this.props }; delete props.onEventSent;
 
-    let deepArElement;
-    if (Platform.OS === 'android')
-      deepArElement = <DeepARViewAndroid onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-    else if (Platform.OS === 'ios')
-      deepArElement = <DeepARIOS />;
 
     const { permissionsGranted } = this.state;
+    const screenWidth =  Dimensions.get('window').width;
 
     const MyButton = (props) => {
       // also can use Icon.Button
@@ -214,26 +266,62 @@ export default class App extends React.Component {
     };
 
     const data = [
-      {label:'caqqqw', value:'1'},
-      {label:'few', value:'2'},
-      {label:'fcweeeeeeee q', value:'3'},
-      {label:'qwdd ', value:'4', custom: <Icon name='cpu' /> },
-      {label:'eeq eqw', value:'5', custom: <Icon name='box' /> },
+      { label: 'caqqqw', value: '1' },
+      { label: 'few', value: '2' },
+      { label: 'fcweeeeeeee q', value: '3' },
+      { label: 'qwdd ', value: '4', custom: <Icon name='cpu' /> },
+      { label: 'eeq eqw', value: '5', custom: <Icon name='box' /> },
     ];
+
+    const routeRandom = () => <Text>random</Text>;
+    const routeFav = () => <Text>fav</Text>;
+    const routePhoto = () => <Text>photo</Text>;
+    const routeClip = () => <Text>clip</Text>;
+    const routeBuy = () => <Text>buy</Text>;
+
+    const bottomNavScene = BottomNavigation.SceneMap({
+      random: routeRandom,
+      fav: routeFav,
+      photo: routePhoto,
+      clip: routeClip,
+      buy: routeBuy,
+    });
+    const bottomNavRoutes = [
+      { key: 'ere1', title: 'ert', icon: 'codesandbox' },
+      { key: 'ere2', title: 'ert', icon: 'codesandbox' },
+      { key: 'ere3', title: 'ert', icon: 'codesandbox' },
+      { key: 'ere5', title: 'ert', icon: 'codesandbox' },
+      { key: 'ere6', title: 'ert', icon: 'codesandbox' },
+    ];
+
+    // let deepArElement;
+    // if (Platform.OS === 'android')
+    //   deepArElement = <DeepARViewAndroid onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />;
+    // else if (Platform.OS === 'ios')
+     const deepArElement = <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />;
 
     return (
       <SafeAreaView style={styles.container}>
+
         <Snackbar 
-          visible={this.state.alertVisible}  duration={2000}
-          onDismiss={()=>{console.debug('dismiss?'); this.setState({alertVisible:false})}} 
-          // action={{label:'',onPress:()=>{}}} 
-          >this is only a test
-        </Snackbar>
+          visible={this.state.alertVisible} duration={2000}
+          onDismiss={() => { console.debug('dismiss?'); this.setState({ alertVisible: false }) }}
+        // action={{label:'',onPress:()=>{}}} 
+        >this is only a test</Snackbar>
 
-        {/* {permissionsGranted ? <View style={{flexDirection:'column',justifyContent:'space-around'}}>{deepArElement}</View> :
-        <Text>permissions not granted</Text>} */}
+        {/* <Appbar style={styles.appbar}>
+          <Appbar.Content title='Mask Fashions' subtitle='have fun. be safe.' />
+          <Appbar.Action icon='video' onPress={() => { }} />
+          <Appbar.Action icon='gift' onPress={() => { }} />
+        </Appbar> */}
 
-        <View style={styles.buttonContainer}>
+        {/* <BottomNavigation
+          renderScene={bottomNavScene}
+          navigationState={ {index:0, routes:bottomNavRoutes} }
+          onIndexChange={(index)=>{}}
+        /> */}
+
+        <View name="belt nav" style={styles.buttonContainer}>
           <MyButton iconName='camera' text='camera' onPress={this.switchCamera} />
           <MyButton iconName='external-link' text='browser' onPress={InAppBrowserWrapper.onLogin} />
           <MyButton iconName='anchor' text='change mask' onPress={this.onChangeEffect} />
@@ -242,19 +330,19 @@ export default class App extends React.Component {
           <MyButton iconName='gift' text='alert' onPress={this.showAlert} />
         </View>
 
-        <MFDropdown data={data} ></MFDropdown>
+        {/* <MFDropdown data={data} ></MFDropdown> */}
 
-        <View style={styles.flatlist(maskSize)}>
+        <View name="DeepAR container" >
+          {permissionsGranted ? deepArElement : <Text>permissions not granted</Text>}
+        </View>
+
+        <View name="mask scroll" style={styles.maskScroll(maskSize)}>
           <FlatList
             contentContainerStyle={{ alignItems: 'center', }}
             keyExtractor={(item, index) => item.id + item.picUrl}
             horizontal={true} data={listData} renderItem={renderItem} />
         </View>
 
-
-        {/* <Appbar style={styles.appbar}>
-          <Appbar.Action icon='book-open' onPress={()=>{}} />
-        </Appbar> */}
 
         {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
 
@@ -267,12 +355,12 @@ export default class App extends React.Component {
 let maskSize = 135;
 
 let listData = new Array(20).fill(null).map(
-  (v,i) => ({key:i, picUrl: `https://picsum.photos/${maskSize}?${i}`})
+  (v, i) => ({ key: i, picUrl: `https://picsum.photos/${maskSize}?${i}` })
 );
 
 let renderItem = ({ item, index, sep }) => {
   return (
-    <MaskedView key={item.key} style={styles.flatlistItem(maskSize)}
+    <MaskedView key={item.key} style={styles.maskScrollItem(maskSize)}
       maskElement={
         <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
           <Image style={{ width: maskSize, height: maskSize }} source={require('./assets/images/maskmask.png')} ></Image>

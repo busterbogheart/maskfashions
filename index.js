@@ -13,7 +13,7 @@ const theme = {
         primary: '#ccf',
         secondary: '#66f',
         accent: '#03dac4',
-        background: '#f0f0e6',
+        background: '#4fc4fc',
         // drop down bg
         surface: '#caf',
         error: '#B00020',

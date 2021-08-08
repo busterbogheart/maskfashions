@@ -1,14 +1,24 @@
 import { Dimensions, StyleSheet } from "react-native";
 
-const { width } = Dimensions.get('window');
+const screenWidth = Dimensions.get('window').width;
 export default StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    // alignContent: 'flex-end', //cross axis with flexWrap on, overrides alignContent of parent
-    justifyContent: 'flex-end',   // main axis
-    alignItems: 'center', // cross axis
-    backgroundColor: '#a3e3eb',
+    // alignContent: 'flex-start', //cross axis with flexWrap on, overrides alignContent of parent
+    justifyContent: 'flex-start',   // children along main axis
+    alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
+    backgroundColor: '#dec',  
+  },
+  deepar : {
+    ...Platform.select({
+      android: {
+        width: 250, height:350
+      },
+      ios: {
+        width: screenWidth, height: 250
+      },
+    })
   },
   buttonContainer:{
     flex: 1,
@@ -18,26 +28,25 @@ export default StyleSheet.create({
     // alignSelf: 'stretch', // overrides parent's alignItems
   },
   button: {
-    width: 140,
+    width: 120,
     height: 34,
     paddingVertical: 0,
     margin: 3,
     alignItems: 'flex-start',
   },
-  flatlist: (maskSize='') => ({
+  maskScroll: (maskSize='') => ({
     height: maskSize - 10,
     flexDirection: 'row',
   }),
-  flatlistItem: (maskSize='') => ({
+  maskScrollItem: (maskSize='') => ({
     marginHorizontal: 8,
     marginBottom: 25,
     height: maskSize,
     width: maskSize,
   }),
   appbar: {
-    // left:0, right:0, bottom:0, position:'absolute',
-    height: 60,
+    height: 40,
     justifyContent: 'space-around',
-    width: width,
+    width: screenWidth,
   }
 });

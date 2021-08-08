@@ -14,7 +14,7 @@
 
 @implementation RNTDeepARViewManager
 
-RCT_EXPORT_MODULE(DeepAR)
+RCT_EXPORT_MODULE(DeepARModule)
 
 - (UIView *)view {
   

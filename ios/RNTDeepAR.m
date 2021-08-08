@@ -8,26 +8,37 @@
 #import <Foundation/Foundation.h>
 #import "RNTDeepAR.h"
 #import "React/UIView+React.h"
+#import <DeepAR/CameraController.h>
 
 @implementation RNTDeepAR {
   CGRect _frame;
   ARView* _arview;
+  CameraController* cameraController;
   UIImageView* _backgroundView;
 }
 
 
 -(instancetype)init {
   if ((self = [super init])) {
-    _arview = [[ARView alloc] init];
+    _arview = [[ARView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     
     // Set your app licence key for iOS project here (created through developer.deepar.ai)
     [_arview setLicenseKey:@"cdc74a8eb2bd4024cddc6b353aa9fe479005dfa6cbb3eac2d617098121ba4e6d1dc20db28378820f"];
     
     _arview.delegate = self;
     [self addSubview:_arview];
+
+    cameraController = [[CameraController alloc] init];
+    cameraController.arview = _arview;
+
+    [_arview initialize];
+    [cameraController startCamera];
+
+//    AVAudioSession *session = [AVAudioSession sharedInstance];
+//    [session setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+
     
-    
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    //    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
   }
   
   return self;
@@ -67,6 +78,7 @@
 }
 
 - (void)reactSetFrame:(CGRect)frame {
+  NSLog(@"setting frame <<<<<<<<<<<<<<<<<");
   [super reactSetFrame: frame];
   _frame = frame;
   [self setupDeepARViewFrame];
@@ -169,6 +181,7 @@
 }
 
 -(void) setupDeepARViewFrame {
+  CGRect mine = _arview.frame;
   if(_arview.initialized && !CGRectIsEmpty(_frame) &&
                             (_arview.frame.size.height != _frame.size.height ||
                              _arview.frame.size.width != _frame.size.width ||
