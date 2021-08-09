@@ -235,7 +235,7 @@
   NSData *data = UIImageJPEGRepresentation(screenshot, 1.0);
   NSFileManager *fileManager = [NSFileManager defaultManager];
   NSString *cachesDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory , NSUserDomainMask, YES) lastObject];
-  NSString *fullPath = [cachesDir stringByAppendingPathComponent:@"temp_screenshot.jpg"];
+  NSString *fullPath = [cachesDir stringByAppendingPathComponent:@"MaskFashions.jpg"];
   [fileManager createFileAtPath:fullPath contents:data attributes:nil];
   
   self.onEventSent(@{ @"type": @"screenshotTaken", @"value": fullPath});

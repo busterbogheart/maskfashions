@@ -4,10 +4,11 @@ import App from './App';
 import { name as appName } from './app.json';
 import { configureFonts, Provider as Paper } from 'react-native-paper';
 import Feather from 'react-native-vector-icons/Feather';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const theme = {
     dark: false,
-    roundness: 4,
+    roundness: 3,
     colors: {
         // most frequent 
         primary: '#ccf',
@@ -18,12 +19,13 @@ const theme = {
         surface: '#caf',
         error: '#B00020',
         onPrimary: '#ccf7',
+        // snackbar bg color
         onSurface: '#ffa',
         text: '#444',
-        // alerts
         disabled: '#777',
         placeholder: '#777',
-        backdrop: '#8f8',
+        // modal bg color
+        backdrop: '#cdc',
         notification: '#ca5',
     },
     fonts: configureFonts(),
@@ -35,7 +37,8 @@ const theme = {
 export default function Main() {
     return (
         <Paper 
-            settings={{icon: props => <Feather {...props}/>}} 
+            // settings={{icon: props => <Feather {...props}/>}} 
+            settings={{icon: props => <MaterialCommunityIcons {...props}/>}} 
             theme={theme}>
             <App />
         </Paper>

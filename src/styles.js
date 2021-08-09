@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
 const screenWidth = Dimensions.get('window').width;
 export default StyleSheet.create({
@@ -6,6 +6,7 @@ export default StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     // alignContent: 'flex-start', //cross axis with flexWrap on, overrides alignContent of parent
+    // alignSelf: 'stretch', // overrides parent's alignItems
     justifyContent: 'flex-start',   // children along main axis
     alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
     backgroundColor: '#dec',  
@@ -21,18 +22,19 @@ export default StyleSheet.create({
     })
   },
   buttonContainer:{
-    flex: 1,
+    flex:1,
     flexWrap: 'wrap',  //set on container,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    // alignSelf: 'stretch', // overrides parent's alignItems
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    top: Platform.OS == 'ios' ? 20 : 0,
+    position: 'absolute',
+    width: screenWidth,
   },
   button: {
-    width: 110,
+    width: 105,
     height: 30,
     paddingVertical: 0,
     margin: 5,
-    alignItems: 'center',
   },
   maskScroll: (maskSize='') => ({
     height: maskSize - 10,

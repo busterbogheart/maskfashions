@@ -8,7 +8,7 @@ import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import styles from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button, Snackbar, Appbar, BottomNavigation } from 'react-native-paper';
+import { Button, Snackbar, Appbar, BottomNavigation, Modal, Portal } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
@@ -16,6 +16,7 @@ import firestore, { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { differenceInHours, differenceInSeconds } from 'date-fns';
+import BeltNav from './src/BeltNav';
 
 export default class App extends React.Component {
 
@@ -28,6 +29,7 @@ export default class App extends React.Component {
       currentTexture: 0,
       selectedItems: [],
       alertVisible: false,
+      modalVisible: false,
       userLoggedIn: false,
     }
 
@@ -75,7 +77,7 @@ export default class App extends React.Component {
       return
     }
 
-    this.deepARView.switchEffect('mask-08','effect');
+    this.deepARView.switchEffect('mask-08', 'effect');
 
     return;
 
@@ -125,6 +127,14 @@ export default class App extends React.Component {
     this.setState({ alertVisible: true });
   }
 
+  showModal = () => {
+    this.setState({ modalVisible: true });
+  }
+
+  hideModal = () => {
+    this.setState({ modalVisible: false });
+  }
+
   componentDidMount() {
     console.debug('componentdidmount');
     if (Platform.OS === 'android') {
@@ -146,7 +156,7 @@ export default class App extends React.Component {
       })
     }
 
-    //new AdButler();
+    // new AdButler();
 
     this.setupAuthListener();
     this.setupUserLocal().then(
@@ -159,72 +169,72 @@ export default class App extends React.Component {
           console.warn('uid null from setuplocaluser');
         }
       }, reason => console.warn('failed: ' + reason));
-      
-      //adItems();
-      //preloadAdItemImages();
-      //adItemTagSchema();
-      
-      const adData = [
-        { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
-        { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
-        { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
-        { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
-      ];
-    }
-    
-    // authed user and device unique id required for favorites.  
-    // device unique id not required for auth.
-    // get them separately but ensure both exist later for r/w favorites.
-    checkFavorites = () => {
-      if(this.state.userLoggedIn === false || this.userId == null){
-        console.debug(`checkfavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
-        return;
-      }
 
-      console.debug(`checking favs for ${this.userId}`);
-      const favsData = firestore().collection('users').doc(this.userId).get()
-        .then( doc => {
-          console.debug(`favs for ${this.userId}?`);
-          if(doc.exists){
-            console.debug('got user doc', doc.data());
-          } else {
-            //TODO
-            // show tutorial, cta to add
-            console.info('doc no existo for ',this.userId)
-          }
-        })
-        .catch( e => console.warn(`doc get failed for ${this.userId}`,e));
+    //adItems();
+    //preloadAdItemImages();
+    //adItemTagSchema();
+
+    const adData = [
+      { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
+      { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
+      { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
+      { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
+    ];
+  }
+
+  // authed user and device unique id required for favorites.  
+  // device unique id not required for auth.
+  // get them separately but ensure both exist later for r/w favorites.
+  checkFavorites = () => {
+    if (this.state.userLoggedIn === false || this.userId == null) {
+      console.debug(`checkfavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
+      return;
+    }
+
+    console.debug(`checking favs for ${this.userId}`);
+    const favsData = firestore().collection('users').doc(this.userId).get()
+      .then(doc => {
+        console.debug(`favs for ${this.userId}?`);
+        if (doc.exists) {
+          console.debug('got user doc', doc.data());
+        } else {
+          //TODO
+          // show tutorial, cta to add
+          console.info('doc no existo for ', this.userId)
+        }
+      })
+      .catch(e => console.warn(`doc get failed for ${this.userId}`, e));
   }
 
 
   addToFavorites = () => {
-    if(this.state.userLoggedIn === false || this.userId == null){
+    if (this.state.userLoggedIn === false || this.userId == null) {
       console.debug(`addtofavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
       return;
     }
 
     console.debug(`setting favorites for ${this.userId}`)
-    const adItemId = String(Math.floor(Math.random()*99999));
+    const adItemId = String(Math.floor(Math.random() * 99999));
     let userDoc = firestore().collection('users').doc(this.userId);
     userDoc.get()
       .then(doc => {
         // update; will also create favorites field if it doesnt exist
-        if(doc.exists){
+        if (doc.exists) {
           userDoc.update({
             favorites: firestore.FieldValue.arrayUnion(adItemId),
           })
-          .then(()=> console.log('firestore update successful'))
-          .catch( e => console.error(e));
+            .then(() => console.log('firestore update successful'))
+            .catch(e => console.error(e));
           // create
         } else {
           userDoc.set({
             favorites: [adItemId],
           })
-            .then(()=> console.log('firestore set successful'))
-            .catch( e => console.error(e));
+            .then(() => console.log('firestore set successful'))
+            .catch(e => console.error(e));
         }
       })
-      .catch( e => console.error(e));
+      .catch(e => console.error(e));
   }
 
   setupUserLocal = async () => {
@@ -279,13 +289,13 @@ export default class App extends React.Component {
 
   setupAuthListener = () => {
     // returns unsub function
-    this.authUnsub = firebase.auth().onAuthStateChanged( authUser => {
-      if(this.state.userLoggedIn===true && !authUser){
+    this.authUnsub = firebase.auth().onAuthStateChanged(authUser => {
+      if (this.state.userLoggedIn === true && !authUser) {
         console.debug(`auth state change, logged out`);
-        this.setState({userLoggedIn: false});
-      } else if ( this.state.userLoggedIn===false && authUser){
+        this.setState({ userLoggedIn: false });
+      } else if (this.state.userLoggedIn === false && authUser) {
         console.debug(`auth state change, logged in:`, authUser);
-        this.setState({userLoggedIn: true});
+        this.setState({ userLoggedIn: true });
       }
     });
   }
@@ -293,11 +303,11 @@ export default class App extends React.Component {
   loginAnon = () => {
     console.log('loginanon');
     firebase.auth().signInAnonymously()
-      .then(()=>{console.debug('user signed in anon')})
+      .then(() => { console.debug('user signed in anon') })
       .catch(e => {
-        console.error('unable to auth anon, trying again',e);
+        console.error('unable to auth anon, trying again', e);
         firebase.auth().signInAnonymously()
-          .then(()=> console.debug('user signed in anon second time') )
+          .then(() => console.debug('user signed in anon second time'))
       });
   }
 
@@ -330,13 +340,13 @@ export default class App extends React.Component {
 
 
     const { permissionsGranted } = this.state;
-    const screenWidth =  Dimensions.get('window').width;
+    const screenWidth = Dimensions.get('window').width;
 
     const MyButton = (props) => {
       // also can use Icon.Button
-      return <Button 
+      return <Button
         style={[styles.button, props.style]} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
-        {props.text}
+        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{props.text}</Text>
       </Button>
     };
 
@@ -348,35 +358,21 @@ export default class App extends React.Component {
       { label: 'eeq eqw', value: '5', custom: <Icon name='box' /> },
     ];
 
-    const routeRandom = () => <Text>random</Text>;
-    const routeFav = () => <Text>fav</Text>;
-    const routePhoto = () => <Text>photo</Text>;
-    const routeClip = () => <Text>clip</Text>;
-    const routeBuy = () => <Text>buy</Text>;
-
-    const bottomNavScene = BottomNavigation.SceneMap({
-      random: routeRandom,
-      fav: routeFav,
-      photo: routePhoto,
-      clip: routeClip,
-      buy: routeBuy,
-    });
-    const bottomNavRoutes = [
-      { key: 'ere1', title: 'ert', icon: 'codesandbox' },
-      { key: 'ere2', title: 'ert', icon: 'codesandbox' },
-      { key: 'ere3', title: 'ert', icon: 'codesandbox' },
-      { key: 'ere5', title: 'ert', icon: 'codesandbox' },
-      { key: 'ere6', title: 'ert', icon: 'codesandbox' },
-    ];
-
     return (
       <SafeAreaView style={styles.container}>
 
-        <Snackbar 
-          visible={this.state.alertVisible} duration={2000}
-          onDismiss={() => { console.debug('dismiss?'); this.setState({ alertVisible: false }) }}
-        // action={{label:'',onPress:()=>{}}} 
-        >this is only a test</Snackbar>
+        <Portal>
+          <Snackbar
+            visible={this.state.alertVisible} duration={2000}
+            onDismiss={() => { console.debug('dismiss?'); this.setState({ alertVisible: false }) }}
+          // action={{label:'',onPress:()=>{}}} 
+          >this is only a test ({Platform.Version})</Snackbar>
+        </Portal>
+
+        <Portal>
+          <Modal visible={this.state.modalVisible} onDismiss={this.hideModal}
+            contentContainerStyle={{ padding: 20, margin: 40 }} style={{ marginVertical: 40 }}><Text>hell-o</Text></Modal>
+        </Portal>
 
         {/* <Appbar style={styles.appbar}>
           <Appbar.Content title='Mask Fashions' subtitle='have fun. be safe.' />
@@ -384,33 +380,26 @@ export default class App extends React.Component {
           <Appbar.Action icon='gift' onPress={() => { }} />
         </Appbar> */}
 
-        {/* <BottomNavigation
-          renderScene={bottomNavScene}
-          navigationState={ {index:0, routes:bottomNavRoutes} }
-          onIndexChange={(index)=>{}}
-        /> */}
+        <View name="DeepAR container" >
+          {permissionsGranted ?
+            <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
+            :
+            <Text>permissions not granted</Text>}
+        </View>
 
-        <View name="belt nav" style={styles.buttonContainer}>
-          <MyButton iconName='camera' text='camera' onPress={this.switchCamera} />
-          <MyButton iconName='anchor' text='change mask' onPress={this.onChangeEffect} />
-          <MyButton iconName='activity' text='change texture' onPress={this.onChangeTexture} />
-          <MyButton iconName='maximize' text='screenshot' onPress={this.takeScreenshot} />
-          <MyButton iconName='gift' text='alert' onPress={this.showAlert} />
-          {this.state.userLoggedIn ? <MyButton style={{backgroundColor:'#aea'}} iconName='thumbs-up' text='authed' onPress={()=>{}} /> 
-          : <MyButton iconName='log-in' text='login' onPress={this.loginAnon} />
+        <BeltNav app={this} />
+
+        <View name="buttons" style={styles.buttonContainer}>
+          <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} />
+          <MyButton iconName='ticket' text='change texture' onPress={this.onChangeTexture} />
+          <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} />
+          <MyButton iconName='projector-screen' text='modal' onPress={this.showModal} />
+          {this.state.userLoggedIn ? <MyButton style={{ backgroundColor: '#aea' }} iconName='thumb-up' text='authed' onPress={() => {}} />
+            : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
           }
-          <MyButton iconName='heart' text='+fav' onPress={this.addToFavorites} />
-          <MyButton iconName='list' text='view favs' onPress={this.checkFavorites} />
         </View>
 
         {/* <MFDropdown data={data} ></MFDropdown> */}
-
-        <View name="DeepAR container" >
-          {permissionsGranted ? 
-            <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} /> 
-            : 
-            <Text>permissions not granted</Text> }
-        </View>
 
         <View name="mask scroll" style={styles.maskScroll(maskSize)}>
           <FlatList
@@ -418,7 +407,6 @@ export default class App extends React.Component {
             keyExtractor={(item, index) => item.id + item.picUrl}
             horizontal={true} data={listData} renderItem={renderItem} />
         </View>
-
 
         {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
 

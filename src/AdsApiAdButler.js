@@ -1,7 +1,7 @@
 import { isFuture, isPast } from "date-fns";
 import { AdCampaign, AdItem } from "./AdsApiMapping";
 
-//('creatives') //file names, ids, "media_group"? 
+//('creatives/image') //file names only, ids, "media_group"? 
 //('campaigns') //all campaigns aka "advertisement" in JSON, gives Advertiser name, id
 //('schedules') //schedules only gives start/end, no link to ads, advertisers
 //('zones') // just gives publisher, metadata
@@ -15,6 +15,7 @@ export default class AdsApiAdButler {
 
   constructor() {
     // this.jsonApi_example();
+    // this.restAPI_Creatives();
     // this.restAPI_AdItems();
   }
 
@@ -104,6 +105,17 @@ export default class AdsApiAdButler {
         console.log(json.data.length+" ad items fetched");
         for (const k in json.data) {
           // const e = new AdItem(json.data[k]);
+        }
+        console.log(JSON.stringify(json,null,1));
+      })
+      .catch((err) => console.warn(err));
+  }
+
+  restAPI_Creatives = () => {
+    this.#restAPI('creatives/image', true)
+      .then(response => response.json())
+      .then(json => {
+        for (const k in json.data) {
         }
         console.log(JSON.stringify(json,null,1));
       })
