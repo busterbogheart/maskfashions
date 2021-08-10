@@ -1,7 +1,38 @@
 import { Dimensions, Platform, StyleSheet } from "react-native";
+import { configureFonts } from "react-native-paper";
+
 
 const screenWidth = Dimensions.get('window').width;
-export default StyleSheet.create({
+
+const theme = {
+  dark: false,
+  roundness: 3,
+  colors: {
+      // most frequent 
+      primary: '#ccf',
+      secondary: '#66f',
+      accent: '#03dac4',
+      background: '#4fc4fc',
+      // drop down bg
+      surface: '#caf',
+      error: '#B00020',
+      onPrimary: '#ccf7',
+      // snackbar bg color
+      onSurface: '#ffa',
+      text: '#444',
+      disabled: '#777',
+      placeholder: '#777',
+      // modal bg color
+      backdrop: '#cdc',
+      notification: '#ca5',
+  },
+  fonts: configureFonts(),
+  animation: {
+      scale: 1.0,
+  },
+};
+
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -9,32 +40,33 @@ export default StyleSheet.create({
     // alignSelf: 'stretch', // overrides parent's alignItems
     justifyContent: 'flex-start',   // children along main axis
     alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
-    backgroundColor: '#dec',  
+    backgroundColor: '#fdd',  
   },
   deepar : {
     ...Platform.select({
       android: {
-        width: 250, height:350
+        width: screenWidth, height:420
       },
       ios: {
-        width: screenWidth, height: 250
+        width: screenWidth, height: 350
       },
     })
   },
   buttonContainer:{
     flex:1,
-    flexWrap: 'wrap',  //set on container,
-    flexDirection: 'row',
+    // flexWrap: 'wrap',  //set on container,
+    flexDirection: 'column',
     justifyContent: 'flex-start',
-    top: Platform.OS == 'ios' ? 20 : 0,
+    top: Platform.OS == 'ios' ? 20 : 5,
     position: 'absolute',
     width: screenWidth,
   },
   button: {
     width: 105,
     height: 30,
-    paddingVertical: 0,
+    padding: 0,
     margin: 5,
+    alignItems:'flex-start'
   },
   maskScroll: (maskSize='') => ({
     height: maskSize - 10,
@@ -52,3 +84,5 @@ export default StyleSheet.create({
     width: screenWidth,
   }
 });
+
+export {styles, theme};

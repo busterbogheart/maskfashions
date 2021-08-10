@@ -1,21 +1,21 @@
 "use strict";
 
 import React from 'react';
-import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions } from 'react-native';
+import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert } from 'react-native';
 import DeepARModuleWrapper from './src/DeepARModuleWrapper';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
-import styles from './src/styles';
+import { styles } from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button, Snackbar, Appbar, BottomNavigation, Modal, Portal } from 'react-native-paper';
+import { Button, Snackbar, Modal, Portal, Dialog, Paragraph } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
 import firestore, { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { differenceInHours, differenceInSeconds } from 'date-fns';
+import { differenceInHours, differenceInMilliseconds, differenceInSeconds } from 'date-fns';
 import BeltNav from './src/BeltNav';
 
 export default class App extends React.Component {
@@ -29,12 +29,23 @@ export default class App extends React.Component {
       currentTexture: 0,
       selectedItems: [],
       alertVisible: false,
+      dialogVisible: false,
       modalVisible: false,
       userLoggedIn: false,
     }
 
     this.userId = null;
     this.authUnsub = null;
+    this.maskSize = 135;
+    this.maskListData = new Array(20).fill(null).map(
+      (v, i) => ({ key: i, uri: `https://picsum.photos/500?${i}${Math.random()}` })
+      // (v, i) => ({ key: i, uri: `https://picsum.photos/${this.maskSize}?${i}` })
+    );
+
+    this.textureList = [
+      { adId: '491', url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg' },
+      { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
+    ];
   }
 
   didAppear() {
@@ -127,13 +138,22 @@ export default class App extends React.Component {
     this.setState({ alertVisible: true });
   }
 
-  showModal = () => {
-    this.setState({ modalVisible: true });
+  showAlert2 = () => {
+    Alert.alert(
+      "Here's the deal",
+      "Some explanation of how the buy button will act.",
+      [
+        {text:'ok'},
+        {text:'less than ok', style:'cancel'},
+        {text:'VERY ok', style:'destructive'},
+      ],
+      {cancelable:true}
+    );
   }
 
-  hideModal = () => {
-    this.setState({ modalVisible: false });
-  }
+  showDialog = () => this.setState({ dialogVisible: true });
+
+  hideModal = () => this.setState({ dialogVisible: false });
 
   componentDidMount() {
     console.debug('componentdidmount');
@@ -156,8 +176,13 @@ export default class App extends React.Component {
       })
     }
 
-    // new AdButler();
-
+    let butler = new AdButler();
+    let allAds;
+    butler.getAdItems().then(ads => {
+      allAds=ads;
+      // loaded
+    });
+    
     this.setupAuthListener();
     this.setupUserLocal().then(
       uid => {
@@ -171,16 +196,63 @@ export default class App extends React.Component {
       }, reason => console.warn('failed: ' + reason));
 
     //adItems();
-    //preloadAdItemImages();
+    this.preloadAdItemImages();
     //adItemTagSchema();
+  }
 
+  // CDN urls should be parsed and pre-loaded for the listview, and also made available 
+  // to Java and objc on local filesystem for the deepar native switchTexture method
+  // save resized copy for listview?  performance?
+  // try https://github.com/itinance/react-native-fs
+  preloadAdItemImages = () => {
     const adData = [
       { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
       { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
       { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
       { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
     ];
+
+    this.textureList.forEach(v => {
+      let uri = v.url;
+      // console.debug(`preloading ${uri}`);
+      Image.prefetch(uri)
+        .then(
+          successBool => {},
+          failReason => console.warn(failReason))
+        .catch(e => console.error(e))
+    });
+
+    this.maskListData.forEach(v => {
+      let uri = v.uri;
+      // console.debug(`preloading ${uri}`);
+      Image.prefetch(uri)
+        .then(
+          successBool => {},
+          failReason => console.warn(failReason))
+        .catch(e => console.error(e))
+    })
+
   }
+
+  renderItem = ({ item, index, sep }) => {
+    const maskmask = './assets/images/maskmask.png';
+    return (
+      <MaskedView key={item.key} style={styles.maskScrollItem(this.maskSize)}
+        maskElement={
+          <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+            <Image style={{ width: this.maskSize, height: this.maskSize }} source={require(maskmask)} ></Image>
+          </View>
+        }>
+        <View style={{ flex: 1, height: '100%', }} >
+          <Image
+            fadeDuration={100}
+            progressiveRenderingEnabled={true}
+            style={{ width: this.maskSize, height: this.maskSize, }}
+            source={{ uri: item.uri }} />
+        </View>
+      </MaskedView>
+    )
+  };
 
   // authed user and device unique id required for favorites.  
   // device unique id not required for auth.
@@ -205,7 +277,6 @@ export default class App extends React.Component {
       })
       .catch(e => console.warn(`doc get failed for ${this.userId}`, e));
   }
-
 
   addToFavorites = () => {
     if (this.state.userLoggedIn === false || this.userId == null) {
@@ -311,16 +382,9 @@ export default class App extends React.Component {
       });
   }
 
-  // CDN urls should be parsed and pre-loaded, then also made available to Java and objc
-  // on the local filesystem for the deepar native switchTexture method
-  // try https://github.com/itinance/react-native-fs
   onChangeTexture = () => {
-    let textureList = [
-      { adId: '491', url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg' },
-      { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
-    ];
-    let tex = textureList[this.state.currentTexture];
-    this.state.currentTexture = this.state.currentTexture + 1 == textureList.length ? 0 : this.state.currentTexture + 1;
+    let tex = this.textureList[this.state.currentTexture];
+    this.state.currentTexture = this.state.currentTexture + 1 == this.textureList.length ? 0 : this.state.currentTexture + 1;
     this.deepARView.switchTexture(tex.url);
   }
 
@@ -337,7 +401,6 @@ export default class App extends React.Component {
     }
 
     let { ...props } = { ...this.props }; delete props.onEventSent;
-
 
     const { permissionsGranted } = this.state;
     const screenWidth = Dimensions.get('window').width;
@@ -370,12 +433,15 @@ export default class App extends React.Component {
         </Portal>
 
         <Portal>
-          <Modal visible={this.state.modalVisible} onDismiss={this.hideModal}
-            contentContainerStyle={{ padding: 20, margin: 40 }} style={{ marginVertical: 40 }}><Text>hell-o</Text></Modal>
+          <Dialog style={{ width: 100, height: 150, backgroundColor: 'transparent' }} visible={this.state.dialogVisible} onDismiss={this.hideModal}
+            contentContainerStyle={{ padding: 20, margin: 40 }} style={{ marginVertical: 40 }}>
+            <Dialog.Title>Buy button explanation</Dialog.Title>
+            <Dialog.Content><Paragraph>Well, here's the deal</Paragraph></Dialog.Content>
+          </Dialog>
         </Portal>
 
         {/* <Appbar style={styles.appbar}>
-          <Appbar.Content title='Mask Fashions' subtitle='have fun. be safe.' />
+          <Appbar.Content title='Mask Fashions' subtitle='look good. be safe.' />
           <Appbar.Action icon='video' onPress={() => { }} />
           <Appbar.Action icon='gift' onPress={() => { }} />
         </Appbar> */}
@@ -389,11 +455,12 @@ export default class App extends React.Component {
 
         <BeltNav app={this} />
 
-        <View name="buttons" style={styles.buttonContainer}>
+        <View name="test-buttons" style={styles.buttonContainer}>
           <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} />
           <MyButton iconName='ticket' text='change texture' onPress={this.onChangeTexture} />
           <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} />
-          <MyButton iconName='projector-screen' text='modal' onPress={this.showModal} />
+          <MyButton iconName='projector-screen' text='dialog' onPress={this.showDialog} />
+          <MyButton iconName='exclamation' text='alert#2' onPress={this.showAlert2} />
           {this.state.userLoggedIn ? <MyButton style={{ backgroundColor: '#aea' }} iconName='thumb-up' text='authed' onPress={() => {}} />
             : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
           }
@@ -401,11 +468,11 @@ export default class App extends React.Component {
 
         {/* <MFDropdown data={data} ></MFDropdown> */}
 
-        <View name="mask scroll" style={styles.maskScroll(maskSize)}>
+        <View name="mask scroll" style={styles.maskScroll(this.maskSize)}>
           <FlatList
             contentContainerStyle={{ alignItems: 'center', }}
-            keyExtractor={(item, index) => item.id + item.picUrl}
-            horizontal={true} data={listData} renderItem={renderItem} />
+            keyExtractor={(item, index) => item.id + item.uri}
+            horizontal={true} data={this.maskListData} renderItem={this.renderItem} />
         </View>
 
         {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
@@ -416,23 +483,3 @@ export default class App extends React.Component {
 
 }
 
-let maskSize = 135;
-
-let listData = new Array(20).fill(null).map(
-  (v, i) => ({ key: i, picUrl: `https://picsum.photos/${maskSize}?${i}` })
-);
-
-let renderItem = ({ item, index, sep }) => {
-  return (
-    <MaskedView key={item.key} style={styles.maskScrollItem(maskSize)}
-      maskElement={
-        <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-          <Image style={{ width: maskSize, height: maskSize }} source={require('./assets/images/maskmask.png')} ></Image>
-        </View>
-      }>
-      <View style={{ flex: 1, height: '100%', }} >
-        <Image style={{ width: maskSize, height: maskSize, }} source={{ uri: item.picUrl }} />
-      </View>
-    </MaskedView>
-  )
-};

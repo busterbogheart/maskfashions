@@ -8,15 +8,24 @@ import { AdCampaign, AdItem } from "./AdsApiMapping";
 //('ad-items') // just all creatives and data, no links
 export default class AdsApiAdButler {
 
-  #activeAdItems = [];
+  #allAdItems = [];
   #campaignsById = new Map();
   #apiKeyTest = 'da81d8cf585242c7818d43bdddcd0769';
   #apiKeyLive = 'b87ea9fb1559cbea91d941f0be63ce9b';
 
   constructor() {
-    // this.jsonApi_example();
     // this.restAPI_Creatives();
     // this.restAPI_AdItems();
+    // this.restAPI_SelfserveInfo();
+  }
+
+  restAPI_SelfserveInfo = () => {
+    this.#restAPI('self-serve/portals/405/orders', true)
+      .then(response => response.json())
+      .then(json => {
+        console.log(JSON.stringify(json, null, 1));
+      })
+      .catch((err) => console.warn(err));
   }
 
   async fetchAll() {
@@ -25,7 +34,7 @@ export default class AdsApiAdButler {
       .then(json => {
         for (let k in json.data) {
           const ad = new AdItem(json.data[k].advertisement)
-          this.#activeAdItems.push(ad);
+          this.#allAdItems.push(ad);
           if (json.data[k].campaign) {
             const campaign = new AdCampaign(json.data[k].campaign);
             ad.campaignId = campaign.id;
@@ -63,52 +72,48 @@ export default class AdsApiAdButler {
   //   //check empty activeaditems
   // })
 
-  //wrapper, utility
-  async #adbutlerFetch(apiUrl = API_URLS.REST, params = {}, endpoint = '') {
+  #adbutlerFetch = async (apiUrl = API_URLS.REST, params = {}, endpoint = '') => {
     const apiKey = this.#apiKeyLive;
     console.log(`fetching ${apiUrl} with ${JSON.stringify(params)} to ${endpoint}`);
-    if (apiUrl == API_URLS.REST) {
-      const data = params ? new URLSearchParams(params) : '';
-      const url = API_URLS.REST + endpoint + "?" + data;
-      let response = await fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + apiKey,
-        },
-      });
-      return response;
-
-    } else if (apiUrl == API_URLS.JSON) {
-      let response = await fetch(apiUrl, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + apiKey,
-        },
-        body: JSON.stringify(params)
-      })
-      return response;
-
-    }
-
-    console.warn("No API method matching");
+    const data = params ? new URLSearchParams(params) : '';
+    const url = API_URLS.REST + endpoint + "?" + data;
+    let response = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + apiKey,
+      },
+    });
+    return response;
   }
 
   //ad items give image, meta, url, etc. but no start/end dates
-  restAPI_AdItems = () => {
-    this.#restAPI('ad-items', true)
-      .then(response => response.json())
-      .then(json => {
-        console.log(json.data.length+" ad items fetched");
-        for (const k in json.data) {
-          // const e = new AdItem(json.data[k]);
-        }
-        console.log(JSON.stringify(json,null,1));
-      })
-      .catch((err) => console.warn(err));
+  restAPI_AdItems = async () => {
+    let res = await this.#restAPI('ad-items', true);
+    if(res.status != 200){
+      console.error('restapi failed')
+    }
+    let json = await res.json();
+    console.log(json.data.length + " ad items fetched");
+
+    for (const k in json.data) {
+      const e = new AdItem(json.data[k]);
+      if(e.creative) {  // some don't have creative data (not added from Library)
+        e.creative_url = `https://servedbyadbutler.com/getad.img/;libID=${e.creative.id}`;
+      }
+      this.#allAdItems.push(e);
+    }
+  }
+
+  getAdItems = async () => {
+    // cached?
+    if(this.#allAdItems.length > 1){
+      return this.#allAdItems;
+    }
+    // or no
+    await this.restAPI_AdItems();
+    return this.#allAdItems;
   }
 
   restAPI_Creatives = () => {
@@ -117,31 +122,13 @@ export default class AdsApiAdButler {
       .then(json => {
         for (const k in json.data) {
         }
-        console.log(JSON.stringify(json,null,1));
+        console.log(JSON.stringify(json, null, 1));
       })
       .catch((err) => console.warn(err));
   }
 
-  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json //standard dynamic w/ Versace
-  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
-  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
-  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=0x0;     setID=491503; type=json //dynamic zone
-  jsonApi_example = () => {
-    // each successful call registers an impression
-    this.#jsonApi({
-      setID: '492969',
-      type: 'jsonr', //jsonr for all
-      ID: '181924',
-    }) 
-      .then(response => response.json(), reason => console.warn(reason))
-      .then(json => console.log(JSON.stringify(json,null,1), reason => console.warn(reason)))
-      .catch(err => {
-        console.warn(err);
-      });
-  }
-
   //wrapper
-  #restAPI(endpoint, expandAll = true, params = {}) {
+  #restAPI = async (endpoint, expandAll = true, params = {}) => {
     if (expandAll) {
       params = { ...params, ...{ expand: "all" } };
     }
@@ -149,16 +136,14 @@ export default class AdsApiAdButler {
     return this.#adbutlerFetch(API_URLS.REST, params, endpoint);
   }
 
-
-  //wrapper
-  #jsonApi(params = {}) {
-    return this.#adbutlerFetch(API_URLS.JSON, params);
-  }
-
 }
 
 class API_URLS {
   static get JSON() {
+    //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json //standard dynamic w/ Versace
+    //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
+    //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
+    //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=0x0;     setID=491503; type=json //dynamic zone
     return 'https://servedbyadbutler.com/adserve/';
   }
   static get REST() {

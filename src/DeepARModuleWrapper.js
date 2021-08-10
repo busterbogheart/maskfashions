@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Dimensions, findNodeHandle, Platform, requireNativeComponent, StyleSheet, UIManager} from "react-native";
-import styles from './styles';
+import {styles} from './styles';
 
 export default class DeepARModuleWrapper extends React.Component {
   constructor(props){
