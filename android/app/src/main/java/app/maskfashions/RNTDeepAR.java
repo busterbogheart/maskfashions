@@ -356,7 +356,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
 
     @Override
     public void initialized() {
-        sendEvent("initialized!", "", null);
+        sendEvent("initialized", "", null);
     }
 
     @Override
@@ -375,6 +375,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
 
     @Override
     public void effectSwitched(String s) {
+      // this works
 
     }
     @Override
@@ -444,20 +445,19 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         // need more research on Android filesystem; whether this will change, etc
         // also how does caching and cache checking factor in
         String path = rc.getApplicationContext().getFilesDir().getAbsolutePath()+"/textures";
-        Log.i(RNTDeepAR.LOG,"PATH! "+path);
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        // 'parameter' varies based on shader's json
-        deepAr.changeParameterTexture("mask-itself","MeshRenderer",
-                "s_texDiffuse", bitmap);
+//        Bitmap bitmap = BitmapFactory.decodeFile(path);
+//        deepAr.changeParameterTexture("mask-itself","MeshRenderer","s_texDiffuse", bitmap);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(textureUrl, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 if(statusCode == 200){
                   Bitmap bitmap = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
-                  // 'parameter' varies based on shader's json
+                    // 'parameter' varies based on shader's json
                   deepAr.changeParameterTexture("mask-itself","MeshRenderer",
                           "s_texDiffuse", bitmap);
+                } else {
+                    Log.e(RNTDeepAR.LOG,"error loading texture: "+textureUrl);
                 }
             }
 

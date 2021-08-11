@@ -1,5 +1,5 @@
 import { Dimensions, Platform, StyleSheet } from "react-native";
-import { configureFonts } from "react-native-paper";
+import { configureFonts, useTheme } from "react-native-paper";
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -12,16 +12,16 @@ const theme = {
       primary: '#ccf',
       secondary: '#66f',
       accent: '#03dac4',
-      background: '#4fc4fc',
+      background: '#000',
       // drop down bg
       surface: '#caf',
       error: '#B00020',
-      onPrimary: '#ccf7',
+      onPrimary: '#ccf7ff',
       // snackbar bg color
       onSurface: '#ffa',
-      text: '#444',
-      disabled: '#777',
-      placeholder: '#777',
+      text: '#333',
+      disabled: '#77700c',
+      placeholder: '#777fff',
       // modal bg color
       backdrop: '#cdc',
       notification: '#ca5',
@@ -38,19 +38,17 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     // alignContent: 'flex-start', //cross axis with flexWrap on, overrides alignContent of parent
     // alignSelf: 'stretch', // overrides parent's alignItems
-    justifyContent: 'flex-start',   // children along main axis
+    justifyContent: 'space-between',   // children along main axis
     alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
-    backgroundColor: '#fdd',  
+    backgroundColor: theme.colors.background,  
   },
   deepar : {
-    ...Platform.select({
-      android: {
-        width: screenWidth, height:420
-      },
-      ios: {
-        width: screenWidth, height: 350
-      },
-    })
+    width: screenWidth, 
+    flex:1,
+  },
+  deeparContainer:{
+    flexBasis: 300,
+    flexGrow: 1,
   },
   buttonContainer:{
     flex:1,
@@ -69,17 +67,16 @@ const styles = StyleSheet.create({
     alignItems:'flex-start'
   },
   maskScroll: (maskSize='') => ({
-    height: maskSize - 10,
+    flexBasis: maskSize,
     flexDirection: 'row',
+    backgroundColor:'#ffffff66'
   }),
   maskScrollItem: (maskSize='') => ({
-    marginHorizontal: 8,
-    marginBottom: 25,
     height: maskSize,
     width: maskSize,
   }),
   appbar: {
-    height: 40,
+    flexBasis: 40,
     justifyContent: 'space-around',
     width: screenWidth,
   }

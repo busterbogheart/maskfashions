@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Dimensions, findNodeHandle, Platform, requireNativeComponent, StyleSheet, UIManager} from "react-native";
+import { Dimensions, findNodeHandle, Platform, requireNativeComponent, StyleSheet, UIManager, View} from "react-native";
 import {styles} from './styles';
 
 export default class DeepARModuleWrapper extends React.Component {
@@ -20,6 +20,7 @@ export default class DeepARModuleWrapper extends React.Component {
   }
 
   switchTexture = (textureUrl) => {
+    console.debug('switchtexture '+textureUrl);
     UIManager.dispatchViewManagerCommand(
       this.getDeepARViewHandle(),
       UIManager.getViewManagerConfig('DeepARModule').Commands.switchTexture,

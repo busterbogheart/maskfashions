@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert } from 'react-native';
+import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert, TouchableOpacity } from 'react-native';
 import DeepARModuleWrapper from './src/DeepARModuleWrapper';
 import InAppBrowserWrapper from './src/InAppBrowserWrapper';
 import Share from 'react-native-share';
@@ -36,15 +36,17 @@ export default class App extends React.Component {
 
     this.userId = null;
     this.authUnsub = null;
-    this.maskSize = 135;
+    this.maskSize = 165;
     this.maskListData = new Array(20).fill(null).map(
       (v, i) => ({ key: i, uri: `https://picsum.photos/500?${i}${Math.random()}` })
-      // (v, i) => ({ key: i, uri: `https://picsum.photos/${this.maskSize}?${i}` })
     );
 
     this.textureList = [
-      { adId: '491', url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg' },
-      { adId: '313', url: 'https://maskfashions-cdn.web.app/02-tintshues_coral.jpg' },
+      { adId: '31223563', url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg' },
+      { adId: '3145644t', url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg' },
+      { adId: '314254t', url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg' },
+      { adId: '314524t', url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg' },
+      { adId: '3146264t', url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg' },
     ];
   }
 
@@ -67,7 +69,8 @@ export default class App extends React.Component {
     if (event.type === 'cameraSwitch') {
       this.setState({ switchCameraInProgress: false })
     } else if (event.type === 'initialized') {
-
+      this.deepARView.switchEffect('mask-09', 'effect');
+      this.switchToNextTexture();
     } else if (event.type === 'didStartVideoRecording') {
 
     } else if (event.type === 'didFinishVideoRecording') {
@@ -88,7 +91,6 @@ export default class App extends React.Component {
       return
     }
 
-    this.deepARView.switchEffect('mask-08', 'effect');
 
     return;
 
@@ -138,16 +140,16 @@ export default class App extends React.Component {
     this.setState({ alertVisible: true });
   }
 
-  showAlert2 = () => {
+  showNativeDialog = () => {
     Alert.alert(
       "Here's the deal",
       "Some explanation of how the buy button will act.",
       [
-        {text:'ok'},
-        {text:'less than ok', style:'cancel'},
-        {text:'VERY ok', style:'destructive'},
+        { text: 'ok' },
+        { text: 'less than ok', style: 'cancel' },
+        { text: 'VERY ok', style: 'destructive' },
       ],
-      {cancelable:true}
+      { cancelable: true }
     );
   }
 
@@ -162,16 +164,18 @@ export default class App extends React.Component {
         [
           PermissionsAndroid.PERMISSIONS.CAMERA,
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-        ]
+          // PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+        ],
       ).then(result => {
         if (
           result['android.permission.CAMERA'].match(/^granted|never_ask_again$/) &&
-          result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/) &&
-          result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/)) {
-          this.setState({ permissionsGranted: true, showPermsAlert: false });
+          // result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) &&
+          result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
+        ) {
+          console.debug('permissions granted')
+          this.setState({ permissionsGranted: true });
         } else {
-          this.setState({ permissionsGranted: false, showPermsAlert: true });
+          this.setState({ permissionsGranted: false });
         }
       })
     }
@@ -179,10 +183,10 @@ export default class App extends React.Component {
     let butler = new AdButler();
     let allAds;
     butler.getAdItems().then(ads => {
-      allAds=ads;
+      allAds = ads;
       // loaded
     });
-    
+
     this.setupAuthListener();
     this.setupUserLocal().then(
       uid => {
@@ -205,54 +209,16 @@ export default class App extends React.Component {
   // save resized copy for listview?  performance?
   // try https://github.com/itinance/react-native-fs
   preloadAdItemImages = () => {
-    const adData = [
-      { bannerId: 555225, creative_url: 'https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg', },
-      { bannerId: 442225, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185174', },
-      { bannerId: 742110, creative_url: 'https://servedbyadbutler.com/getad.img/;libID=3185097', },
-      { bannerId: 844044, creative_url: 'https://maskfashions-cdn.web.app/02-jklm_skullflowers.jpg', },
-    ];
-
     this.textureList.forEach(v => {
       let uri = v.url;
-      // console.debug(`preloading ${uri}`);
+      console.debug(`preloading texture ${uri}`);
       Image.prefetch(uri)
         .then(
           successBool => {},
           failReason => console.warn(failReason))
         .catch(e => console.error(e))
     });
-
-    this.maskListData.forEach(v => {
-      let uri = v.uri;
-      // console.debug(`preloading ${uri}`);
-      Image.prefetch(uri)
-        .then(
-          successBool => {},
-          failReason => console.warn(failReason))
-        .catch(e => console.error(e))
-    })
-
   }
-
-  renderItem = ({ item, index, sep }) => {
-    const maskmask = './assets/images/maskmask.png';
-    return (
-      <MaskedView key={item.key} style={styles.maskScrollItem(this.maskSize)}
-        maskElement={
-          <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-            <Image style={{ width: this.maskSize, height: this.maskSize }} source={require(maskmask)} ></Image>
-          </View>
-        }>
-        <View style={{ flex: 1, height: '100%', }} >
-          <Image
-            fadeDuration={100}
-            progressiveRenderingEnabled={true}
-            style={{ width: this.maskSize, height: this.maskSize, }}
-            source={{ uri: item.uri }} />
-        </View>
-      </MaskedView>
-    )
-  };
 
   // authed user and device unique id required for favorites.  
   // device unique id not required for auth.
@@ -382,11 +348,40 @@ export default class App extends React.Component {
       });
   }
 
-  onChangeTexture = () => {
+  switchToNextTexture = () => {
     let tex = this.textureList[this.state.currentTexture];
     this.state.currentTexture = this.state.currentTexture + 1 == this.textureList.length ? 0 : this.state.currentTexture + 1;
     this.deepARView.switchTexture(tex.url);
   }
+
+  switchTexture = (url) => {
+    this.deepARView.switchTexture(url);
+  }
+
+  switchToRandomTexture = () => {
+        
+  }
+
+  renderItem = ({ item, index, sep }) => {
+    const maskmask = './assets/images/maskmask.png';
+    // TODO check androidrenderingmode software
+    return (
+      <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
+        maskElement={
+          <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+            <Image key={Date.now()} style={{ width: this.maskSize, height: this.maskSize }} width={this.maskSize} height={this.maskSize}
+              source={require(maskmask)} ></Image>
+          </View>
+        }>
+        <TouchableOpacity onPressIn={ () => {this.switchTexture(item.url)} } delayPressIn={100} activeOpacity={.5} >
+          <Image
+            fadeDuration={100} progressiveRenderingEnabled={true}
+            style={{ width: this.maskSize, height: this.maskSize }} key={Date.now() + item.adId}
+            width={this.maskSize} height={this.maskSize} source={{ uri: item.url }} />
+        </TouchableOpacity>
+      </MaskedView>
+    )
+  };
 
   render() {
     console.info('render');
@@ -446,7 +441,7 @@ export default class App extends React.Component {
           <Appbar.Action icon='gift' onPress={() => { }} />
         </Appbar> */}
 
-        <View name="DeepAR container" >
+        <View name="DeepAR container" style={styles.deeparContainer}>
           {permissionsGranted ?
             <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
             :
@@ -455,12 +450,23 @@ export default class App extends React.Component {
 
         <BeltNav app={this} />
 
+        {/* <MaskedView key='3errrrrr' maskElement={
+            <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+              <Image key={Date.now()} style={{ width: 50, height: 50 }} width={50} height={50} source={require('./assets/images/maskmask.png')} ></Image>
+            </View>
+          }>
+          <Image fadeDuration={100} progressiveRenderingEnabled={true}
+            style={{ width: 50, height: 50 }} key={Date.now()}
+            width={50} height={50} source={{ uri: this.textureList[0].url }} />
+        </MaskedView>
+ */}
         <View name="test-buttons" style={styles.buttonContainer}>
-          <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} />
-          <MyButton iconName='ticket' text='change texture' onPress={this.onChangeTexture} />
-          <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} />
-          <MyButton iconName='projector-screen' text='dialog' onPress={this.showDialog} />
-          <MyButton iconName='exclamation' text='alert#2' onPress={this.showAlert2} />
+          <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+          {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
+          {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
+          {/* <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} /> */}
+          {/* <MyButton iconName='projector-screen' text='dialog' onPress={this.showDialog} /> */}
+          {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
           {this.state.userLoggedIn ? <MyButton style={{ backgroundColor: '#aea' }} iconName='thumb-up' text='authed' onPress={() => {}} />
             : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
           }
@@ -471,8 +477,8 @@ export default class App extends React.Component {
         <View name="mask scroll" style={styles.maskScroll(this.maskSize)}>
           <FlatList
             contentContainerStyle={{ alignItems: 'center', }}
-            keyExtractor={(item, index) => item.id + item.uri}
-            horizontal={true} data={this.maskListData} renderItem={this.renderItem} />
+            keyExtractor={(item, index) => item.adId}
+            horizontal={true} data={this.textureList} renderItem={this.renderItem} />
         </View>
 
         {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
