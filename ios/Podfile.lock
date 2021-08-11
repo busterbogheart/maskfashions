@@ -562,8 +562,6 @@ PODS:
     - Firebase/Firestore (= 8.4.0)
     - React-Core
     - RNFBApp
-  - RNInAppBrowser (3.6.3):
-    - React-Core
   - RNShare (6.5.0):
     - React-Core
   - RNVectorIcons (8.1.0):
@@ -604,7 +602,6 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
-  - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -689,8 +686,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBFirestore:
     :path: "../node_modules/@react-native-firebase/firestore"
-  RNInAppBrowser:
-    :path: "../node_modules/react-native-inappbrowser-reborn"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNVectorIcons:
@@ -745,7 +740,6 @@ SPEC CHECKSUMS:
   RNFBApp: 97b2da195d4606716b284a7c8a988dd8ed5cec41
   RNFBAuth: 63a3ca8a290937f73fa90d3bf37766458ce03e17
   RNFBFirestore: 9ff0a5bac2c5acddb8de7a64d4d8eb38c49604bf
-  RNInAppBrowser: 3ff3a3b8f458aaf25aaee879d057352862edf357
   RNShare: 047d42214f875d731bde73a2b67418638af85ad9
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   Yoga: 3ebccbdd559724312790e7742142d062476b698e

@@ -12,7 +12,7 @@ const theme = {
       primary: '#ccf',
       secondary: '#66f',
       accent: '#03dac4',
-      background: '#000',
+      background: '#cdd',
       // drop down bg
       surface: '#caf',
       error: '#B00020',
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     // flexWrap: 'wrap',  //set on container,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    top: Platform.OS == 'ios' ? 20 : 5,
+    top: Platform.OS == 'ios' ? 80 : 65,
     position: 'absolute',
     width: screenWidth,
   },
@@ -67,16 +67,15 @@ const styles = StyleSheet.create({
     alignItems:'flex-start'
   },
   maskScroll: (maskSize='') => ({
-    flexBasis: maskSize,
+    flexBasis: maskSize - 70,
     flexDirection: 'row',
-    backgroundColor:'#ffffff66'
   }),
   maskScrollItem: (maskSize='') => ({
     height: maskSize,
     width: maskSize,
   }),
   appbar: {
-    flexBasis: 40,
+    flexBasis: 48,
     justifyContent: 'space-around',
     width: screenWidth,
   }

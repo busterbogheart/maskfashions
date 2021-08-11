@@ -2,13 +2,12 @@
 
 import React from 'react';
 import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert, TouchableOpacity } from 'react-native';
-import DeepARModuleWrapper from './src/DeepARModuleWrapper';
-import InAppBrowserWrapper from './src/InAppBrowserWrapper';
+import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import { styles } from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button, Snackbar, Modal, Portal, Dialog, Paragraph } from 'react-native-paper';
+import { Button, Snackbar, Modal, Portal, Dialog, Paragraph, Appbar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
@@ -16,7 +15,7 @@ import firestore, { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { differenceInHours, differenceInMilliseconds, differenceInSeconds } from 'date-fns';
-import BeltNav from './src/BeltNav';
+import BeltNav from './src/components/BeltNav';
 
 export default class App extends React.Component {
 
@@ -36,17 +35,13 @@ export default class App extends React.Component {
 
     this.userId = null;
     this.authUnsub = null;
-    this.maskSize = 165;
-    this.maskListData = new Array(20).fill(null).map(
-      (v, i) => ({ key: i, uri: `https://picsum.photos/500?${i}${Math.random()}` })
-    );
-
+    this.maskSize = 220;
     this.textureList = [
-      { adId: '31223563', url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg' },
-      { adId: '3145644t', url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg' },
-      { adId: '314254t', url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg' },
       { adId: '314524t', url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg' },
+      { adId: '3145644t', url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg' },
       { adId: '3146264t', url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg' },
+      { adId: '314254t', url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg' },
+      { adId: '31223563', url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg' },
     ];
   }
 
@@ -250,8 +245,10 @@ export default class App extends React.Component {
       return;
     }
 
-    console.debug(`setting favorites for ${this.userId}`)
     const adItemId = String(Math.floor(Math.random() * 99999));
+    console.debug(`setting favorites (${adItemId}) for ${this.userId}`)
+
+    // creates if doesnt exist
     let userDoc = firestore().collection('users').doc(this.userId);
     userDoc.get()
       .then(doc => {
@@ -262,16 +259,16 @@ export default class App extends React.Component {
           })
             .then(() => console.log('firestore update successful'))
             .catch(e => console.error(e));
-          // create
+        // create
         } else {
           userDoc.set({
             favorites: [adItemId],
           })
             .then(() => console.log('firestore set successful'))
-            .catch(e => console.error(e));
+            .catch(e => console.error('firestore set error',e));
         }
       })
-      .catch(e => console.error(e));
+      .catch(e => console.error('firestore get() error',e));
   }
 
   setupUserLocal = async () => {
@@ -368,15 +365,15 @@ export default class App extends React.Component {
     return (
       <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
         maskElement={
-          <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-            <Image key={Date.now()} style={{ width: this.maskSize, height: this.maskSize }} width={this.maskSize} height={this.maskSize}
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+            <Image key={Date.now()} style={{ width: this.maskSize -50, height: this.maskSize-50 }} width={this.maskSize-50} height={this.maskSize-50}
               source={require(maskmask)} ></Image>
           </View>
         }>
         <TouchableOpacity onPressIn={ () => {this.switchTexture(item.url)} } delayPressIn={100} activeOpacity={.5} >
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{ width: this.maskSize, height: this.maskSize }} key={Date.now() + item.adId}
+            style={{ width: this.maskSize, height: this.maskSize, top:-40 }} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{ uri: item.url }} />
         </TouchableOpacity>
       </MaskedView>
@@ -435,11 +432,10 @@ export default class App extends React.Component {
           </Dialog>
         </Portal>
 
-        {/* <Appbar style={styles.appbar}>
-          <Appbar.Content title='Mask Fashions' subtitle='look good. be safe.' />
-          <Appbar.Action icon='video' onPress={() => { }} />
-          <Appbar.Action icon='gift' onPress={() => { }} />
-        </Appbar> */}
+        <Appbar style={styles.appbar}>
+          <Appbar.Content title='Mask Fashions' subtitle='look good, stay safe ' />
+          <Appbar.Action icon='menu' onPress={() => { }} />
+        </Appbar>
 
         <View name="DeepAR container" style={styles.deeparContainer}>
           {permissionsGranted ?
