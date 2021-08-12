@@ -8,7 +8,7 @@ import AdButler from './src/AdsApiAdButler';
 import { styles } from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { Button, Snackbar, Modal, Portal, Dialog, Paragraph, Appbar } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
 import firestore, { firebase } from '@react-native-firebase/firestore';
@@ -16,6 +16,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { differenceInHours, differenceInMilliseconds, differenceInSeconds } from 'date-fns';
 import BeltNav from './src/components/BeltNav';
+import BottomNav from './src/components/BottomNav';
 
 export default class App extends React.Component {
 
@@ -409,7 +410,7 @@ export default class App extends React.Component {
       { label: 'caqqqw', value: '1' },
       { label: 'few', value: '2' },
       { label: 'fcweeeeeeee q', value: '3' },
-      { label: 'qwdd ', value: '4', custom: <Icon name='cpu' /> },
+      { label: 'qwdd ', value: '4', custom: <Icon name='box' /> },
       { label: 'eeq eqw', value: '5', custom: <Icon name='box' /> },
     ];
 
@@ -421,7 +422,7 @@ export default class App extends React.Component {
             visible={this.state.alertVisible} duration={2000}
             onDismiss={() => { console.debug('dismiss?'); this.setState({ alertVisible: false }) }}
           // action={{label:'',onPress:()=>{}}} 
-          >this is only a test ({Platform.Version})</Snackbar>
+          >this is only a test ({Platform.Version}) <Icon name='check-circle-outline' /></Snackbar>
         </Portal>
 
         <Portal>
@@ -434,7 +435,7 @@ export default class App extends React.Component {
 
         <Appbar style={styles.appbar}>
           <Appbar.Content title='Mask Fashions' subtitle='look good, stay safe ' />
-          <Appbar.Action icon='menu' onPress={() => { }} />
+          {/* <Appbar.Action icon='menu' onPress={() => { }} /> */}
         </Appbar>
 
         <View name="DeepAR container" style={styles.deeparContainer}>
@@ -460,7 +461,7 @@ export default class App extends React.Component {
           <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
           {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
           {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-          {/* <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} /> */}
+          <MyButton iconName='bell-alert' text='alert' onPress={this.showAlert} />
           {/* <MyButton iconName='projector-screen' text='dialog' onPress={this.showDialog} /> */}
           {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
           {this.state.userLoggedIn ? <MyButton style={{ backgroundColor: '#aea' }} iconName='thumb-up' text='authed' onPress={() => {}} />
@@ -477,7 +478,9 @@ export default class App extends React.Component {
             horizontal={true} data={this.textureList} renderItem={this.renderItem} />
         </View>
 
-        {/* <Text style={{fontSize:18}}><Icon name='cpu' size={18} />whoa</Text> */}
+        <BottomNav app={this} />
+
+        {/* <Text style={{fontSize:18}}><Icon name='heart' size={18} />whoa</Text> */}
 
       </SafeAreaView>
     );
