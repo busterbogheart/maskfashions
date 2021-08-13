@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     flex:1,
   },
   deeparContainer:{
-    flexBasis: 300,
+    flexBasis: 200,
     flexGrow: 1,
   },
   buttonContainer:{

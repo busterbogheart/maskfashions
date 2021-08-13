@@ -14,7 +14,7 @@ const BottomNav = (props) => {
         'ios-bug':'',
         'ios-heart':'',
     };
-    const IosIcons = createIconSet(glyphmap, 'Ionicons Regular', 'Ionicons.ttf');
+    const IosIcons = createIconSet(glyphmap, 'Ionicons', 'Ionicons.ttf');
     const iconByPlatform = (iosIconName, androidIconName) => {
         if(Platform.OS == 'android') return androidIconName;
         else return ({size,color}) => <IosIcons size={size} color={color} name={iosIconName} />
