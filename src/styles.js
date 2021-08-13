@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   deeparContainer:{
     flexBasis: 200,
     flexGrow: 1,
+    backgroundColor: theme.colors.background,
   },
   buttonContainer:{
     flex:1,
@@ -73,13 +74,14 @@ const styles = StyleSheet.create({
   maskScroll: (maskSize='') => ({
     flexBasis: maskSize - 70,
     flexDirection: 'row',
+    backgroundColor: theme.colors.background,
   }),
   maskScrollItem: (maskSize='') => ({
     height: maskSize,
     width: maskSize,
   }),
   appbar: {
-    flexBasis: 48,
+    flexBasis: 38,
     justifyContent: 'space-around',
     width: screenWidth,
   }

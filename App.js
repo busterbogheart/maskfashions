@@ -1,13 +1,13 @@
 "use strict";
 
 import React from 'react';
-import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Text, View, PermissionsAndroid, Platform, SafeAreaView, FlatList, Image, Dimensions, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import { styles } from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Button, Snackbar, Modal, Portal, Dialog, Paragraph, Appbar } from 'react-native-paper';
+import { Button, Snackbar, Modal, Portal, Dialog, Paragraph, Appbar, Menu } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { differenceInHours, differenceInMilliseconds, differenceInSeconds } from 'date-fns';
 import BeltNav from './src/components/BeltNav';
 import BottomNav from './src/components/BottomNav';
+import SideMenu from 'react-native-side-menu-updated';
+import DrawerMenu from './src/components/DrawerMenu';
 
 export default class App extends React.Component {
 
@@ -30,7 +32,7 @@ export default class App extends React.Component {
       selectedItems: [],
       alertVisible: false,
       dialogVisible: false,
-      modalVisible: false,
+      drawerVisible: false,
       userLoggedIn: false,
     }
 
@@ -66,7 +68,7 @@ export default class App extends React.Component {
       this.setState({ switchCameraInProgress: false })
     } else if (event.type === 'initialized') {
       this.deepARView.switchEffect('mask-09', 'effect');
-      this.switchToNextTexture();
+      // this.switchToNextTexture();
     } else if (event.type === 'didStartVideoRecording') {
 
     } else if (event.type === 'didFinishVideoRecording') {
@@ -150,8 +152,10 @@ export default class App extends React.Component {
   }
 
   showDialog = () => this.setState({ dialogVisible: true });
-
   hideModal = () => this.setState({ dialogVisible: false });
+
+  showDrawer = () => this.setState({ drawerVisible: true });
+  hideDrawer = () => this.setState({ drawerVisible: false });
 
   componentDidMount() {
     console.debug('componentdidmount');
@@ -260,16 +264,16 @@ export default class App extends React.Component {
           })
             .then(() => console.log('firestore update successful'))
             .catch(e => console.error(e));
-        // create
+          // create
         } else {
           userDoc.set({
             favorites: [adItemId],
           })
             .then(() => console.log('firestore set successful'))
-            .catch(e => console.error('firestore set error',e));
+            .catch(e => console.error('firestore set error', e));
         }
       })
-      .catch(e => console.error('firestore get() error',e));
+      .catch(e => console.error('firestore get() error', e));
   }
 
   setupUserLocal = async () => {
@@ -357,7 +361,7 @@ export default class App extends React.Component {
   }
 
   switchToRandomTexture = () => {
-        
+
   }
 
   renderItem = ({ item, index, sep }) => {
@@ -367,14 +371,14 @@ export default class App extends React.Component {
       <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
         maskElement={
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-            <Image key={Date.now()} style={{ width: this.maskSize -50, height: this.maskSize-50 }} width={this.maskSize-50} height={this.maskSize-50}
+            <Image key={Date.now()} style={{ width: this.maskSize - 50, height: this.maskSize - 50 }} width={this.maskSize - 50} height={this.maskSize - 50}
               source={require(maskmask)} ></Image>
           </View>
         }>
-        <TouchableOpacity onPressIn={ () => {this.switchTexture(item.url)} } delayPressIn={100} activeOpacity={.5} >
+        <TouchableOpacity onPressIn={() => { this.switchTexture(item.url) }} delayPressIn={100} activeOpacity={.5} >
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{ width: this.maskSize, height: this.maskSize, top:-40 }} key={Date.now() + item.adId}
+            style={{ width: this.maskSize, height: this.maskSize, top: -40 }} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{ uri: item.url }} />
         </TouchableOpacity>
       </MaskedView>
@@ -415,7 +419,7 @@ export default class App extends React.Component {
     ];
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={140} menuPosition='right' isOpen={this.state.drawerVisible} onChange={(isOpen) => { this.setState({ drawerVisible: isOpen }) }} >
 
         <Portal>
           <Snackbar
@@ -433,10 +437,10 @@ export default class App extends React.Component {
           </Dialog>
         </Portal>
 
-        <Appbar style={styles.appbar}>
-          <Appbar.Content title='Mask Fashions' subtitle='look good, stay safe ' />
-          {/* <Appbar.Action icon='menu' onPress={() => { }} /> */}
-        </Appbar>
+        <Appbar.Header style={styles.appbar}>
+          <Appbar.Content titleStyle={{ fontSize: 15, fontWeight: 'bold' }} subtitleStyle={{ fontSize: 11, }} title='Mask Fashions' subtitle='Stay safe. Look good.' />
+          <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
+        </Appbar.Header>
 
         <View name="DeepAR container" style={styles.deeparContainer}>
           {permissionsGranted ?
@@ -448,15 +452,15 @@ export default class App extends React.Component {
         <BeltNav app={this} />
 
         {/* <MaskedView key='3errrrrr' maskElement={
-            <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-              <Image key={Date.now()} style={{ width: 50, height: 50 }} width={50} height={50} source={require('./assets/images/maskmask.png')} ></Image>
-            </View>
-          }>
-          <Image fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{ width: 50, height: 50 }} key={Date.now()}
-            width={50} height={50} source={{ uri: this.textureList[0].url }} />
-        </MaskedView>
- */}
+              <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+                <Image key={Date.now()} style={{ width: 50, height: 50 }} width={50} height={50} source={require('./assets/images/maskmask.png')} ></Image>
+              </View>
+            }>
+            <Image fadeDuration={100} progressiveRenderingEnabled={true}
+              style={{ width: 50, height: 50 }} key={Date.now()}
+              width={50} height={50} source={{ uri: this.textureList[0].url }} />
+          </MaskedView>
+  */}
         <View name="test-buttons" style={styles.buttonContainer}>
           <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
           {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
@@ -478,11 +482,11 @@ export default class App extends React.Component {
             horizontal={true} data={this.textureList} renderItem={this.renderItem} />
         </View>
 
-        <BottomNav app={this} />
+        {/* <BottomNav app={this} /> */}
 
         {/* <Text style={{fontSize:18}}><Icon name='heart' size={18} />whoa</Text> */}
 
-      </SafeAreaView>
+      </SideMenu>
     );
   }
 
