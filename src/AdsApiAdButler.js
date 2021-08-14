@@ -12,6 +12,7 @@ export default class AdsApiAdButler {
   #campaignsById = new Map();
   #apiKeyTest = 'da81d8cf585242c7818d43bdddcd0769';
   #apiKeyLive = 'b87ea9fb1559cbea91d941f0be63ce9b';
+  #filterSchema = {};
 
   constructor() {
     // this.restAPI_Creatives();
@@ -89,21 +90,33 @@ export default class AdsApiAdButler {
   }
 
   //ad items give image, meta, url, etc. but no start/end dates
-  restAPI_AdItems = async () => {
-    let res = await this.#restAPI('ad-items', true);
-    if(res.status != 200){
-      console.error('restapi failed')
+  #restAPI_AdItems = async () => {
+    let res = await this.#restAPI('ad-items',true);
+    if (res.status != 200) {
+      console.error('restapi failed');
     }
     let json = await res.json();
     console.log(json.data.length + " ad items fetched");
 
     for (const k in json.data) {
       const e = new AdItem(json.data[k]);
-      if(e.creative) {  // some don't have creative data (not added from Library)
+      if (e.creative) { // some don't have creative data (not added from Library)
         e.creative_url = `https://servedbyadbutler.com/getad.img/;libID=${e.creative.id}`;
+      }
+      // the all important filter schema
+      if (e.id == '520484750') {
+        for (const k in e.metadata) {
+          let arr = e.metadata[k].split(',');
+          this.#filterSchema[k] = arr.map(str => str.trim());
+        }
       }
       this.#allAdItems.push(e);
     }
+  };
+
+  getFilterSchema() {
+    if (this.#filterSchema.length == 0) console.error('empty schema');
+    return this.#filterSchema;
   }
 
   getAdItems = async () => {
@@ -112,7 +125,7 @@ export default class AdsApiAdButler {
       return this.#allAdItems;
     }
     // or no
-    await this.restAPI_AdItems();
+    await this.#restAPI_AdItems();
     return this.#allAdItems;
   }
 

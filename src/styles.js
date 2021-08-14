@@ -2,7 +2,7 @@ import { Dimensions, Platform, StyleSheet } from "react-native";
 import { configureFonts, useTheme } from "react-native-paper";
 
 
-const screenWidth = Dimensions.get('window').width;
+const {width:screenWidth, height:screenHeight} = Dimensions.get('window');
 
 const theme = {
   dark: false,
@@ -11,12 +11,13 @@ const theme = {
       // most frequent, belt nav 
       primary: '#ccf',
       // bottom nav
-      secondary: '#eee',
-      accent: '#03dac4',
-      background: '#cdd',
+      secondary: '#eaeaef',
+      accent: '#aef',
+      background: '#def',
       // drop down bg
       surface: '#000',
-      error: '#B00020',
+      // also used for cancel actions, 'clear'
+      error: '#b44',
       onPrimary: '#ccf7ff',
       // snackbar bg color
       onSurface: '#de3',
@@ -80,11 +81,60 @@ const styles = StyleSheet.create({
     height: maskSize,
     width: maskSize,
   }),
+  filtersContainer:{
+    flexBasis: 38,
+    width: screenWidth,
+    backgroundColor: theme.colors.background,
+  },
+  filterButtons:{
+    flex:1,
+    backgroundColor: theme.colors.secondary,
+    flexDirection:'row',
+    justifyContent: 'center',
+    alignItems:'center',
+  },
+  filterButtonsClear: {
+    paddingRight: 15,
+  },
+  filterButtonsFilter: {
+    flex:1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  beltNav: {
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#000',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: screenWidth,
+    height: 56,
+    backgroundColor: theme.colors.primary
+  },
   appbar: {
     flexBasis: 38,
     justifyContent: 'space-around',
     width: screenWidth,
-  }
+  },
 });
 
-export {styles, theme};
+const filterModalStyles = StyleSheet.create({
+  // modal bg
+  container: {
+  },
+  scrollView:{
+    // backgroundColor:theme.colors.background
+  },
+  // also covers the screen
+  backdrop: {
+  },
+  // covers the screen
+  modalWrapper: {
+  },
+  listContainer: {
+  },
+});
+
+export {styles, theme, filterModalStyles};

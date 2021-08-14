@@ -1,12 +1,11 @@
 import React from "react"
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { Appbar, useTheme } from "react-native-paper";
+import {styles} from '../styles';
 
 const BeltNav = (props) => {
     const theme = useTheme();
-    const screenWidth = Dimensions.get('window').width;
     const iconSize = 34;
-    const navHeight = 56;
     const app = props.app;
 
     const IconNav = (props) => {
@@ -21,9 +20,7 @@ const BeltNav = (props) => {
     };
 
     return (
-        <View style={{alignItems:'center', borderBottomWidth:1, borderBottomColor:'#000', 
-        flexDirection:'row', justifyContent:'space-evenly', width: screenWidth, 
-        height: navHeight, backgroundColor: theme.colors.primary }}>
+        <View style={styles.beltNav}>
             <IconNav title='random' icon='dice-3' onPress={app.switchToRandomTexture} />
             <IconNav title='save' icon='heart-plus' onPress={app.addToFavorites} />
             <IconNav title='' 
