@@ -6,7 +6,7 @@ import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {Button,Snackbar,Portal,Dialog,Paragraph,Appbar} from 'react-native-paper';
+import {Button,Snackbar,Portal,Paragraph,Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
@@ -32,13 +32,12 @@ export default class App extends React.Component {
       currentTexture: 0,
       multiSelectItems: [],
       snackbarVisible: false,
-      dialogVisible: false,
       drawerVisible: false,
       userLoggedIn: false,
     }
 
     this.renderCount = 0;
-    this.isRelease = !false;
+    this.isRelease = false;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
@@ -156,9 +155,6 @@ export default class App extends React.Component {
       {cancelable: true}
     );
   }
-
-  showDialog = () => this.setState({dialogVisible: true});
-  hideModal = () => this.setState({dialogVisible: false});
 
   showDrawer = () => this.setState({drawerVisible: true});
   hideDrawer = () => this.setState({drawerVisible: false});
@@ -481,14 +477,6 @@ export default class App extends React.Component {
           >this is only a test ({Platform.Version}) <Icon name='check-circle-outline' /></Snackbar>
         </Portal>
 
-        <Portal>
-          <Dialog style={{width: 100,height: 150,backgroundColor: 'transparent'}} visible={this.state.dialogVisible} onDismiss={this.hideModal}
-            contentContainerStyle={{padding: 20,margin: 40}} style={{marginVertical: 40}}>
-            <Dialog.Title>Buy button explanation</Dialog.Title>
-            <Dialog.Content><Paragraph>Well, here's the deal</Paragraph></Dialog.Content>
-          </Dialog>
-        </Portal>
-
         <Appbar.Header style={styles.appbar}>
           <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
           <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
@@ -520,7 +508,6 @@ export default class App extends React.Component {
             {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
             {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
             <MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />
-            {/* <MyButton iconName='projector-screen' text='dialog' onPress={this.showDialog} /> */}
             {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
             {this.state.userLoggedIn ? <MyButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
               : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
