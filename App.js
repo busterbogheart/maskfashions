@@ -1,12 +1,12 @@
 "use strict";
 
 import React from 'react';
-import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Dimensions,Alert,TouchableOpacity,Touchable} from 'react-native';
+import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {Button,Snackbar,Portal,Paragraph,Appbar} from 'react-native-paper';
+import {Button,Snackbar,Portal,Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
@@ -21,33 +21,35 @@ import SideMenu from 'react-native-side-menu-updated';
 import DrawerMenu from './src/components/DrawerMenu';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 
+
 export default class App extends React.Component {
 
   constructor(props) {
     super(props);
+    console.debug('\n\n__________SESSION START__________________________');
 
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
       currentTexture: 0,
-      multiSelectItems: [],
+      multiSelectedItems: [],
       snackbarVisible: false,
       drawerVisible: false,
       userLoggedIn: false,
     }
 
     this.renderCount = 0;
-    this.isRelease = false;
+    this.isRelease = true;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
-    this.maskSize = 220;
+    this.maskSize = 200;
     this.textureList = [
-      {adId: '314524t',url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
-      {adId: '3145644t',url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
-      {adId: '3146264t',url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg'},
-      {adId: '314254t',url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg'},
-      {adId: '31223563',url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg'},
+      {adId: '314524t',metadata: {'acceptsfilter':'yes','colors':'white,blue','pattern':'checked,checkered'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
+      {adId: '3145644t',metadata: {}, url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
+      {adId: '3146264t',metadata: {'pattern':'floral'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg'},
+      {adId: '314254t',metadata: {'pattern':'skulls,floral','colors':'black, white'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg'},
+      {adId: '31223563',metadata: {'style':'space','colors':'black'}, url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg'},
     ];
 
     this.multiSelectData = [];
@@ -161,6 +163,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     console.debug('componentdidmount');
+
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -244,9 +247,17 @@ export default class App extends React.Component {
       Image.prefetch(uri)
         .then(
           successBool => {},
-          failReason => console.warn(failReason))
+          failReason => {
+            // connectivity issues cause this to fail
+            console.warn(failReason);
+          })
         .catch(e => console.error(e))
     });
+
+    Image.prefetch(Image.resolveAssetSource(require('./assets/images/maskmask.png')).uri).then(response => {
+      console.log('prefetched mask.png? ',response);
+      this.setState({});
+    })
   }
 
   // authed user and device unique id required for favorites.  
@@ -394,20 +405,19 @@ export default class App extends React.Component {
   }
 
   renderItem = ({item,index,sep}) => {
-    const maskmask = './assets/images/maskmask.png';
     // TODO check androidrenderingmode software
     return (
       <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
         maskElement={
           <View style={{flex: 1,justifyContent: 'center',alignItems: 'center',}}>
             <Image key={Date.now()} style={{width: this.maskSize - 50,height: this.maskSize - 50}} width={this.maskSize - 50} height={this.maskSize - 50}
-              source={require(maskmask)} ></Image>
+              source={require('./assets/images/maskmask.png')} defaultSource={require('./assets/images/maskmask.png')} ></Image>
           </View>
         }>
         <TouchableOpacity onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={100} activeOpacity={.5} >
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{width: this.maskSize,height: this.maskSize,top: -40}} key={Date.now() + item.adId}
+            style={{width: this.maskSize,height: this.maskSize,top: -36}} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{uri: item.url}} />
         </TouchableOpacity>
       </MaskedView>
@@ -491,16 +501,26 @@ export default class App extends React.Component {
 
         <BeltNav app={this} />
 
-        {/* <MaskedView key='3errrrrr' maskElement={
-              <View style={{ backgroundColor: 'transparent', flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-                <Image key={Date.now()} style={{ width: 50, height: 50 }} width={50} height={50} source={require('./assets/images/maskmask.png')} ></Image>
-              </View>
-            }>
-            <Image fadeDuration={100} progressiveRenderingEnabled={true}
-              style={{ width: 50, height: 50 }} key={Date.now()}
-              width={50} height={50} source={{ uri: this.textureList[0].url }} />
+
+        <View style={{flexDirection: 'row',opacity:0, display: 'none', width:0,height:0}} name='debug this shit' >
+          <Image defaultSource={require('./assets/images/maskmask.png')} key={Date.now()+Math.random()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
+
+          <Image key={Date.now()+Math.random()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
+
+          <Image progressiveRenderingEnabled={true}
+              style={{width: 50,height: 50}} key={Date.now()+Math.random()}
+              width={50} height={50} source={{uri: this.textureList[0].url}} />
+
+          <MaskedView key='3errrrrr' style={{width: 50,height: 50}} maskElement={
+            <View style={{flex: 1,justifyContent: 'center',alignItems: 'center',}}>
+              <Image defaultSource={require('./assets/images/maskmask.png')} key={Date.now()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
+            </View>
+          }>
+            <Image progressiveRenderingEnabled={true}
+              style={{width: 50,height: 50}} key={Date.now()}
+              width={50} height={50} source={{uri: this.textureList[0].url}} />
           </MaskedView>
-  */}
+        </View>
 
         {this.isRelease == false ? (
           <View name="test-buttons" style={styles.buttonContainer}>
@@ -533,11 +553,11 @@ export default class App extends React.Component {
                   <Icon name='format-list-bulleted-type' size={28} style={{paddingHorizontal: 5}} />
                   <Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter</Text>
                 </TouchableOpacity>
-              {this.state.multiSelectItems.length > 0 ?
+                {this.state.multiSelectedItems.length > 0 ?
                   <TouchableOpacity onPress={() => {this.multiSelectRef._removeAllItems()}} style={styles.filterButtonsClear}>
-                    <Text style={{color: theme.colors.error, fontSize:15, fontWeight:'bold'}}>clear</Text>
+                    <Text style={{color: theme.colors.error,fontSize: 15,fontWeight: 'bold'}}>clear</Text>
                   </TouchableOpacity>
-                : <></>}
+                  : <></>}
               </View>
               <SectionedMultiSelect
                 ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
@@ -588,20 +608,20 @@ export default class App extends React.Component {
                 // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
                 onSelectedItemsChange={(items) => {
                   console.debug('selecteditemschange:',JSON.stringify(items,null,1))
-                  this.setState({multiSelectItems: items});
+                  this.setState({multiSelectedItems: items});
                 }}
                 onSelectedItemObjectsChange={(items) => {
                   // returned as the original objects not just ids
                   console.debug('selecteditemsobjectchange:',JSON.stringify(items,null,1))
                 }}
-                selectedItems={this.state.multiSelectItems}
+                selectedItems={this.state.multiSelectedItems}
                 onToggleSelector={(modalOpen) => {console.log(`filter modal open? ${modalOpen}`)}}
                 onConfirm={() => {
                   // no args
-                  console.debug('confirmed:',this.state.multiSelectItems);
+                  console.debug('confirmed:',this.state.multiSelectedItems);
                 }}
                 onCancel={() => {
-                  this.setState({multiSelectItems: []})
+                  this.setState({multiSelectedItems: []})
                 }}
               />
             </>

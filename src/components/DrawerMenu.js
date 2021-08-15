@@ -3,6 +3,7 @@ import {Dimensions,Linking,Platform,Share as RNShare,Text,TouchableOpacity,View}
 import {Appbar,useTheme} from "react-native-paper";
 import {createIconSet} from "react-native-vector-icons";
 import Share from 'react-native-share';
+import DeviceInfo from 'react-native-device-info';
 
 const DrawerMenu = (props) => {
     const theme = useTheme();
@@ -45,7 +46,17 @@ const DrawerMenu = (props) => {
 
     const emailMe = async () => {
         const email = 'mailto:hello@maskfashions.app'
-        Linking.openURL(`${email}?subject=bug report`);
+        //const info = Promise.allSettled([
+        //    DeviceInfo.getApiLevel(),
+        //    DeviceInfo.getUniqueId(),
+        //])
+        //    .then(results => {
+        //        results.forEach(res => {
+        //            console.log(res)
+        //        })
+        //    });
+
+        Linking.openURL(`${email}?subject=bug report&body=`);
     }
 
     return (

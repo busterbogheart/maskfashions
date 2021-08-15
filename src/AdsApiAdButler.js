@@ -121,6 +121,7 @@ export default class AdsApiAdButler {
 
   getAdItems = async () => {
     // cached?
+    // TODO actual asyncstorage cache
     if(this.#allAdItems.length > 1){
       return this.#allAdItems;
     }

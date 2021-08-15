@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     width: maskSize,
   }),
   filtersContainer:{
-    flexBasis: 38,
+    flexBasis: 42,
     width: screenWidth,
     backgroundColor: theme.colors.background,
   },
@@ -94,19 +94,22 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   filterButtonsClear: {
+    position: 'absolute',
+    right: 15,
     paddingRight: 15,
+    paddingLeft: 7,
+    paddingVertical: 7,
   },
   filterButtonsFilter: {
     flex:1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
   },
   beltNav: {
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: '#555',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     width: screenWidth,
@@ -127,14 +130,18 @@ const filterModalStyles = StyleSheet.create({
   scrollView:{
     // backgroundColor:theme.colors.background
   },
-  // also covers the screen
+  // covers the screen
   backdrop: {
+    backgroundColor: theme.colors.background
   },
   // covers the screen
   modalWrapper: {
   },
   listContainer: {
   },
+  confirmText: {
+    color: theme.colors.text
+  }
 });
 
 export {styles, theme, filterModalStyles};
