@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		9A476490240D54D700E07300 /* RNTDeepARViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */; };
@@ -35,6 +34,7 @@
 		D075792D26BF4ED700A3ACBB /* DeepAR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D075792B26BF4ED000A3ACBB /* DeepAR.framework */; };
 		D075792E26BF4ED700A3ACBB /* DeepAR.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D075792B26BF4ED000A3ACBB /* DeepAR.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D0C440AD26C046C2002B882B /* mask-08 in Resources */ = {isa = PBXBuildFile; fileRef = D0C440AC26C046C2002B882B /* mask-08 */; };
+		D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */; };
 		D0D8D5B426B7369900E6692A /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D0D8D5B326B7369900E6692A /* fonts */; };
 /* End PBXBuildFile section */
 
@@ -59,7 +59,7 @@
 		13B07F961A680F5B00A75B9A /* Mask Fashions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mask Fashions.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = deeparRNExample/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = deeparRNExample/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = deeparRNExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = deeparRNExample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = deeparRNExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = deeparRNExample/main.m; sourceTree = "<group>"; };
@@ -179,7 +179,7 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				D02A43FB26B4BA4200F9884D /* GoogleService-Info.plist */,
 				9A47648E240D54C000E07300 /* RNTDeepARViewManager.h */,
@@ -344,7 +344,7 @@
 				9A4764C7240E89A200E07300 /* plastic_ocean in Resources */,
 				9A4764C1240E89A200E07300 /* topology in Resources */,
 				9A4764C5240E89A200E07300 /* scuba in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */,
 				9A4764C3240E89A200E07300 /* hair_segmentation in Resources */,
 				9A4764C9240E89A200E07300 /* beauty in Resources */,
 				9A4764CE240E89A200E07300 /* aviators in Resources */,
@@ -457,18 +457,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = deeparRNExample;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -591,7 +579,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -638,7 +626,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
