@@ -36,6 +36,7 @@ export default class App extends React.Component {
       snackbarVisible: false,
       drawerVisible: false,
       userLoggedIn: false,
+      forceRenderMaskScroll: 0,
     }
 
     this.renderCount = 0;
@@ -164,6 +165,8 @@ export default class App extends React.Component {
   componentDidMount() {
     console.debug('componentdidmount');
 
+    this.preloadMaskPNG();
+
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -186,6 +189,8 @@ export default class App extends React.Component {
     }
 
     let butler = new AdButler();
+    butler.restAPI_ManualTracking();
+
     let allAds;
     // currently also populates filterSchema
     butler.getAdItems().then(ads => {
@@ -253,11 +258,6 @@ export default class App extends React.Component {
           })
         .catch(e => console.error(e))
     });
-
-    Image.prefetch(Image.resolveAssetSource(require('./assets/images/maskmask.png')).uri).then(response => {
-      console.log('prefetched mask.png? ',response);
-      this.setState({});
-    })
   }
 
   // authed user and device unique id required for favorites.  
@@ -390,6 +390,14 @@ export default class App extends React.Component {
       });
   }
 
+  preloadMaskPNG = () => {
+    Image.prefetch(Image.resolveAssetSource(require('./assets/images/maskmask.png')).uri).then(response => {
+      console.log('prefetched mask.png? ',response);
+      // crucial
+      this.setState({forceRenderMaskScroll:new Date()});
+    })
+  }
+
   switchToNextTexture = () => {
     let tex = this.textureList[this.state.currentTexture];
     this.state.currentTexture = this.state.currentTexture + 1 == this.textureList.length ? 0 : this.state.currentTexture + 1;
@@ -477,7 +485,7 @@ export default class App extends React.Component {
     }
 
     return (
-      <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={140} menuPosition='right' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
+      <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={120} menuPosition='left' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
 
         <Portal>
           <Snackbar
@@ -488,8 +496,8 @@ export default class App extends React.Component {
         </Portal>
 
         <Appbar.Header style={styles.appbar}>
-          <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
           <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
+          <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
         </Appbar.Header>
 
         <View name="DeepAR container" style={styles.deeparContainer}>
@@ -500,27 +508,6 @@ export default class App extends React.Component {
         </View>
 
         <BeltNav app={this} />
-
-
-        <View style={{flexDirection: 'row',opacity:0, display: 'none', width:0,height:0}} name='debug this shit' >
-          <Image defaultSource={require('./assets/images/maskmask.png')} key={Date.now()+Math.random()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
-
-          <Image key={Date.now()+Math.random()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
-
-          <Image progressiveRenderingEnabled={true}
-              style={{width: 50,height: 50}} key={Date.now()+Math.random()}
-              width={50} height={50} source={{uri: this.textureList[0].url}} />
-
-          <MaskedView key='3errrrrr' style={{width: 50,height: 50}} maskElement={
-            <View style={{flex: 1,justifyContent: 'center',alignItems: 'center',}}>
-              <Image defaultSource={require('./assets/images/maskmask.png')} key={Date.now()} style={{width: 50,height: 50,top: 10}} width={50} height={50} source={require('./assets/images/maskmask.png')} />
-            </View>
-          }>
-            <Image progressiveRenderingEnabled={true}
-              style={{width: 50,height: 50}} key={Date.now()}
-              width={50} height={50} source={{uri: this.textureList[0].url}} />
-          </MaskedView>
-        </View>
 
         {this.isRelease == false ? (
           <View name="test-buttons" style={styles.buttonContainer}>
@@ -537,7 +524,7 @@ export default class App extends React.Component {
 
         {/* <MFDropdown data={data} ></MFDropdown> */}
 
-        <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
+        <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
           <FlatList
             contentContainerStyle={{alignItems: 'center',}}
             keyExtractor={(item,index) => item.adId}
