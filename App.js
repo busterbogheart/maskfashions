@@ -8,7 +8,6 @@ import {filterModalStyles,styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
 import {Button,Snackbar,Portal,Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MFDropdown from './src/MFDropdown';
 import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -215,6 +214,7 @@ export default class App extends React.Component {
     let allAds;
     // currently also populates filterSchema
     butler.getAdItems().then(ads => {
+      console.debug('got ads and filter schema');
       // loaded
       allAds = ads;
       let sch = butler.getFilterSchema();
@@ -508,14 +508,17 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container} >
-        <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={120} menuPosition='left' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
+        <SideMenu menu={<DrawerMenu app={this} />} bounceBackOnOverdraw={false} openMenuOffset={120}
+          menuPosition='left' isOpen={this.state.drawerVisible} overlayColor={'#00000066'}
+          onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}}
+        >
           <Portal>
             <Snackbar
               visible={this.state.snackbarVisible} duration={5000}
-              onDismiss={() => {console.debug('dismiss?'); }}
+              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false}); }}
               action={{label: 'Ok', onPress: () => this.setState({snackbarVisible: false})}}
             >
-              {this.state.snackbarText ? <Text>{this.state.snackbarText}</Text> : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
+              {this.state.snackbarText ? this.state.snackbarText : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
             </Snackbar>
           </Portal>
 
@@ -545,8 +548,6 @@ export default class App extends React.Component {
               }
             </View>
           ) : <></>}
-
-          {/* <MFDropdown data={data} ></MFDropdown> */}
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
             <FlatList 
