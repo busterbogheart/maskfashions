@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity} from 'react-native';
+import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView, Dimensions, useWindowDimensions} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
@@ -34,6 +34,7 @@ export default class App extends React.Component {
       currentTexture: 0,
       multiSelectedItems: [],
       snackbarVisible: false,
+      snackbarText: null,
       drawerVisible: false,
       userLoggedIn: false,
       forceRenderMaskScroll: 0,
@@ -44,16 +45,18 @@ export default class App extends React.Component {
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
-    this.maskSize = 200;
+    this.screenWidth = Dimensions.get('window').width;
+    this.maskSize = this.screenWidth / 1.3;
     this.textureList = [
-      {adId: '314524t',metadata: {'acceptsfilter':'yes','colors':'white,blue','pattern':'checked,checkered'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
-      {adId: '3145644t',metadata: {}, url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
-      {adId: '3146264t',metadata: {'pattern':'floral'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg'},
-      {adId: '314254t',metadata: {'pattern':'skulls,floral','colors':'black, white'}, url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg'},
-      {adId: '31223563',metadata: {'style':'space','colors':'black'}, url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg'},
+      {adId: '314524t',metadata: {'acceptsfilter': 'yes','colors': 'white,blue','pattern': 'checked,checkered'},url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
+      {adId: '3145644t',metadata: {},url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
+      {adId: '3146264t',metadata: {'pattern': 'floral'},url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg'},
+      {adId: '314254t',metadata: {'pattern': 'skulls,floral','colors': 'black, white'},url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg'},
+      {adId: '31223563',metadata: {'style': 'space','colors': 'black'},url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg'},
     ];
 
     this.multiSelectData = [];
+    this.firstTimeFace = null;
   }
 
   didAppear() {
@@ -71,7 +74,6 @@ export default class App extends React.Component {
   }
 
   onEventSent = (event) => {
-    console.debug(`event sent from native: ${event.type}`);
     if (event.type === 'cameraSwitch') {
       this.setState({switchCameraInProgress: false})
     } else if (event.type === 'initialized') {
@@ -88,7 +90,14 @@ export default class App extends React.Component {
     } else if (event.type === 'didSwitchEffect') {
 
     } else if (event.type === 'imageVisibilityChanged') {
-
+      console.log('deepar imagevisibilitychanged')
+    } else if (event.type === 'faceVisibilityChanged') {
+      let faceIsDetected = event.value === "true";
+      console.log('deepar faceVisible?: '+faceIsDetected)
+      if (faceIsDetected && this.firstTimeFace) {
+        clearTimeout(this.firstTimeFace);
+        this.firstTimeFace = null;
+      }
     }
   }
 
@@ -142,7 +151,8 @@ export default class App extends React.Component {
     }
   }
 
-  showSnackbar = (text = '') => {
+  showSnackbar = (text = null) => {
+    this.setState({snackbarText: text});
     this.setState({snackbarVisible: true});
   }
 
@@ -167,6 +177,11 @@ export default class App extends React.Component {
 
     this.preloadMaskPNG();
 
+    this.firstTimeFace = setTimeout(() => {
+      this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
+    }, 2000);
+
+
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -190,6 +205,12 @@ export default class App extends React.Component {
 
     let butler = new AdButler();
     butler.restAPI_ManualTracking();
+
+    /*
+      1. get ad items, filter schema
+      2. preload texture CDN URLs
+      3. (save textures locally?)
+    */
 
     let allAds;
     // currently also populates filterSchema
@@ -394,7 +415,7 @@ export default class App extends React.Component {
     Image.prefetch(Image.resolveAssetSource(require('./assets/images/maskmask.png')).uri).then(response => {
       console.log('prefetched mask.png? ',response);
       // crucial
-      this.setState({forceRenderMaskScroll:new Date()});
+      this.setState({forceRenderMaskScroll: new Date()});
     })
   }
 
@@ -414,21 +435,22 @@ export default class App extends React.Component {
 
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
+    const maskSizeScale = .77;
     return (
+        <TouchableOpacity onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={40} activeOpacity={.5} >
       <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
         maskElement={
-          <View style={{flex: 1,justifyContent: 'center',alignItems: 'center',}}>
-            <Image key={Date.now()} style={{width: this.maskSize - 50,height: this.maskSize - 50}} width={this.maskSize - 50} height={this.maskSize - 50}
+          <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
+            <Image key={Date.now()} style={{width: this.maskSize * maskSizeScale,height: this.maskSize * maskSizeScale}} width={this.maskSize * maskSizeScale} height={this.maskSize * maskSizeScale}
               source={require('./assets/images/maskmask.png')} defaultSource={require('./assets/images/maskmask.png')} ></Image>
           </View>
         }>
-        <TouchableOpacity onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={100} activeOpacity={.5} >
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{width: this.maskSize,height: this.maskSize,top: -36}} key={Date.now() + item.adId}
+            style={{width: this.maskSize,height: this.maskSize,top: -(this.maskSize * .18)}} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{uri: item.url}} />
-        </TouchableOpacity>
       </MaskedView>
+        </TouchableOpacity>
     )
   };
 
@@ -485,142 +507,143 @@ export default class App extends React.Component {
     }
 
     return (
-      <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={120} menuPosition='left' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
+      <View style={styles.container} >
+        <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={120} menuPosition='left' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
+          <Portal>
+            <Snackbar
+              visible={this.state.snackbarVisible} duration={2000}
+              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false})}}
+            // action={{label:'',onPress:()=>{}}} 
+            >
+              {this.state.snackbarText ? <Text>{this.state.snackbarText}</Text> : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
+            </Snackbar>
+          </Portal>
 
-        <Portal>
-          <Snackbar
-            visible={this.state.snackbarVisible} duration={2000}
-            onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false})}}
-          // action={{label:'',onPress:()=>{}}} 
-          >this is only a test ({Platform.Version}) <Icon name='check-circle-outline' /></Snackbar>
-        </Portal>
+          <Appbar.Header style={styles.appbar}>
+            <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
+            <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
+          </Appbar.Header>
 
-        <Appbar.Header style={styles.appbar}>
-          <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
-          <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
-        </Appbar.Header>
-
-        <View name="DeepAR container" style={styles.deeparContainer}>
-          {permissionsGranted ?
-            <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-            :
-            <Text>permissions not granted</Text>}
-        </View>
-
-        <BeltNav app={this} />
-
-        {this.isRelease == false ? (
-          <View name="test-buttons" style={styles.buttonContainer}>
-            <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
-            {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
-            {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-            <MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />
-            {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
-            {this.state.userLoggedIn ? <MyButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
-              : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
-            }
+          <View name="DeepAR container" style={styles.deeparContainer}>
+            {permissionsGranted ?
+              <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
+              :
+              <Text>permissions not granted</Text>}
           </View>
-        ) : <></>}
 
-        {/* <MFDropdown data={data} ></MFDropdown> */}
+          <BeltNav app={this} />
 
-        <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
-          <FlatList
-            contentContainerStyle={{alignItems: 'center',}}
-            keyExtractor={(item,index) => item.adId}
-            horizontal={true} data={this.textureList} renderItem={this.renderItem} />
-        </View>
+          {this.isRelease == false ? (
+            <View name="test-buttons" style={styles.buttonContainer}>
+              <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+              {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
+              {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
+              <MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />
+              {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
+              {this.state.userLoggedIn ? <MyButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
+                : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
+              }
+            </View>
+          ) : <></>}
 
+          {/* <MFDropdown data={data} ></MFDropdown> */}
 
-        <View name="filters" style={[styles.filtersContainer]}>
-          {this.multiSelectData.length > 0 ?
-            <>
-              <View name="filter buttons" style={styles.filterButtons}>
-                <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
-                  <Icon name='format-list-bulleted-type' size={28} style={{paddingHorizontal: 5}} />
-                  <Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter</Text>
-                </TouchableOpacity>
-                {this.state.multiSelectedItems.length > 0 ?
-                  <TouchableOpacity onPress={() => {this.multiSelectRef._removeAllItems()}} style={styles.filterButtonsClear}>
-                    <Text style={{color: theme.colors.error,fontSize: 15,fontWeight: 'bold'}}>clear</Text>
+          <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
+            <FlatList 
+              contentContainerStyle={{alignItems: 'center',}}
+              keyExtractor={(item,index) => item.adId}
+              horizontal={true} data={this.textureList} renderItem={this.renderItem} />
+          </View>
+
+          <View name="filters" style={[styles.filtersContainer]}>
+            {this.multiSelectData.length > 0 ?
+              <>
+                <View name="filter buttons" style={styles.filterButtons}>
+                  <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
+                    <Icon name='format-list-bulleted-type' size={28} style={{paddingHorizontal: 5}} />
+                    <Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter</Text>
                   </TouchableOpacity>
-                  : <></>}
-              </View>
-              <SectionedMultiSelect
-                ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
-                styles={filterModalStyles}
-                colors={{
-                  // confirm button bg, dropdown arrow color
-                  primary: theme.colors.primary,
-                  // check icon color
-                  success: '#2a2',
-                  // cancel button bg
-                  cancel: theme.colors.error,
-                  // main category bg
-                  itemBackground: '#fff',
-                  subItemBackground: '#fff',
-                  // button text
-                  selectToggleTextColor: theme.colors.text,
-                }}
-                items={this.multiSelectData}
-                IconRenderer={filterIconRenderer}
-                uniqueKey="id"
-                subKey="children"
-                selectText=''
-                //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
-                showDropDowns={true}
-                selectChildren={true}
-                // remove down arrow at start
-                selectToggleIconComponent={<></>}
-                // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
-                expandDropDowns={false}
-                // headerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>header</Text></View>}
-                // footerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>foot</Text></View>}
-                // stickyFooterComponent={<View style={{backgroundColor:'#bfd',padding:5,height:30}}><Text style={{textAlign:'right'}}>hot tip: Be hot.</Text></View>}
-                readOnlyHeadings={false}
-                showRemoveAll={true}
-                animateDropDowns={false}
-                modalAnimationType='slide'
-                modalWithSafeAreaView={true}
-                modalWithTouchable={true}
-                hideSearch={true}
-                hideSelect={true}
-                showCancelButton={true}
-                showChips={false}
-                highlightChildren={true}
-                confirmText='APPLY'
-                selectedIconOnLeft={true}
-                selectedIconComponent={<Icon name='check-bold' color='#2c2' style={{paddingRight: 3}} />}
-                alwaysShowSelectText={false}
-                // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
-                onSelectedItemsChange={(items) => {
-                  console.debug('selecteditemschange:',JSON.stringify(items,null,1))
-                  this.setState({multiSelectedItems: items});
-                }}
-                onSelectedItemObjectsChange={(items) => {
-                  // returned as the original objects not just ids
-                  console.debug('selecteditemsobjectchange:',JSON.stringify(items,null,1))
-                }}
-                selectedItems={this.state.multiSelectedItems}
-                onToggleSelector={(modalOpen) => {console.log(`filter modal open? ${modalOpen}`)}}
-                onConfirm={() => {
-                  // no args
-                  console.debug('confirmed:',this.state.multiSelectedItems);
-                }}
-                onCancel={() => {
-                  this.setState({multiSelectedItems: []})
-                }}
-              />
-            </>
-            : <></>}
-        </View>
+                  {this.state.multiSelectedItems.length > 0 ?
+                    <TouchableOpacity onPress={() => {this.multiSelectRef._removeAllItems()}} style={styles.filterButtonsClear}>
+                      <Text style={{color: theme.colors.error,fontSize: 15,fontWeight: 'bold'}}>clear</Text>
+                    </TouchableOpacity>
+                    : <></>}
+                </View>
+                <SectionedMultiSelect
+                  ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
+                  styles={filterModalStyles}
+                  colors={{
+                    // confirm button bg, dropdown arrow color
+                    primary: theme.colors.primary,
+                    // check icon color
+                    success: '#2a2',
+                    // cancel button bg
+                    cancel: theme.colors.error,
+                    // main category bg
+                    itemBackground: '#fff',
+                    subItemBackground: '#fff',
+                    // button text
+                    selectToggleTextColor: theme.colors.text,
+                  }}
+                  items={this.multiSelectData}
+                  IconRenderer={filterIconRenderer}
+                  uniqueKey="id"
+                  subKey="children"
+                  selectText=''
+                  //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
+                  showDropDowns={true}
+                  selectChildren={true}
+                  // remove down arrow at start
+                  selectToggleIconComponent={<></>}
+                  // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
+                  expandDropDowns={false}
+                  // headerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>header</Text></View>}
+                  // footerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>foot</Text></View>}
+                  // stickyFooterComponent={<View style={{backgroundColor:'#bfd',padding:5,height:30}}><Text style={{textAlign:'right'}}>hot tip: Be hot.</Text></View>}
+                  readOnlyHeadings={false}
+                  showRemoveAll={true}
+                  animateDropDowns={false}
+                  modalAnimationType='slide'
+                  modalWithSafeAreaView={true}
+                  modalWithTouchable={true}
+                  hideSearch={true}
+                  hideSelect={true}
+                  showCancelButton={true}
+                  showChips={false}
+                  highlightChildren={true}
+                  confirmText='APPLY'
+                  selectedIconOnLeft={true}
+                  selectedIconComponent={<Icon name='check-bold' color='#2c2' style={{paddingRight: 3}} />}
+                  alwaysShowSelectText={false}
+                  // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
+                  onSelectedItemsChange={(items) => {
+                    console.debug('selecteditemschange:',JSON.stringify(items,null,1))
+                    this.setState({multiSelectedItems: items});
+                  }}
+                  onSelectedItemObjectsChange={(items) => {
+                    // returned as the original objects not just ids
+                    console.debug('selecteditemsobjectchange:',JSON.stringify(items,null,1))
+                  }}
+                  selectedItems={this.state.multiSelectedItems}
+                  onToggleSelector={(modalOpen) => {console.log(`filter modal open? ${modalOpen}`)}}
+                  onConfirm={() => {
+                    // no args
+                    console.debug('confirmed:',this.state.multiSelectedItems);
+                  }}
+                  onCancel={() => {
+                    this.setState({multiSelectedItems: []})
+                  }}
+                />
+              </>
+              : <></>}
+          </View>
 
+          {/* <BottomNav app={this} /> */}
 
-        {/* <BottomNav app={this} /> */}
+          {/* <Text style={{fontSize:18}}><Icon name='heart' size={18} />whoa</Text> */}
 
-        {/* <Text style={{fontSize:18}}><Icon name='heart' size={18} />whoa</Text> */}
-
-      </SideMenu>
+        </SideMenu>
+      </View>
     );
   }
 

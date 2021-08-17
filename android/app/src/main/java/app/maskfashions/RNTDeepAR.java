@@ -361,7 +361,7 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
 
     @Override
     public void faceVisibilityChanged(boolean b) {
-
+        sendEvent("faceVisibilityChanged", String.valueOf(b), "");
     }
 
     @Override

@@ -9,18 +9,17 @@ const theme = {
   roundness: 3,
   colors: {
       // most frequent, belt nav 
-      primary: '#ccf',
-      // bottom nav
-      secondary: '#eaeaef',
-      accent: '#aef',
-      background: '#def',
-      // drop down bg
+      primary: '#a2e3eb',
+      // bottom nav, filter
+      secondary: '#EBEB3f',
+      accent: '#D11573',
+      background: '#EBEBEB',
       surface: '#000',
       // also used for cancel actions, 'clear'
-      error: '#b44',
+      error: '#612',
       onPrimary: '#ccf7ff',
       // snackbar bg color
-      onSurface: '#de3',
+      onSurface: '#ddd',
       text: '#333',
       // bottom nav
       textSecondary: '#888',
@@ -40,11 +39,11 @@ const theme = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
+    paddingBottom: Platform.OS == 'ios' ? 15 : 0,
     // alignContent: 'flex-start', //cross axis with flexWrap on, overrides alignContent of parent
     // alignSelf: 'stretch', // overrides parent's alignItems
-    justifyContent: 'space-between',   // children along main axis
-    alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
+    //justifyContent: 'space-between',   // children along main axis
+    //alignItems: 'flex-start', // children along cross axis.  for stretch to work, children must not be fixed in cross axis
     backgroundColor: theme.colors.background,  
   },
   deepar : {
@@ -108,12 +107,12 @@ const styles = StyleSheet.create({
   },
   beltNav: {
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: 3,
     borderBottomColor: '#555',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     width: screenWidth,
-    height: 56,
+    height: 58,
     backgroundColor: theme.colors.primary
   },
   appbar: {
