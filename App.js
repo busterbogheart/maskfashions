@@ -34,7 +34,7 @@ export default class App extends React.Component {
       multiSelectedItems: [],
       snackbarVisible: false,
       snackbarText: null,
-      drawerVisible: false,
+      sidemenuVisible: false,
       userLoggedIn: false,
       forceRenderMaskScroll: 0,
     }
@@ -168,8 +168,8 @@ export default class App extends React.Component {
     );
   }
 
-  showDrawer = () => this.setState({drawerVisible: true});
-  hideDrawer = () => this.setState({drawerVisible: false});
+  showDrawer = () => this.setState({sidemenuVisible: true});
+  hideDrawer = () => this.setState({sidemenuVisible: false});
 
   componentDidMount() {
     console.debug('componentdidmount');
@@ -179,7 +179,6 @@ export default class App extends React.Component {
     this.firstTimeFace = setTimeout(() => {
       this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
     }, 8000);
-
 
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
@@ -203,7 +202,6 @@ export default class App extends React.Component {
     }
 
     let butler = new AdButler();
-    butler.restAPI_ManualTracking();
 
     /*
       1. get ad items, filter schema
@@ -211,23 +209,20 @@ export default class App extends React.Component {
       3. (save textures locally?)
     */
 
-    let allAds;
     // currently also populates filterSchema
-    butler.getAdItems().then(ads => {
+    butler.getAdItems().then(allAds => {
       console.debug('got ads and filter schema');
-      // loaded
-      allAds = ads;
-      let sch = butler.getFilterSchema();
-      let count = 0;
-      let type;
-      for (const k in sch) {
+      let schema = butler.getFilterSchema();
+      butler.getAdTrackingURLS();
+      let count = 0, type;
+      for (const k in schema) {
         let childrenArr = [];
         // toggle vs multi option categories
-        if (sch[k].length == 1) {
+        if (schema[k].length == 1) {
           type = 'toggle';
         } else {
-          if (sch[k] != null) {
-            for (const el of sch[k]) {
+          if (schema[k] != null) {
+            for (const el of schema[k]) {
               childrenArr.push({name: el,id: `${count}-${el}`});
             }
           }
@@ -257,9 +252,7 @@ export default class App extends React.Component {
         }
       },reason => console.warn('failed: ' + reason));
 
-    //adItems();
     this.preloadAdItemImages();
-    //adItemTagSchema();
   }
 
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
@@ -509,8 +502,8 @@ export default class App extends React.Component {
     return (
       <View style={styles.container} >
         <SideMenu menu={<DrawerMenu app={this} />} bounceBackOnOverdraw={false} openMenuOffset={120}
-          menuPosition='left' isOpen={this.state.drawerVisible} overlayColor={'#00000066'}
-          onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}}
+          menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
+          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen})}}
         >
           <Portal>
             <Snackbar
