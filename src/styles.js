@@ -10,8 +10,9 @@ const theme = {
   colors: {
       // most frequent, belt nav 
       primary: '#a2e3eb',
-      // bottom nav, filter
-      secondary: '#EBEB3f',
+      // bottom nav, filter button
+      secondary: '#aBeBaf',
+      // snackbar action button
       accent: '#D11573',
       background: '#EBEBEB',
       surface: '#000',

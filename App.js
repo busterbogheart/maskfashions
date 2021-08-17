@@ -179,7 +179,7 @@ export default class App extends React.Component {
 
     this.firstTimeFace = setTimeout(() => {
       this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
-    }, 2000);
+    }, 8000);
 
 
     if (Platform.OS === 'android') {
@@ -511,9 +511,9 @@ export default class App extends React.Component {
         <SideMenu menu={<DrawerMenu app={this} />} openMenuOffset={120} menuPosition='left' isOpen={this.state.drawerVisible} onChange={(isOpen) => {this.setState({drawerVisible: isOpen})}} >
           <Portal>
             <Snackbar
-              visible={this.state.snackbarVisible} duration={2000}
-              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false})}}
-            // action={{label:'',onPress:()=>{}}} 
+              visible={this.state.snackbarVisible} duration={5000}
+              onDismiss={() => {console.debug('dismiss?'); }}
+              action={{label: 'Ok', onPress: () => this.setState({snackbarVisible: false})}}
             >
               {this.state.snackbarText ? <Text>{this.state.snackbarText}</Text> : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
             </Snackbar>
