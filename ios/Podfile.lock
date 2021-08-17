@@ -616,6 +616,8 @@ PODS:
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
   - React-jsinspector (0.63.2)
+  - react-native-safe-area-context (3.3.0):
+    - React-Core
   - React-RCTActionSheet (0.63.2):
     - React-Core/RCTActionSheetHeaders (= 0.63.2)
   - React-RCTAnimation (0.63.2):
@@ -676,20 +678,20 @@ PODS:
     - React-Core (= 0.63.2)
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
-  - RNCAsyncStorage (1.15.5):
+  - RNCAsyncStorage (1.15.6):
     - React-Core
   - RNCMaskedView (0.2.6):
     - React-Core
   - RNDeviceInfo (8.3.0):
     - React-Core
-  - RNFBApp (12.5.0):
+  - RNFBApp (12.6.0):
     - Firebase/CoreOnly (= 8.5.0)
     - React-Core
-  - RNFBAuth (12.5.0):
+  - RNFBAuth (12.6.0):
     - Firebase/Auth (= 8.5.0)
     - React-Core
     - RNFBApp
-  - RNFBFirestore (12.5.0):
+  - RNFBFirestore (12.6.0):
     - Firebase/Firestore (= 8.5.0)
     - React-Core
     - RNFBApp
@@ -717,6 +719,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -787,6 +790,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -858,6 +863,7 @@ SPEC CHECKSUMS:
   React-jsi: 54245e1d5f4b690dec614a73a3795964eeef13a8
   React-jsiexecutor: 8ca588cc921e70590820ce72b8789b02c67cce38
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
+  react-native-safe-area-context: 8465df05de8106c584b117f0e027e17174d6e02e
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
   React-RCTBlob: 39cf0ece1927996c4466510e25d2105f67010e13
@@ -868,12 +874,12 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
-  RNCAsyncStorage: 56a3355a10b5d660c48c6e37325ac85ebfd09885
+  RNCAsyncStorage: bb9649cb43f0040f82948084a0044e45292c5be3
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNDeviceInfo: 1c15bd65d0555a4246107dd9b5b9d9095aa6ad76
-  RNFBApp: 5f583e80cd7a32621d6057da3b786c4db96f1ef4
-  RNFBAuth: dad93f1e8db2d02f3d470778a7922b75693d318a
-  RNFBFirestore: 90ef524f4615268a98569b4e6151e49b3b1b0852
+  RNFBApp: 6fbdb0d684c16507c4eb51689d4ff4cfef3bf11f
+  RNFBAuth: 352fddc14c7de4fcac69b12c821e20212845d974
+  RNFBFirestore: b817db23e6cc021e60644efc04803be807fb07f1
   RNShare: 047d42214f875d731bde73a2b67418638af85ad9
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
