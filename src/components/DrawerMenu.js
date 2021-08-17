@@ -46,15 +46,17 @@ const DrawerMenu = (props) => {
 
     const emailMe = async () => {
         const email = 'mailto:hello@maskfashions.app'
-        //const info = Promise.allSettled([
-        //    DeviceInfo.getApiLevel(),
-        //    DeviceInfo.getUniqueId(),
-        //])
-        //    .then(results => {
-        //        results.forEach(res => {
-        //            console.log(res)
-        //        })
-        //    });
+        console.debug(process.version)
+        const info = Promise.allSettled([
+            //DeviceInfo.getApiLevel(),
+            //DeviceInfo.getUniqueId(),
+            Promise.resolve(true)
+        ])
+            .then(results => {
+                results.forEach(res => {
+                    console.log(res)
+                })
+            });
 
         Linking.openURL(`${email}?subject=bug report&body=`);
     }

@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView, Dimensions, useWindowDimensions} from 'react-native';
+import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView,Dimensions,useWindowDimensions} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
@@ -40,7 +40,7 @@ export default class App extends React.Component {
     }
 
     this.renderCount = 0;
-    this.isRelease = true;
+    this.isRelease = !true;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
@@ -56,6 +56,15 @@ export default class App extends React.Component {
 
     this.multiSelectData = [];
     this.firstTimeFace = null;
+    this.viewabilityConfig = {
+      minimumViewTime: 1000,
+      //viewAreaCoveragePercentThreshold: 80,
+      itemVisiblePercentThreshold: 30,
+      waitForInteraction: false,
+    };
+    this.adsAlreadyViewed = [];
+    this.maskScrollRef = React.createRef();
+    this.maskSizeScale = .77;
   }
 
   didAppear() {
@@ -92,7 +101,7 @@ export default class App extends React.Component {
       console.log('deepar imagevisibilitychanged')
     } else if (event.type === 'faceVisibilityChanged') {
       let faceIsDetected = event.value === "true";
-      console.log('deepar faceVisible?: '+faceIsDetected)
+      console.log('deepar faceVisible?: ' + faceIsDetected)
       if (faceIsDetected && this.firstTimeFace) {
         clearTimeout(this.firstTimeFace);
         this.firstTimeFace = null;
@@ -178,7 +187,7 @@ export default class App extends React.Component {
 
     this.firstTimeFace = setTimeout(() => {
       this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
-    }, 8000);
+    },8000);
 
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
@@ -214,7 +223,7 @@ export default class App extends React.Component {
       console.debug('got ads and filter schema');
       let schema = butler.getFilterSchema();
       butler.getAdTrackingURLS();
-      let count = 0, type;
+      let count = 0,type;
       for (const k in schema) {
         let childrenArr = [];
         // toggle vs multi option categories
@@ -422,28 +431,50 @@ export default class App extends React.Component {
     this.deepARView.switchTexture(url);
   }
 
-  switchToRandomTexture = () => {
+  switchToRandomAdItem = () => {
+    this.maskScrollRef.current.scrollToIndex({
+      index: Math.floor(Math.random() * this.textureList.length),
+      viewOffset: (this.screenWidth - this.maskSize) / 2,
+    })
+  }
 
+  trackImpression = (url) => {
+    fetch(url).then(res => {if (res.status !== 200) fetch(url)})
+    .catch(err => {
+      console.error(err);
+    });
+  }
+
+  onViewableItemsChanged = ({changed, viewableItems}) => {
+    for (let v of viewableItems) {
+      let adId = v.item.adId;
+      if (this.adsAlreadyViewed.includes(adId) == false) {
+        console.log('logging impression: ',v.index,adId)
+        let url = 'http://maskfashions.app';
+        this.trackImpression(url);
+        this.adsAlreadyViewed.push(adId);
+      }
+    }
   }
 
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
-    const maskSizeScale = .77;
     return (
-        <TouchableOpacity onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={40} activeOpacity={.5} >
-      <MaskedView key={Number(item.adId)} style={styles.maskScrollItem(this.maskSize)}
-        maskElement={
-          <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
-            <Image key={Date.now()} style={{width: this.maskSize * maskSizeScale,height: this.maskSize * maskSizeScale}} width={this.maskSize * maskSizeScale} height={this.maskSize * maskSizeScale}
-              source={require('./assets/images/maskmask.png')} defaultSource={require('./assets/images/maskmask.png')} ></Image>
-          </View>
-        }>
+      <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
+        onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={40} activeOpacity={.5} >
+        <MaskedView key={Number(item.adId)} 
+          maskElement={
+            <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
+              <Image key={Date.now()} style={{width: this.maskSize * this.maskSizeScale,height: this.maskSize * this.maskSizeScale}} width={this.maskSize * this.maskSizeScale} height={this.maskSize * this.maskSizeScale}
+                source={require('./assets/images/maskmask.png')} defaultSource={require('./assets/images/maskmask.png')} ></Image>
+            </View>
+          }>
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
             style={{width: this.maskSize,height: this.maskSize,top: -(this.maskSize * .18)}} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{uri: item.url}} />
-      </MaskedView>
-        </TouchableOpacity>
+        </MaskedView>
+      </TouchableOpacity>
     )
   };
 
@@ -501,6 +532,7 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container} >
+        {/*<View name='tracking pixel' style={{display:'none'}}><Image width={0} height={0} source={{uri: "https://servedbyadbutler.com/adserve/;ID=181924;size=1x1;type=pixel;setID=492969;plid=1564943;BID=520454898;place=0;wt=1629226795;rnd=12564;v=0"}} /></View>*/}
         <SideMenu menu={<DrawerMenu app={this} />} bounceBackOnOverdraw={false} openMenuOffset={120}
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
           onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen})}}
@@ -508,8 +540,8 @@ export default class App extends React.Component {
           <Portal>
             <Snackbar
               visible={this.state.snackbarVisible} duration={5000}
-              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false}); }}
-              action={{label: 'Ok', onPress: () => this.setState({snackbarVisible: false})}}
+              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}}
+              action={{label: 'Ok',onPress: () => this.setState({snackbarVisible: false})}}
             >
               {this.state.snackbarText ? this.state.snackbarText : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
             </Snackbar>
@@ -543,10 +575,14 @@ export default class App extends React.Component {
           ) : <></>}
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
-            <FlatList 
+            <FlatList ref={this.maskScrollRef}
+              ListEmptyComponent={<View style={{padding: 20}}><Text style={{fontSize: 15}}>No results. <Icon name='bat' size={22} /></Text></View>}
               contentContainerStyle={{alignItems: 'center',}}
               keyExtractor={(item,index) => item.adId}
-              horizontal={true} data={this.textureList} renderItem={this.renderItem} />
+              horizontal={true} data={this.textureList} renderItem={this.renderItem}
+              onViewableItemsChanged={this.onViewableItemsChanged}
+              viewabilityConfig={this.viewabilityConfig}
+              />
           </View>
 
           <View name="filters" style={[styles.filtersContainer]}>

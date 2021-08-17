@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     width: maskSize,
   }),
   filtersContainer:{
-    flexBasis: 42,
+    flexBasis: 58,
     width: screenWidth,
     backgroundColor: theme.colors.background,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   beltNav: {
     alignItems: 'center',
-    borderBottomWidth: 3,
+    borderBottomWidth: 1,
     borderBottomColor: '#555',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
