@@ -19,6 +19,7 @@ import BottomNav from './src/components/BottomNav';
 import SideMenu from 'react-native-side-menu-updated';
 import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import {AdItem} from './src/AdsApiMapping';
 
 export default class App extends React.Component {
 
@@ -45,15 +46,8 @@ export default class App extends React.Component {
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
     this.screenWidth = Dimensions.get('window').width;
-    this.maskSize = this.screenWidth / 1.4;
-    this.textureList = [
-      {adId: '314524t',metadata: {'acceptsfilter': 'yes','colors': 'white,blue','pattern': 'checked,checkered'},url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
-      {adId: '3145644t',metadata: {},url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
-      {adId: '3146264t',metadata: {'pattern': 'floral'},url: 'https://maskfashions-cdn.web.app/mask-model-09-janice-flowerswhite.jpg'},
-      {adId: '314254t',metadata: {'pattern': 'skulls,floral','colors': 'black, white'},url: 'https://maskfashions-cdn.web.app/mask-model-09-jklm-skullflowers.jpg'},
-      {adId: '31223563',metadata: {'style': 'space','colors': 'black'},url: 'https://maskfashions-cdn.web.app/mask-09-geekchic-microfloral1024.jpg'},
-    ];
-
+    this.textureList = [];
+    
     this.multiSelectData = [];
     this.firstTimeFace = null;
     this.viewabilityConfig = {
@@ -65,6 +59,7 @@ export default class App extends React.Component {
     this.adsAlreadyViewed = [];
     this.maskScrollRef = React.createRef();
     this.maskSizeScale = .77;
+    this.maskSize = this.screenWidth / 1.4;
   }
 
   didAppear() {
@@ -220,6 +215,16 @@ export default class App extends React.Component {
 
     // currently also populates filterSchema
     butler.getAdItems().then(allAds => {
+      for (let ad of allAds) {
+        this.textureList.push({
+          adId: String(ad.id),
+          url: ad.creative_url,
+          name: ad.name,
+          metadata: ad.metadata,
+        });
+      }
+      this.textureList = this.textureList.sort(()=>Math.random() - .5);
+      console.debug(JSON.stringify(this.textureList,null,1))
       console.debug('got ads and filter schema');
       let schema = butler.getFilterSchema();
       butler.getAdTrackingURLS();
@@ -464,7 +469,7 @@ export default class App extends React.Component {
       let adId = v.item.adId;
       if (this.adsAlreadyViewed.includes(adId) == false) {
         console.log('logging impression: ',v.index,adId)
-        let url = 'https://maskfashions.app';
+        let url = 'https://maskfashions.app?';
         this.trackImpression(url);
         this.adsAlreadyViewed.push(adId);
       }
@@ -475,7 +480,7 @@ export default class App extends React.Component {
     // TODO check androidrenderingmode software
     return (
       <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
-        onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={40} activeOpacity={.5} >
+        onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={80} activeOpacity={.5} >
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
@@ -546,7 +551,6 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container} >
-        {/*<View name='tracking pixel' style={{display:'none'}}><Image width={0} height={0} source={{uri: "https://servedbyadbutler.com/adserve/;ID=181924;size=1x1;type=pixel;setID=492969;plid=1564943;BID=520454898;place=0;wt=1629226795;rnd=12564;v=0"}} /></View>*/}
         <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
           onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}

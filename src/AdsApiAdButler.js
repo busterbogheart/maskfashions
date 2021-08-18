@@ -15,6 +15,12 @@ export default class AdsApiAdButler {
   #filterSchema = {};
   #urlJSON = 'https://servedbyadbutler.com/adserve/';
   #urlREST = 'https://api.adbutler.com/v2/';
+  // the data given to the FlatList, should be [{url:'', impUrl:'', clickUrl:'', adId:''}, ...]
+  #allActiveAdItems = [];
+
+  // JSON call for tracking URLs
+  // REST call(s) for ad items and scheduling, filter schema
+  // 
 
   constructor() {
     // this.restAPI_Creatives();
@@ -104,6 +110,9 @@ export default class AdsApiAdButler {
       if (e.creative) { // some don't have creative data (not added from Library)
         e.creative_url = `https://servedbyadbutler.com/getad.img/;libID=${e.creative.id}`;
       }
+      if (e.name == 'Default Ad Item') {
+        continue;
+      }
       // the all important filter schema
       if (e.id == '520484750') {
         for (const k in e.metadata) {
@@ -155,7 +164,7 @@ export default class AdsApiAdButler {
       .then(json => {
         for (const k in json.data) {
         }
-        console.log(JSON.stringify(json,null,1));
+        //console.log(JSON.stringify(json,null,1));
       })
       .catch((err) => console.warn(err));
   }
@@ -196,15 +205,12 @@ export default class AdsApiAdButler {
       type: 'jsonr',
       ID: '181924',
     })
-//JSON not working     https://servedbyadbutler.com/redirect.spark?MID=181924&plid=1589807&setID=492969&channelID=0&CID=577231&banID=520485932&PID=0&textadID=0&tc=1&mt=1629227650201856&spr=1&hc=e220c3ada5cde5340a6830edd24c731c2580a965&location=
-//REST not working     https://servedbyadbutler.com/redirect.spark?MID=181924&plid=1589807&setID=492969&channelID=0&CID=577231&banID=520485932&PID=0&textadID=0&tc=1&type=tclick&mt=1&hc=400b1a2ae6f13c19acb752c8073e3234b98fabbf&location=
-//REST works (clickcb) https://servedbyadbutler.com/redirect.spark?MID=181924&plid=1589807&setID=492969&channelID=0&CID=577231&banID=520485932&PID=0&textadID=0&tc=1&type=tclickcb&mt=1&hc=72f827837a4be717523aecdf1d44099de7cd5cd4&location=
       .then(response => response.json())
       .then(json => {
         if (json.status != "SUCCESS") throw Error('JSON api failed');
         for (let placement of json.placements) {
           let impUrl = placement.accupixel_url;
-          let clickUrl = placement.redirect_url+'&type=tclickcb';
+          let clickUrl = placement.redirect_url;
           let id = placement.banner_id;
           this.#allTrackingUrls.push({
             id, impUrl, clickUrl
