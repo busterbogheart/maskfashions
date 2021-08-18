@@ -17,6 +17,7 @@
     "@react-native-masked-view/masked-view": "^0.2.6",
     "core-util-is": "^1.0.2",
     "date-fns": "^2.22.1",
+    "promise.allsettled": "git+https://github.com/es-shims/Promise.allSettled.git",
     "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-native": "0.63.2",
@@ -42,8 +43,8 @@
   "jest": {
     "preset": "react-native"
   },
-  "engines" : { 
-    "node" : ">=14" 
+  "engines": {
+    "node": ">=14"
   },
   "engineStrict": true
 }

@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import {Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView,Dimensions,useWindowDimensions} from 'react-native';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView,Dimensions,useWindowDimensions} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
@@ -17,9 +17,8 @@ import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import BottomNav from './src/components/BottomNav';
 import SideMenu from 'react-native-side-menu-updated';
-import DrawerMenu from './src/components/DrawerMenu';
+import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
-
 
 export default class App extends React.Component {
 
@@ -37,6 +36,7 @@ export default class App extends React.Component {
       sidemenuVisible: false,
       userLoggedIn: false,
       forceRenderMaskScroll: 0,
+      sideMenuData: null,
     }
 
     this.renderCount = 0;
@@ -45,7 +45,7 @@ export default class App extends React.Component {
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
     this.screenWidth = Dimensions.get('window').width;
-    this.maskSize = this.screenWidth / 1.3;
+    this.maskSize = this.screenWidth / 1.4;
     this.textureList = [
       {adId: '314524t',metadata: {'acceptsfilter': 'yes','colors': 'white,blue','pattern': 'checked,checkered'},url: 'https://maskfashions-cdn.web.app/mask-model-09-tintshues-bluechecked.jpg'},
       {adId: '3145644t',metadata: {},url: 'https://maskfashions-cdn.web.app/mask-model-09-geekchic-prism.jpg'},
@@ -159,7 +159,7 @@ export default class App extends React.Component {
     }
   }
 
-  showSnackbar = (text = null) => {
+  showSnackbar = (text = '') => {
     this.setState({snackbarText: text});
     this.setState({snackbarVisible: true});
   }
@@ -177,7 +177,7 @@ export default class App extends React.Component {
     );
   }
 
-  showDrawer = () => this.setState({sidemenuVisible: true});
+  showSideMenu = () => this.setState({sidemenuVisible: true});
   hideDrawer = () => this.setState({sidemenuVisible: false});
 
   componentDidMount() {
@@ -293,11 +293,16 @@ export default class App extends React.Component {
     }
 
     console.debug(`checking favs for ${this.userId}`);
-    const favsData = firestore().collection('users').doc(this.userId).get()
+    firestore().collection('users').doc(this.userId).get()
       .then(doc => {
         console.debug(`favs for ${this.userId}?`);
         if (doc.exists) {
           console.debug('got user doc',doc.data());
+          let el = <View style={{flex: 1,justifyContent: 'center',width: 100,height: 100}}>
+            {this.renderItem({item: this.textureList[0]})}
+            {this.renderItem({item: this.textureList[2]})}
+          </View>;
+          this.setState({sideMenuData: el});
         } else {
           //TODO
           // show tutorial, cta to add
@@ -305,6 +310,7 @@ export default class App extends React.Component {
         }
       })
       .catch(e => console.warn(`doc get failed for ${this.userId}`,e));
+
   }
 
   addToFavorites = () => {
@@ -438,19 +444,27 @@ export default class App extends React.Component {
     })
   }
 
-  trackImpression = (url) => {
-    fetch(url).then(res => {if (res.status !== 200) fetch(url)})
-    .catch(err => {
-      console.error(err);
+  shareApp = () => {
+    Share.open({
+      message: 'it\'s Mask Fashions!',
+      title: 'Mask Fashions?',
+      url: 'http://maskfashions.app',
     });
   }
 
-  onViewableItemsChanged = ({changed, viewableItems}) => {
+  trackImpression = (url) => {
+    fetch(url).then(res => {if (res.status !== 200) fetch(url)})
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  onViewableItemsChanged = ({changed,viewableItems}) => {
     for (let v of viewableItems) {
       let adId = v.item.adId;
       if (this.adsAlreadyViewed.includes(adId) == false) {
         console.log('logging impression: ',v.index,adId)
-        let url = 'http://maskfashions.app';
+        let url = 'https://maskfashions.app';
         this.trackImpression(url);
         this.adsAlreadyViewed.push(adId);
       }
@@ -462,7 +476,7 @@ export default class App extends React.Component {
     return (
       <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
         onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={40} activeOpacity={.5} >
-        <MaskedView key={Number(item.adId)} 
+        <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
               <Image key={Date.now()} style={{width: this.maskSize * this.maskSizeScale,height: this.maskSize * this.maskSizeScale}} width={this.maskSize * this.maskSizeScale} height={this.maskSize * this.maskSizeScale}
@@ -533,9 +547,9 @@ export default class App extends React.Component {
     return (
       <View style={styles.container} >
         {/*<View name='tracking pixel' style={{display:'none'}}><Image width={0} height={0} source={{uri: "https://servedbyadbutler.com/adserve/;ID=181924;size=1x1;type=pixel;setID=492969;plid=1564943;BID=520454898;place=0;wt=1629226795;rnd=12564;v=0"}} /></View>*/}
-        <SideMenu menu={<DrawerMenu app={this} />} bounceBackOnOverdraw={false} openMenuOffset={120}
+        <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
-          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen})}}
+          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
         >
           <Portal>
             <Snackbar
@@ -548,7 +562,7 @@ export default class App extends React.Component {
           </Portal>
 
           <Appbar.Header style={styles.appbar}>
-            <Appbar.Action size={32} icon='menu' onPress={this.showDrawer} />
+            <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
             <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
           </Appbar.Header>
 
@@ -566,7 +580,7 @@ export default class App extends React.Component {
               <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
               {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
               {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-              <MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />
+              {/*<MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
               {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
               {this.state.userLoggedIn ? <MyButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
                 : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
@@ -582,7 +596,7 @@ export default class App extends React.Component {
               horizontal={true} data={this.textureList} renderItem={this.renderItem}
               onViewableItemsChanged={this.onViewableItemsChanged}
               viewabilityConfig={this.viewabilityConfig}
-              />
+            />
           </View>
 
           <View name="filters" style={[styles.filtersContainer]}>
