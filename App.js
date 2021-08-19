@@ -19,7 +19,7 @@ import BottomNav from './src/components/BottomNav';
 import SideMenu from 'react-native-side-menu-updated';
 import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
-import {AdItem} from './src/AdsApiMapping';
+import FilterSchema from './src/FilterSchema';
 
 export default class App extends React.Component {
 
@@ -32,21 +32,23 @@ export default class App extends React.Component {
       switchCameraInProgress: false,
       currentTexture: 0,
       multiSelectedItems: [],
+      multiSelectedItemObjects: [],
       snackbarVisible: false,
       snackbarText: null,
       sidemenuVisible: false,
       userLoggedIn: false,
-      forceRenderMaskScroll: 0,
       sideMenuData: null,
+      forceRenderFlatList: true,
     }
 
     this.renderCount = 0;
-    this.isRelease = !true;
+    this.isRelease = true;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
     this.screenWidth = Dimensions.get('window').width;
-    this.textureList = [];
+    this.masterItemList = [];
+    this.filteredItemList = [];
     
     this.multiSelectData = [];
     this.firstTimeFace = null;
@@ -205,52 +207,29 @@ export default class App extends React.Component {
       })
     }
 
-    let butler = new AdButler();
-
     /*
-      1. get ad items, filter schema
-      2. preload texture CDN URLs
-      3. (save textures locally?)
+    1. get ad items, filter schema
+    2. preload texture CDN URLs
+    3. (save textures locally?)
     */
-
+   
+    let schema;
+    let butler = new AdButler();
     // currently also populates filterSchema
-    butler.getAdItems().then(allAds => {
+    butler.getAdItemsWithSchema().then(allAds => {
       for (let ad of allAds) {
-        this.textureList.push({
+        this.masterItemList.push({
           adId: String(ad.id),
           url: ad.creative_url,
           name: ad.name,
           metadata: ad.metadata,
         });
       }
-      this.textureList = this.textureList.sort(()=>Math.random() - .5);
-      console.debug(JSON.stringify(this.textureList,null,1))
-      console.debug('got ads and filter schema');
-      let schema = butler.getFilterSchema();
+      this.filteredItemList = this.masterItemList;
       butler.getAdTrackingURLS();
-      let count = 0,type;
-      for (const k in schema) {
-        let childrenArr = [];
-        // toggle vs multi option categories
-        if (schema[k].length == 1) {
-          type = 'toggle';
-        } else {
-          if (schema[k] != null) {
-            for (const el of schema[k]) {
-              childrenArr.push({name: el,id: `${count}-${el}`});
-            }
-          }
-          type = 'category';
-        }
-        this.multiSelectData.push({
-          name: k,
-          id: count,
-          type: type,
-          children: childrenArr,
-        });
-        count++;
-      }
-
+      console.debug('got ads and filter schema');
+      schema = new FilterSchema(butler.getFilterSchema());
+      this.multiSelectData = schema.filterAndReturnFilteredSchema(this.masterItemList);
       this.setState({});
     });
 
@@ -274,7 +253,7 @@ export default class App extends React.Component {
   // save resized copy for listview?  performance?
   // try https://github.com/itinance/react-native-fs
   preloadAdItemImages = () => {
-    this.textureList.forEach(v => {
+    this.masterItemList.forEach(v => {
       let uri = v.url;
       console.debug(`preloading texture ${uri}`);
       Image.prefetch(uri)
@@ -304,8 +283,8 @@ export default class App extends React.Component {
         if (doc.exists) {
           console.debug('got user doc',doc.data());
           let el = <View style={{flex: 1,justifyContent: 'center',width: 100,height: 100}}>
-            {this.renderItem({item: this.textureList[0]})}
-            {this.renderItem({item: this.textureList[2]})}
+            {this.renderItem({item: this.masterItemList[0]})}
+            {this.renderItem({item: this.masterItemList[2]})}
           </View>;
           this.setState({sideMenuData: el});
         } else {
@@ -316,6 +295,10 @@ export default class App extends React.Component {
       })
       .catch(e => console.warn(`doc get failed for ${this.userId}`,e));
 
+  }
+
+  showAppInfo = () => {
+    this.setState({sideMenuData: <Text style={{padding: 20, fontSize:20}}>DISCLAIMER</Text>});
   }
 
   addToFavorites = () => {
@@ -428,13 +411,13 @@ export default class App extends React.Component {
     Image.prefetch(Image.resolveAssetSource(require('./assets/images/maskmask.png')).uri).then(response => {
       console.log('prefetched mask.png? ',response);
       // crucial
-      this.setState({forceRenderMaskScroll: new Date()});
+      this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
     })
   }
 
   switchToNextTexture = () => {
-    let tex = this.textureList[this.state.currentTexture];
-    this.state.currentTexture = this.state.currentTexture + 1 == this.textureList.length ? 0 : this.state.currentTexture + 1;
+    let tex = this.filteredItemList[this.state.currentTexture];
+    this.state.currentTexture = this.state.currentTexture + 1 == this.filteredItemList.length ? 0 : this.state.currentTexture + 1;
     this.deepARView.switchTexture(tex.url);
   }
 
@@ -444,7 +427,7 @@ export default class App extends React.Component {
 
   switchToRandomAdItem = () => {
     this.maskScrollRef.current.scrollToIndex({
-      index: Math.floor(Math.random() * this.textureList.length),
+      index: Math.floor(Math.random() * this.filteredItemList.length),
       viewOffset: (this.screenWidth - this.maskSize) / 2,
     })
   }
@@ -475,6 +458,61 @@ export default class App extends React.Component {
       }
     }
   }
+
+  applyFilters = () => {
+    let filters = this.state.multiSelectedItemObjects;
+    console.log('filters: ',JSON.stringify(filters,null,1));
+    if (filters.length == 0) {
+      this.resetFlatList();
+      return;
+    }
+    
+    let tempMasterList = [...this.masterItemList];
+    let filtered = tempMasterList.filter((item,i,arr) => {
+      let itemMetadata = JSON.stringify(item.metadata);
+      console.log(itemMetadata);
+      // run all filters on each one, any fail gets kicked
+      for (let filter of filters) {
+        let allMatch = true;
+        if (filter.type == 'toggle') {
+          //console.log('toggle',filter.name);
+          allMatch = (itemMetadata.indexOf(filter.name) !== -1);
+        } else if(filter.type == 'category') {
+          console.log('category',filter.children);
+          // test individual, throw out non matching
+          for (let ch of filter.children) {
+            let match = (itemMetadata.indexOf(ch.name) !== -1);
+            if (!match) {
+              return false;
+            }
+          }
+        } else {
+          // these are the additional, flatter entries with id and name, one per loop
+          allMatch = (itemMetadata.indexOf(filter.name) !== -1);
+        }
+        if (allMatch == false) return; //just toss out now since they all must pass
+      }
+      //made it
+      return true;
+    });
+
+    this.filteredItemList = filtered;
+    this.refreshFlatList();
+  }
+  
+  refreshFlatList = () => {
+    console.log(this.filteredItemList);
+    this.maskScrollRef.current.scrollToOffset({offset: 0, animated:false, });
+    this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
+  }
+  
+  resetFlatList = () => {
+    console.log(this.filteredItemList);
+    this.filteredItemList = this.masterItemList;
+    this.maskScrollRef.current.scrollToOffset({offset: 0, animated:true, });
+    this.setState({multiSelectedItems: [], multiSelectedItemObjects: [], forceRenderFlatList: !this.state.forceRenderFlatList});
+  }
+
 
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
@@ -592,12 +630,16 @@ export default class App extends React.Component {
             </View>
           ) : <></>}
 
-          <View name="mask scroll" style={styles.maskScroll(this.maskSize)} key={this.state.forceRenderMaskScroll} >
-            <FlatList ref={this.maskScrollRef}
-              ListEmptyComponent={<View style={{padding: 20}}><Text style={{fontSize: 15}}>No results. <Icon name='bat' size={22} /></Text></View>}
-              contentContainerStyle={{alignItems: 'center',}}
+          <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
+            <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+              ListEmptyComponent={
+                <View style={{justifyContent: 'center',alignItems: 'center',alignContent:'center', width: this.screenWidth / 2}}>
+                    <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+                  <Text style={{fontSize: 15, }}>No results. Try removing some filters.</Text>
+                </View>}
+              contentContainerStyle={{alignItems: 'center',flexGrow:1, justifyContent:'center'}}
               keyExtractor={(item,index) => item.adId}
-              horizontal={true} data={this.textureList} renderItem={this.renderItem}
+              horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
               onViewableItemsChanged={this.onViewableItemsChanged}
               viewabilityConfig={this.viewabilityConfig}
             />
@@ -612,7 +654,10 @@ export default class App extends React.Component {
                     <Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter</Text>
                   </TouchableOpacity>
                   {this.state.multiSelectedItems.length > 0 ?
-                    <TouchableOpacity onPress={() => {this.multiSelectRef._removeAllItems()}} style={styles.filterButtonsClear}>
+                    <TouchableOpacity onPress={() => {
+                      //this.multiSelectRef._removeAllItems();
+                      this.resetFlatList();
+                    }} style={styles.filterButtonsClear}>
                       <Text style={{color: theme.colors.error,fontSize: 15,fontWeight: 'bold'}}>clear</Text>
                     </TouchableOpacity>
                     : <></>}
@@ -626,7 +671,7 @@ export default class App extends React.Component {
                     // check icon color
                     success: '#2a2',
                     // cancel button bg
-                    cancel: theme.colors.error,
+                    cancel: '#333',
                     // main category bg
                     itemBackground: '#fff',
                     subItemBackground: '#fff',
@@ -640,7 +685,7 @@ export default class App extends React.Component {
                   selectText=''
                   //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
                   showDropDowns={true}
-                  selectChildren={true}
+                  selectChildren={false}
                   // remove down arrow at start
                   selectToggleIconComponent={<></>}
                   // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
@@ -665,21 +710,19 @@ export default class App extends React.Component {
                   alwaysShowSelectText={false}
                   // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
                   onSelectedItemsChange={(items) => {
-                    console.debug('selecteditemschange:',JSON.stringify(items,null,1))
+                    //console.debug('selecteditemschange:',JSON.stringify(items,null,1))
                     this.setState({multiSelectedItems: items});
                   }}
-                  onSelectedItemObjectsChange={(items) => {
+                  onSelectedItemObjectsChange={(itemsObj) => {
                     // returned as the original objects not just ids
-                    console.debug('selecteditemsobjectchange:',JSON.stringify(items,null,1))
+                    console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
+                    this.setState({multiSelectedItemObjects: itemsObj});
                   }}
                   selectedItems={this.state.multiSelectedItems}
                   onToggleSelector={(modalOpen) => {console.log(`filter modal open? ${modalOpen}`)}}
-                  onConfirm={() => {
-                    // no args
-                    console.debug('confirmed:',this.state.multiSelectedItems);
-                  }}
+                  onConfirm={this.applyFilters}
                   onCancel={() => {
-                    this.setState({multiSelectedItems: []})
+                    this.resetFlatList();
                   }}
                 />
               </>

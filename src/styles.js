@@ -141,7 +141,7 @@ const filterModalStyles = StyleSheet.create({
   },
   confirmText: {
     color: theme.colors.text
-  }
+  },
 });
 
 export {styles, theme, filterModalStyles};

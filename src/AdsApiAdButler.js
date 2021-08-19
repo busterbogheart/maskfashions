@@ -117,7 +117,8 @@ export default class AdsApiAdButler {
       if (e.id == '520484750') {
         for (const k in e.metadata) {
           let arr = e.metadata[k].split(',');
-          this.#filterSchema[k] = arr.map(str => str.trim());
+          let noEmpties = arr.filter( el => el!='');
+          this.#filterSchema[k] = noEmpties.map(str => str.trim());
         }
         continue;
       }
@@ -136,7 +137,7 @@ export default class AdsApiAdButler {
     }
   }
 
-  getAdItems = async () => {
+  getAdItemsWithSchema = async () => {
     // cached?
     // TODO actual asyncstorage cache
     if (this.#allAdItems.length > 1) {
