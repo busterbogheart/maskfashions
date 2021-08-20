@@ -9,8 +9,8 @@ import {AdCampaign,AdItem} from "./AdsApiMapping";
 export default class AdsApiAdButler {
 
   #allAdItems = [];
+  #adItemsInCampaigns = [];
   #allTrackingUrls = [];
-  #campaignsById = new Map();
   #apiKey = 'b87ea9fb1559cbea91d941f0be63ce9b'; //test: da81d8cf585242c7818d43bdddcd0769
   #filterSchema = {};
   #urlJSON = 'https://servedbyadbutler.com/adserve/';
@@ -37,17 +37,17 @@ export default class AdsApiAdButler {
       .catch((err) => console.warn(err));
   }
 
-  async fetchAll() {
+  async fetchCampaigns() {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
-        for (let k in json.data) {
-          const ad = new AdItem(json.data[k].advertisement)
-          this.#allAdItems.push(ad);
-          if (json.data[k].campaign) {
-            const campaign = new AdCampaign(json.data[k].campaign);
-            ad.campaignId = campaign.id;
-            this.#campaignsById.set(campaign.id,campaign);
+        console.debug(json.data.length+' campaign assignments fetched')
+        for (let k of json.data) {
+          if (k.object == 'campaign_assignment' && k.advertisement && k.campaign) {
+            const adId = k.advertisement.id;
+            const selfServe = k.advertisement.is_self_serve;
+            const weight = k.weight;
+            this.#adItemsInCampaigns.push(adId);
           }
         }
       })
@@ -99,11 +99,13 @@ export default class AdsApiAdButler {
   //ad items give image, meta, url, etc. but no start/end dates
   #restAPI_AdItems = async () => {
     let res = await this.#restAPI('ad-items',true);
+    await this.fetchCampaigns();
     if (res.status != 200) {
       console.error('restapi failed');
     }
     let json = await res.json();
     console.log(json.data.length + " ad items fetched");
+    //console.log(JSON.stringify(json.data,null,1));
 
     for (const k in json.data) {
       const e = new AdItem(json.data[k]);
@@ -122,8 +124,11 @@ export default class AdsApiAdButler {
         }
         continue;
       }
-      this.#allAdItems.push(e);
+      if (this.#adItemsInCampaigns.includes(e.id)) {
+        this.#allAdItems.push(e);
+      }
     }
+    console.log(this.#allAdItems.length,this.#adItemsInCampaigns.length);
   };
 
   getFilterSchema() {

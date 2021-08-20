@@ -60,7 +60,7 @@ export default class App extends React.Component {
     this.adsAlreadyViewed = [];
     this.maskScrollRef = React.createRef();
     this.maskSizeScale = .77;
-    this.maskSize = this.screenWidth / 1.4;
+    this.maskSize = this.screenWidth / 1.3;
   }
 
   didAppear() {
@@ -631,7 +631,7 @@ export default class App extends React.Component {
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
             <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
-              snapToInterval={this.maskSize}
+              snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i*this.maskSize) - (this.screenWidth-this.maskSize)/2)}
               ListEmptyComponent={
                 <View style={{justifyContent: 'center',alignItems: 'center',alignContent:'center', width: this.screenWidth / 2}}>
                     <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
