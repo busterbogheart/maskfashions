@@ -71,7 +71,7 @@ const SideMenuContent = ({app,content}) => {
                 <IconNav title='share app' onPress={app.shareApp} icon={iconByPlatform('ios-share','share-variant')} />
                 <IconNav title='report bug' onPress={emailMe} icon={iconByPlatform('ios-bug','spider-thread')} />
                 <IconNav title='suggest feature' icon='bullhorn' onPress={() => {}} />
-                <IconNav title='app info' icon='information' onPress={() => {}} />
+                <IconNav title='app info' icon='information' onPress={app.showAppInfo} />
             </View>
         }
     </>)

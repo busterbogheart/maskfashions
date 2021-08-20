@@ -95,16 +95,16 @@ const styles = StyleSheet.create({
   },
   filterButtonsClear: {
     position: 'absolute',
-    right: 15,
-    paddingRight: 15,
-    paddingLeft: 7,
-    paddingVertical: 7,
+    right: 25,
+    paddingHorizontal: 25,
+    paddingVertical: 11,
   },
   filterButtonsFilter: {
     flex:1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'stretch'
   },
   beltNav: {
     alignItems: 'center',
@@ -126,13 +126,14 @@ const styles = StyleSheet.create({
 const filterModalStyles = StyleSheet.create({
   // modal bg
   container: {
+    marginTop: screenHeight/3,
   },
   scrollView:{
     // backgroundColor:theme.colors.background
   },
   // covers the screen
   backdrop: {
-    backgroundColor: theme.colors.background
+    //backgroundColor: theme.colors.background
   },
   // covers the screen
   modalWrapper: {

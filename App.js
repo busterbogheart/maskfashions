@@ -15,7 +15,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {differenceInHours,differenceInMilliseconds,differenceInSeconds} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
-import BottomNav from './src/components/BottomNav';
 import SideMenu from 'react-native-side-menu-updated';
 import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
@@ -632,6 +631,7 @@ export default class App extends React.Component {
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
             <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+              snapToInterval={this.maskSize}
               ListEmptyComponent={
                 <View style={{justifyContent: 'center',alignItems: 'center',alignContent:'center', width: this.screenWidth / 2}}>
                     <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
@@ -719,7 +719,10 @@ export default class App extends React.Component {
                     this.setState({multiSelectedItemObjects: itemsObj});
                   }}
                   selectedItems={this.state.multiSelectedItems}
-                  onToggleSelector={(modalOpen) => {console.log(`filter modal open? ${modalOpen}`)}}
+                  onToggleSelector={(modalOpen) => {
+                    console.log(`filter modal open? ${modalOpen}`);
+                    if (modalOpen == false) this.applyFilters();
+                  }}
                   onConfirm={this.applyFilters}
                   onCancel={() => {
                     this.resetFlatList();
@@ -728,11 +731,6 @@ export default class App extends React.Component {
               </>
               : <></>}
           </View>
-
-          {/* <BottomNav app={this} /> */}
-
-          {/* <Text style={{fontSize:18}}><Icon name='heart' size={18} />whoa</Text> */}
-
         </SideMenu>
       </View>
     );
