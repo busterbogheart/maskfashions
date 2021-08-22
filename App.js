@@ -1,7 +1,7 @@
 "use strict";
 
-import React from 'react';
-import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,SafeAreaView,Dimensions,useWindowDimensions} from 'react-native';
+import React,{Fragment} from 'react';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
@@ -12,13 +12,14 @@ import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {differenceInHours,differenceInMilliseconds,differenceInSeconds} from 'date-fns';
+import {differenceInHours,differenceInMilliseconds,differenceInSeconds,isThisHour} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import SideMenu from 'react-native-side-menu-updated';
 import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import FilterSchema from './src/FilterSchema';
+import AnimatedFav from './src/components/AnimatedFav';
 
 export default class App extends React.Component {
 
@@ -29,7 +30,6 @@ export default class App extends React.Component {
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
-      currentTexture: 0,
       multiSelectedItems: [],
       multiSelectedItemObjects: [],
       snackbarVisible: false,
@@ -38,18 +38,21 @@ export default class App extends React.Component {
       userLoggedIn: false,
       sideMenuData: null,
       forceRenderFlatList: true,
+      animatedFavIcons: [],
     }
 
-    this.renderCount = 0;
+    this.currentTexture = 0,
+      this.renderCount = 0;
     this.isRelease = true;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
+    this.screenHeight = Dimensions.get('window').height;
     this.screenWidth = Dimensions.get('window').width;
     this.masterItemList = [];
     this.filteredItemList = [];
-    
-    this.multiSelectData = [];
+
+    this.multiSelectFilterSchema = [];
     this.firstTimeFace = null;
     this.viewabilityConfig = {
       minimumViewTime: 1000,
@@ -211,7 +214,7 @@ export default class App extends React.Component {
     2. preload texture CDN URLs
     3. (save textures locally?)
     */
-   
+
     let schema;
     let butler = new AdButler();
     // currently also populates filterSchema
@@ -224,11 +227,12 @@ export default class App extends React.Component {
           metadata: ad.metadata,
         });
       }
+      this.preloadAdItemImages();
       this.filteredItemList = this.masterItemList;
       butler.getAdTrackingURLS();
       console.debug('got ads and filter schema');
       schema = new FilterSchema(butler.getFilterSchema());
-      this.multiSelectData = schema.filterAndReturnFilteredSchema(this.masterItemList);
+      this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
       this.setState({});
     });
 
@@ -243,14 +247,13 @@ export default class App extends React.Component {
           console.warn('uid null from setuplocaluser');
         }
       },reason => console.warn('failed: ' + reason));
-
-    this.preloadAdItemImages();
   }
 
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
   // to Java and objc on local filesystem for the deepar native switchTexture method
   // save resized copy for listview?  performance?
   // try https://github.com/itinance/react-native-fs
+  // currently the RN Image caching doesnt help with switchTexture performance (done in Java)
   preloadAdItemImages = () => {
     this.masterItemList.forEach(v => {
       let uri = v.url;
@@ -297,10 +300,13 @@ export default class App extends React.Component {
   }
 
   showAppInfo = () => {
-    this.setState({sideMenuData: <Text style={{padding: 20, fontSize:20}}>DISCLAIMER</Text>});
+    this.setState({sideMenuData: <Text style={{padding: 20,fontSize: 20}}>DISCLAIMER</Text>});
   }
 
-  addToFavorites = () => {
+  addToFavorites = (mouseEvent) => {
+    this.triggerAnimatedFav(mouseEvent.nativeEvent.pageX,mouseEvent.nativeEvent.pageY);
+
+    return;
     if (this.state.userLoggedIn === false || this.userId == null) {
       console.debug(`addtofavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
       return;
@@ -415,8 +421,8 @@ export default class App extends React.Component {
   }
 
   switchToNextTexture = () => {
-    let tex = this.filteredItemList[this.state.currentTexture];
-    this.state.currentTexture = this.state.currentTexture + 1 == this.filteredItemList.length ? 0 : this.state.currentTexture + 1;
+    let tex = this.filteredItemList[this.currentTexture];
+    this.currentTexture = this.currentTexture + 1 == this.filteredItemList.length ? 0 : this.currentTexture + 1;
     this.deepARView.switchTexture(tex.url);
   }
 
@@ -435,7 +441,7 @@ export default class App extends React.Component {
     Share.open({
       message: 'it\'s Mask Fashions!',
       title: 'Mask Fashions?',
-      url: 'http://maskfashions.app',
+      url: 'https://maskfashions.app',
     });
   }
 
@@ -465,18 +471,17 @@ export default class App extends React.Component {
       this.resetFlatList();
       return;
     }
-    
+
     let tempMasterList = [...this.masterItemList];
     let filtered = tempMasterList.filter((item,i,arr) => {
       let itemMetadata = JSON.stringify(item.metadata);
-      console.log(itemMetadata);
-      // run all filters on each one, any fail gets kicked
+      // run all filters on each item's metadata, any fail gets kicked
       for (let filter of filters) {
         let allMatch = true;
         if (filter.type == 'toggle') {
           //console.log('toggle',filter.name);
           allMatch = (itemMetadata.indexOf(filter.name) !== -1);
-        } else if(filter.type == 'category') {
+        } else if (filter.type == 'category') {
           console.log('category',filter.children);
           // test individual, throw out non matching
           for (let ch of filter.children) {
@@ -498,20 +503,30 @@ export default class App extends React.Component {
     this.filteredItemList = filtered;
     this.refreshFlatList();
   }
-  
+
   refreshFlatList = () => {
-    console.log(this.filteredItemList);
-    this.maskScrollRef.current.scrollToOffset({offset: 0, animated:false, });
+    this.maskScrollRef.current.scrollToOffset({offset: 0,animated: false,});
     this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
   }
-  
+
   resetFlatList = () => {
-    console.log(this.filteredItemList);
     this.filteredItemList = this.masterItemList;
-    this.maskScrollRef.current.scrollToOffset({offset: 0, animated:true, });
-    this.setState({multiSelectedItems: [], multiSelectedItemObjects: [], forceRenderFlatList: !this.state.forceRenderFlatList});
+    this.maskScrollRef.current.scrollToOffset({offset: 0,animated: true,});
+    this.setState({multiSelectedItems: [],multiSelectedItemObjects: [],forceRenderFlatList: !this.state.forceRenderFlatList});
   }
 
+  triggerAnimatedFav = (pageX,pageY) => {
+    // add another to the array, add a key, render later with map()
+    const count = this.state.animatedFavIcons.length;
+    // need to get point relative to AnimatedFav
+    const destX = -(pageX) + 15;
+    const destY = -(pageY) + (Platform.OS === 'ios' ? styles.container.paddingTop : 5);
+    const icon = <Fragment key={count}>
+      <AnimatedFav destX={destX} destY={destY} myKey={count} style={{position: 'absolute',left: pageX,top: pageY,zIndex: 9999}} />
+    </Fragment>
+    const arrCopy = [...this.state.animatedFavIcons,icon];
+    this.setState({animatedFavIcons: arrCopy})
+  }
 
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
@@ -521,7 +536,8 @@ export default class App extends React.Component {
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
-              <Image key={Date.now()} style={{width: this.maskSize * this.maskSizeScale,height: this.maskSize * this.maskSizeScale}} width={this.maskSize * this.maskSizeScale} height={this.maskSize * this.maskSizeScale}
+              <Image key={Date.now()} style={{width: this.maskSize * this.maskSizeScale,height: this.maskSize * this.maskSizeScale}}
+                width={this.maskSize * this.maskSizeScale} height={this.maskSize * this.maskSizeScale}
                 source={require('./assets/images/maskmask.png')} defaultSource={require('./assets/images/maskmask.png')} ></Image>
             </View>
           }>
@@ -592,6 +608,12 @@ export default class App extends React.Component {
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
           onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
         >
+          <Portal name="animated icons">
+            {this.state.animatedFavIcons.length > 0 ?
+              this.state.animatedFavIcons.map(el => el)
+              : <></>}
+          </Portal>
+          
           <Portal>
             <Snackbar
               visible={this.state.snackbarVisible} duration={5000}
@@ -631,13 +653,13 @@ export default class App extends React.Component {
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
             <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
-              snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i*this.maskSize) - (this.screenWidth-this.maskSize)/2)}
+              snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
               ListEmptyComponent={
-                <View style={{justifyContent: 'center',alignItems: 'center',alignContent:'center', width: this.screenWidth / 2}}>
-                    <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
-                  <Text style={{fontSize: 15, }}>No results. Try removing some filters.</Text>
+                <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
+                  <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+                  <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
                 </View>}
-              contentContainerStyle={{alignItems: 'center',flexGrow:1, justifyContent:'center'}}
+              contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
               keyExtractor={(item,index) => item.adId}
               horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
               onViewableItemsChanged={this.onViewableItemsChanged}
@@ -646,19 +668,19 @@ export default class App extends React.Component {
           </View>
 
           <View name="filters" style={[styles.filtersContainer]}>
-            {this.multiSelectData.length > 0 ?
+            {this.multiSelectFilterSchema.length > 0 ?
               <>
                 <View name="filter buttons" style={styles.filterButtons}>
                   <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
-                    <Icon name='format-list-bulleted-type' size={28} style={{paddingHorizontal: 5}} />
-                    <Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter</Text>
+                    <Icon name='format-list-bulleted-type' color='#ddd' size={28} style={{paddingHorizontal: 7}} />
+                    <Text style={{color: '#ddd',textTransform: 'uppercase',fontWeight: 'bold',fontSize: 16}}>filter</Text>
                   </TouchableOpacity>
                   {this.state.multiSelectedItems.length > 0 ?
                     <TouchableOpacity onPress={() => {
                       //this.multiSelectRef._removeAllItems();
                       this.resetFlatList();
                     }} style={styles.filterButtonsClear}>
-                      <Text style={{color: theme.colors.error,fontSize: 15,fontWeight: 'bold'}}>clear</Text>
+                      <Text style={{color: '#f44',fontSize: 16,fontWeight: 'bold'}}>clear</Text>
                     </TouchableOpacity>
                     : <></>}
                 </View>
@@ -678,7 +700,7 @@ export default class App extends React.Component {
                     // button text
                     selectToggleTextColor: theme.colors.text,
                   }}
-                  items={this.multiSelectData}
+                  items={this.multiSelectFilterSchema}
                   IconRenderer={filterIconRenderer}
                   uniqueKey="id"
                   subKey="children"

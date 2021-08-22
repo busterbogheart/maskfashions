@@ -1,8 +1,9 @@
 import { Dimensions, Platform, StyleSheet } from "react-native";
 import { configureFonts, useTheme } from "react-native-paper";
-
+import {getStatusBarHeight} from "react-native-status-bar-height";
 
 const {width:screenWidth, height:screenHeight} = Dimensions.get('window');
+const statusBarHeight = getStatusBarHeight();
 
 const theme = {
   dark: false,
@@ -10,13 +11,13 @@ const theme = {
   colors: {
       // most frequent, belt nav 
       primary: '#a2e3eb',
-      // bottom nav, filter button
-      secondary: '#aBeBaf',
+      // bottom nav, filter button bg
+      secondary: '#333',
       // snackbar action button
       accent: '#D11573',
       background: '#EBEBEB',
       surface: '#000',
-      // also used for cancel actions, 'clear'
+      // also used for cancel actions
       error: '#612',
       onPrimary: '#ccf7ff',
       // snackbar bg color
@@ -40,7 +41,7 @@ const theme = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: Platform.OS == 'ios' ? 15 : 0,
+    paddingTop: Platform.OS === 'ios' ? statusBarHeight : 0,
     // alignContent: 'flex-start', //cross axis with flexWrap on, overrides alignContent of parent
     // alignSelf: 'stretch', // overrides parent's alignItems
     //justifyContent: 'space-between',   // children along main axis

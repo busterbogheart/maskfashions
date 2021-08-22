@@ -1,5 +1,5 @@
 import React from "react"
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import {Linking, Text, TouchableOpacity, View } from "react-native";
 import { Appbar, useTheme } from "react-native-paper";
 import {styles} from '../styles';
 
@@ -10,7 +10,7 @@ const BeltNav = (props) => {
 
     const IconNav = (props) => {
         return (
-            <TouchableOpacity onPress={props.onPress} >
+            <TouchableOpacity onPressIn={props.onPress} delayPressIn={0} >
                 <View style={{top:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
                     <Appbar.Action color={theme.colors.text} style={{padding:0,margin:0,top: props.iconTop || 0}} size={props.iconSize || iconSize} icon={props.icon} />
                     <Text style={{color:theme.colors.text, top: props.textTop || -9, fontSize:11, fontWeight:'bold', textTransform:'uppercase',padding:0,margin:0}}>{props.title}</Text>
@@ -18,6 +18,10 @@ const BeltNav = (props) => {
             </TouchableOpacity>
         )
     };
+
+    const buyLinkClicked = () => {
+        Linking.openURL('https://etsy.com');
+    }
 
     return (
         <View style={styles.beltNav}>
@@ -32,9 +36,7 @@ const BeltNav = (props) => {
                 icon='cart'
                 // icon='rocket-launch'
                 // icon='open-in-new'
-            onPress={app.showNativeDialog} />
-
-
+            onPress={buyLinkClicked} />
         </View>
     );
 }
