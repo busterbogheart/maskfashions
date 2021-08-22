@@ -33,6 +33,7 @@
 		D02A43FC26B4BA4200F9884D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D02A43FB26B4BA4200F9884D /* GoogleService-Info.plist */; };
 		D02DF1A626CB21070034B919 /* DeepAR.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02DF1A526CB21060034B919 /* DeepAR.xcframework */; };
 		D02DF1A726CB21140034B919 /* DeepAR.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D02DF1A526CB21060034B919 /* DeepAR.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */ = {isa = PBXBuildFile; fileRef = D0A3A6E626D1A484006B8B46 /* mask-09 */; };
 		D0C440AD26C046C2002B882B /* mask-08 in Resources */ = {isa = PBXBuildFile; fileRef = D0C440AC26C046C2002B882B /* mask-08 */; };
 		D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */; };
 		D0D8D5B426B7369900E6692A /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D0D8D5B326B7369900E6692A /* fonts */; };
@@ -97,6 +98,7 @@
 		D02DF1A526CB21060034B919 /* DeepAR.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = DeepAR.xcframework; sourceTree = "<group>"; };
 		D078565A26A245640000F659 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		D078565C26A245AA0000F659 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		D0A3A6E626D1A484006B8B46 /* mask-09 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-09"; sourceTree = "<group>"; };
 		D0C440AC26C046C2002B882B /* mask-08 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-08"; sourceTree = "<group>"; };
 		D0D8D5B326B7369900E6692A /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fonts; sourceTree = "<group>"; };
 		D0F7198A26B4C92B00F7C3A4 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 		9A4764AE240E89A200E07300 /* effects */ = {
 			isa = PBXGroup;
 			children = (
+				D0A3A6E626D1A484006B8B46 /* mask-09 */,
 				D0C440AC26C046C2002B882B /* mask-08 */,
 				9A4764AF240E89A200E07300 /* tape_face */,
 				9A4764B0240E89A200E07300 /* topology */,
@@ -342,6 +345,7 @@
 				9A4764C8240E89A200E07300 /* beard in Resources */,
 				9A4764C2240E89A200E07300 /* pumpkin in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */,
 				D0D8D5B426B7369900E6692A /* fonts in Resources */,
 				9A4764C7240E89A200E07300 /* plastic_ocean in Resources */,
 				9A4764C1240E89A200E07300 /* topology in Resources */,

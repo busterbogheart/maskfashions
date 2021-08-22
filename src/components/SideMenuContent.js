@@ -23,7 +23,7 @@ const SideMenuContent = ({app,content}) => {
 
     const IconNav = (props) => {
         return (
-            <TouchableOpacity activeOpacity={.2} style={{padding:8}} onPress={props.onPress} >
+            <TouchableOpacity style={{padding:8}} onPressIn={props.onPress} delayPressIn={0} >
                 <View style={{top: 0,flexDirection: 'column',justifyContent: 'center',alignItems: 'center'}}>
                     <Appbar.Action color={theme.colors.textSecondary} style={{padding: 0,margin: 0,top: 0}} size={iconSize} icon={props.icon} />
                     <Text style={{textAlign: 'center',color: theme.colors.textSecondary,top: 0,fontSize: 12,textTransform: 'uppercase',fontWeight: 'bold'}}>{props.title}</Text>
@@ -43,6 +43,7 @@ const SideMenuContent = ({app,content}) => {
             DeviceInfo.getCodename(),
             DeviceInfo.getDeviceId(),
             DeviceInfo.getLastUpdateTime(),
+            DeviceInfo.getReadableVersion(),
         ])
             .then(results => {
                 let debugData = '';
