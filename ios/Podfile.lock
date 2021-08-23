@@ -693,6 +693,8 @@ PODS:
     - Firebase/Firestore (= 8.5.0)
     - React-Core
     - RNFBApp
+  - RNFS (2.18.0):
+    - React
   - RNShare (6.5.0):
     - React-Core
   - RNVectorIcons (8.1.0):
@@ -733,6 +735,7 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -819,6 +822,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBFirestore:
     :path: "../node_modules/@react-native-firebase/firestore"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNVectorIcons:
@@ -868,12 +873,13 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
-  RNCAsyncStorage: bb9649cb43f0040f82948084a0044e45292c5be3
+  RNCAsyncStorage: b7c6564ce662366dd44d0189456183ef7eda2d4d
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNDeviceInfo: 1c15bd65d0555a4246107dd9b5b9d9095aa6ad76
   RNFBApp: 6fbdb0d684c16507c4eb51689d4ff4cfef3bf11f
   RNFBAuth: 352fddc14c7de4fcac69b12c821e20212845d974
   RNFBFirestore: b817db23e6cc021e60644efc04803be807fb07f1
+  RNFS: 3ab21fa6c56d65566d1fb26c2228e2b6132e5e32
   RNShare: 047d42214f875d731bde73a2b67418638af85ad9
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
