@@ -101,7 +101,7 @@ export default class AdsApiAdButler {
     let res = await this.#restAPI('ad-items',true);
     await this.fetchCampaigns();
     if (res.status != 200) {
-      console.error('restapi failed');
+      throw Error('REST API status not 200')
     }
     let json = await res.json();
     console.log(json.data.length + " ad items fetched");
@@ -128,11 +128,9 @@ export default class AdsApiAdButler {
         this.#allAdItems.push(e);
       }
     }
-    console.log(this.#allAdItems.length,this.#adItemsInCampaigns.length);
   };
 
   getFilterSchema() {
-    if (this.#filterSchema.length == 0) console.error('empty schema');
     return this.#filterSchema;
   }
 

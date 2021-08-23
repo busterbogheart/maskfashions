@@ -12,7 +12,7 @@ import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {differenceInHours,differenceInMilliseconds,differenceInSeconds,isThisHour} from 'date-fns';
+import {differenceInHours,differenceInMilliseconds,differenceInSeconds,getOverlappingDaysInIntervals,isThisHour} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import SideMenu from 'react-native-side-menu-updated';
@@ -193,8 +193,6 @@ export default class App extends React.Component {
   componentDidMount() {
     console.debug('componentdidmount');
 
-    this.preloadMaskPNG();
-
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -220,33 +218,34 @@ export default class App extends React.Component {
       })
     }
 
-    /*
-    1. get ad items, filter schema
-    2. preload texture CDN URLs
-    3. (save textures locally?)
-    */
-
-    let schema;
     let butler = new AdButler();
-    // currently also populates filterSchema
-    butler.getAdItemsWithSchema().then(allAds => {
-      this.setState({adItemsAreLoading: false});
-      for (let ad of allAds) {
-        this.masterItemList.push({
-          adId: String(ad.id),
-          url: ad.creative_url,
-          name: ad.name,
-          metadata: ad.metadata,
-        });
-      }
-      this.preloadAdItemImages();
-      this.filteredItemList = this.masterItemList;
-      butler.getAdTrackingURLS();
-      console.debug('got ads and filter schema');
-      schema = new FilterSchema(butler.getFilterSchema());
-      this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
-      this.setState({});
-    });
+    const _getReady = async () => {
+      return butler.getAdItemsWithSchema().then(allAds => {
+        for (let ad of allAds) {
+          this.masterItemList.push({
+            adId: String(ad.id),
+            url: ad.creative_url,
+            name: ad.name,
+            metadata: ad.metadata,
+          });
+        }
+        this.preloadAdItemImages();
+        this.filteredItemList = this.masterItemList;
+        butler.getAdTrackingURLS();
+        console.debug('got ads and filter schema');
+        let schema = new FilterSchema(butler.getFilterSchema());
+        this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
+        this.setState({adItemsAreLoading: false});
+        this.preloadMaskPNG();
+      })
+    }
+
+    _getReady()
+      .catch(e => {
+        console.error('error fetching ads, trying again',e);
+        //go again
+        _getReady();
+      })
 
     this.setupAuthListener();
     this.setupUserLocal().then(
@@ -260,6 +259,9 @@ export default class App extends React.Component {
         }
       },reason => console.warn('failed: ' + reason));
   }
+
+  mockDelay = ms => new Promise(res => setTimeout(res,ms));
+
 
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
   // to Java and objc on local filesystem for the deepar native switchTexture method
@@ -668,6 +670,96 @@ export default class App extends React.Component {
       return <Icon style={style} size={size} name={iconName} />
     }
 
+    const MultiSelect = (props) => {
+      //in case schema can't be fetched, just hide the filters
+      if (this.multiSelectFilterSchema.length > 0)
+        return (
+          <>
+            <View name="filter buttons" style={styles.filterButtons}>
+              <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
+                <Icon name='format-list-bulleted-type' color='#ddd' size={28} style={{paddingHorizontal: 7}} />
+                <Text style={{color: '#ddd',textTransform: 'uppercase',fontWeight: 'bold',fontSize: 16}}>filter</Text>
+              </TouchableOpacity>
+              {this.state.multiSelectedItems.length > 0 ?
+                <TouchableOpacity onPress={() => {
+                  //this.multiSelectRef._removeAllItems();
+                  this.resetFlatList();
+                }} style={styles.filterButtonsClear}>
+                  <Text style={{color: '#f44',fontSize: 16,fontWeight: 'bold'}}>clear</Text>
+                </TouchableOpacity>
+                : <></>
+              }
+            </View>
+            <SectionedMultiSelect
+              ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
+              styles={filterModalStyles}
+              colors={{
+                // confirm button bg, dropdown arrow color
+                primary: theme.colors.primary,
+                // check icon color
+                success: '#2a2',
+                // cancel button bg
+                cancel: '#333',
+                // main category bg
+                itemBackground: '#fff',
+                subItemBackground: '#fff',
+                // button text
+                selectToggleTextColor: theme.colors.text,
+              }}
+              items={this.multiSelectFilterSchema}
+              IconRenderer={filterIconRenderer}
+              uniqueKey="id"
+              subKey="children"
+              selectText=''
+              //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
+              showDropDowns={true}
+              selectChildren={false}
+              // remove down arrow at start
+              selectToggleIconComponent={<></>}
+              // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
+              expandDropDowns={false}
+              // headerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>header</Text></View>}
+              // footerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>foot</Text></View>}
+              // stickyFooterComponent={<View style={{backgroundColor:'#bfd',padding:5,height:30}}><Text style={{textAlign:'right'}}>hot tip: Be hot.</Text></View>}
+              readOnlyHeadings={false}
+              showRemoveAll={true}
+              animateDropDowns={false}
+              modalAnimationType='slide'
+              modalWithSafeAreaView={true}
+              modalWithTouchable={true}
+              hideSearch={true}
+              hideSelect={true}
+              showCancelButton={true}
+              showChips={false}
+              highlightChildren={true}
+              confirmText='APPLY'
+              selectedIconOnLeft={true}
+              selectedIconComponent={<Icon name='check-bold' color='#2c2' style={{paddingRight: 3}} />}
+              alwaysShowSelectText={false}
+              // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
+              onSelectedItemsChange={(items) => {
+                //console.debug('selecteditemschange:',JSON.stringify(items,null,1))
+                this.setState({multiSelectedItems: items});
+              }}
+              onSelectedItemObjectsChange={(itemsObj) => {
+                // returned as the original objects not just ids
+                //console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
+                this.setState({multiSelectedItemObjects: itemsObj});
+              }}
+              selectedItems={this.state.multiSelectedItems}
+              onToggleSelector={(modalOpen) => {
+                //console.log(`filter modal open? ${modalOpen}`);
+                if (modalOpen == false) this.applyFilters();
+              }}
+              onConfirm={this.applyFilters}
+              onCancel={() => {
+                this.resetFlatList();
+              }}
+            /></>
+        )
+        else return <></>
+    };
+
     return (
       <View style={styles.container} >
         <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
@@ -720,7 +812,7 @@ export default class App extends React.Component {
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
             {this.state.adItemsAreLoading ?
-              <View style={{justifyContent:'center', alignContent:'center',flex:1}}><ActivityIndicator size='large' color={theme.colors.onSurface} /></View>
+              <View style={{justifyContent: 'center',alignContent: 'center',flex: 1}}><ActivityIndicator size='large' color={theme.colors.onSurface} /></View>
               :
               <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
                 snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
@@ -739,93 +831,11 @@ export default class App extends React.Component {
             }
           </View>
 
-          <View name="filters" style={[styles.filtersContainer]}>
+          <View name="filter container" style={[styles.filtersContainer]}>
             {this.state.adItemsAreLoading ?
               <View style={styles.filterButtons}><ActivityIndicator size='small' color={theme.colors.onSurface} /></View>
               :
-              <>
-                <View name="filter buttons" style={styles.filterButtons}>
-                  <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
-                    <Icon name='format-list-bulleted-type' color='#ddd' size={28} style={{paddingHorizontal: 7}} />
-                    <Text style={{color: '#ddd',textTransform: 'uppercase',fontWeight: 'bold',fontSize: 16}}>filter</Text>
-                  </TouchableOpacity>
-                  {this.state.multiSelectedItems.length > 0 ?
-                    <TouchableOpacity onPress={() => {
-                      //this.multiSelectRef._removeAllItems();
-                      this.resetFlatList();
-                    }} style={styles.filterButtonsClear}>
-                      <Text style={{color: '#f44',fontSize: 16,fontWeight: 'bold'}}>clear</Text>
-                    </TouchableOpacity>
-                    : <></>
-                  }
-                </View>
-                <SectionedMultiSelect
-                  ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
-                  styles={filterModalStyles}
-                  colors={{
-                    // confirm button bg, dropdown arrow color
-                    primary: theme.colors.primary,
-                    // check icon color
-                    success: '#2a2',
-                    // cancel button bg
-                    cancel: '#333',
-                    // main category bg
-                    itemBackground: '#fff',
-                    subItemBackground: '#fff',
-                    // button text
-                    selectToggleTextColor: theme.colors.text,
-                  }}
-                  items={this.multiSelectFilterSchema}
-                  IconRenderer={filterIconRenderer}
-                  uniqueKey="id"
-                  subKey="children"
-                  selectText=''
-                  //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
-                  showDropDowns={true}
-                  selectChildren={false}
-                  // remove down arrow at start
-                  selectToggleIconComponent={<></>}
-                  // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
-                  expandDropDowns={false}
-                  // headerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>header</Text></View>}
-                  // footerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>foot</Text></View>}
-                  // stickyFooterComponent={<View style={{backgroundColor:'#bfd',padding:5,height:30}}><Text style={{textAlign:'right'}}>hot tip: Be hot.</Text></View>}
-                  readOnlyHeadings={false}
-                  showRemoveAll={true}
-                  animateDropDowns={false}
-                  modalAnimationType='slide'
-                  modalWithSafeAreaView={true}
-                  modalWithTouchable={true}
-                  hideSearch={true}
-                  hideSelect={true}
-                  showCancelButton={true}
-                  showChips={false}
-                  highlightChildren={true}
-                  confirmText='APPLY'
-                  selectedIconOnLeft={true}
-                  selectedIconComponent={<Icon name='check-bold' color='#2c2' style={{paddingRight: 3}} />}
-                  alwaysShowSelectText={false}
-                  // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
-                  onSelectedItemsChange={(items) => {
-                    //console.debug('selecteditemschange:',JSON.stringify(items,null,1))
-                    this.setState({multiSelectedItems: items});
-                  }}
-                  onSelectedItemObjectsChange={(itemsObj) => {
-                    // returned as the original objects not just ids
-                    //console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
-                    this.setState({multiSelectedItemObjects: itemsObj});
-                  }}
-                  selectedItems={this.state.multiSelectedItems}
-                  onToggleSelector={(modalOpen) => {
-                    //console.log(`filter modal open? ${modalOpen}`);
-                    if (modalOpen == false) this.applyFilters();
-                  }}
-                  onConfirm={this.applyFilters}
-                  onCancel={() => {
-                    this.resetFlatList();
-                  }}
-                />
-              </>
+              <MultiSelect />
             }
           </View>
         </SideMenu>
