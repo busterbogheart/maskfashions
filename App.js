@@ -1,7 +1,7 @@
 "use strict";
 
 import React,{Fragment} from 'react';
-import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions} from 'react-native';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking,ActivityIndicator} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {filterModalStyles,styles,theme} from './src/styles';
@@ -20,6 +20,7 @@ import SideMenuContent from './src/components/SideMenuContent';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import FilterSchema from './src/FilterSchema';
 import AnimatedFav from './src/components/AnimatedFav';
+import RNFS from 'react-native-fs';
 
 export default class App extends React.Component {
 
@@ -39,6 +40,7 @@ export default class App extends React.Component {
       sideMenuData: null,
       forceRenderFlatList: true,
       animatedFavIcons: [],
+      adItemsAreLoading: true,
     }
 
     this.currentTexture = 0,
@@ -64,6 +66,7 @@ export default class App extends React.Component {
     this.maskScrollRef = React.createRef();
     this.maskSizeScale = .77;
     this.maskSize = this.screenWidth / 1.3;
+    this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
   }
 
   didAppear() {
@@ -163,6 +166,14 @@ export default class App extends React.Component {
     this.setState({snackbarVisible: true});
   }
 
+  permissionsNotGranted = () => {
+    Alert.alert(
+      "Permissions were not granted",
+      "Mask Fashions requires your permission to ....  Please close the app and open again to allow.",
+      [],{cancelable: false}
+    );
+  }
+
   showNativeDialog = () => {
     Alert.alert(
       "Here's the deal",
@@ -184,10 +195,6 @@ export default class App extends React.Component {
 
     this.preloadMaskPNG();
 
-    this.firstTimeFace = setTimeout(() => {
-      this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
-    },8000);
-
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -202,8 +209,12 @@ export default class App extends React.Component {
           result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
         ) {
           console.debug('permissions granted')
+          this.firstTimeFace = setTimeout(() => {
+            this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
+          },8000);
           this.setState({permissionsGranted: true});
         } else {
+          this.permissionsNotGranted();
           this.setState({permissionsGranted: false});
         }
       })
@@ -219,6 +230,7 @@ export default class App extends React.Component {
     let butler = new AdButler();
     // currently also populates filterSchema
     butler.getAdItemsWithSchema().then(allAds => {
+      this.setState({adItemsAreLoading: false});
       for (let ad of allAds) {
         this.masterItemList.push({
           adId: String(ad.id),
@@ -251,10 +263,42 @@ export default class App extends React.Component {
 
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
   // to Java and objc on local filesystem for the deepar native switchTexture method
-  // save resized copy for listview?  performance?
-  // try https://github.com/itinance/react-native-fs
-  // currently the RN Image caching doesnt help with switchTexture performance (done in Java)
-  preloadAdItemImages = () => {
+  // CDN url as backup if file doesnt exist localy (then download it local?)
+  // if it's been more than X hours, wipe the /aditems directory and re-download?
+  preloadAdItemImages = async () => {
+    await RNFS.mkdir(this.localAdItemsDir);
+
+    const _downloadOne = (fromUrl,toFile) => {
+      return RNFS.downloadFile({
+        fromUrl,toFile,
+        begin: (status) => {console.log('started job ',status.jobId)},
+      })
+    };
+
+    this.masterItemList.forEach(item => {
+      const localDest = this.localAdItemsDir + item.adId + ".jpg";
+      const CDNurl = item.url;
+      RNFS.exists(localDest)
+        .then(doesExist => {
+          if (!doesExist) {
+            _downloadOne(CDNurl,localDest)
+              .promise.then((res) => {
+                console.log(`finished ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
+                if (res.statusCode !== 200) {
+                  // go again
+                  _downloadOne(CDNurl,localDest);
+                }
+              },rejected => {
+                console.warn(rejected);
+                _downloadOne(CDNurl,localDest);
+              })
+              .catch(e => console.error(e));
+          } else {
+            console.log(`image for ${item.adId} already exists locally`);
+          }
+        })
+    });
+
     this.masterItemList.forEach(v => {
       let uri = v.url;
       console.debug(`preloading texture ${uri}`);
@@ -421,13 +465,26 @@ export default class App extends React.Component {
   }
 
   switchToNextTexture = () => {
-    let tex = this.filteredItemList[this.currentTexture];
+    if (this.filteredItemList.length == 0) return;
+    let ad = this.filteredItemList[this.currentTexture];
     this.currentTexture = this.currentTexture + 1 == this.filteredItemList.length ? 0 : this.currentTexture + 1;
-    this.deepARView.switchTexture(tex.url);
+    this.switchTexture(ad.url,ad.adId);
   }
 
-  switchTexture = (url) => {
-    this.deepARView.switchTexture(url);
+  switchTexture = (url,adId) => {
+    const localDest = this.localAdItemsDir + adId + '.jpg';
+    let URLorFilepath;
+    RNFS.exists(localDest)
+      .then(doesExist => {
+        if (doesExist) {
+          console.log(`switchtexture: ad item ${adId} exists locally`);
+          URLorFilepath = localDest;
+        } else {
+          console.warn(`ad item ${adId} does NOT exist locally, using CDN`);
+          URLorFilepath = url;
+        }
+        this.deepARView.switchTexture(URLorFilepath,!doesExist);
+      });
   }
 
   switchToRandomAdItem = () => {
@@ -466,7 +523,7 @@ export default class App extends React.Component {
 
   applyFilters = () => {
     let filters = this.state.multiSelectedItemObjects;
-    console.log('filters: ',JSON.stringify(filters,null,1));
+    //console.log('filters: ',JSON.stringify(filters,null,1));
     if (filters.length == 0) {
       this.resetFlatList();
       return;
@@ -515,6 +572,15 @@ export default class App extends React.Component {
     this.setState({multiSelectedItems: [],multiSelectedItemObjects: [],forceRenderFlatList: !this.state.forceRenderFlatList});
   }
 
+  getFlatListEmptyComponent = () => {
+    return (
+      <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
+        <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+        <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
+      </View>
+    )
+  }
+
   triggerAnimatedFav = (pageX,pageY) => {
     // add another to the array, add a key, render later with map()
     const count = this.state.animatedFavIcons.length;
@@ -532,7 +598,7 @@ export default class App extends React.Component {
     // TODO check androidrenderingmode software
     return (
       <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
-        onPressIn={() => {this.switchTexture(item.url)}} delayPressIn={80} activeOpacity={.5} >
+        onPressIn={() => {this.switchTexture(item.url,item.adId)}} delayPressIn={80} activeOpacity={.5} >
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
@@ -613,7 +679,7 @@ export default class App extends React.Component {
               this.state.animatedFavIcons.map(el => el)
               : <></>}
           </Portal>
-          
+
           <Portal>
             <Snackbar
               visible={this.state.snackbarVisible} duration={5000}
@@ -641,6 +707,7 @@ export default class App extends React.Component {
           {this.isRelease == false ? (
             <View name="test-buttons" style={styles.buttonContainer}>
               <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+              <MyButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
               {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
               {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
               {/*<MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
@@ -652,23 +719,30 @@ export default class App extends React.Component {
           ) : <></>}
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
-            <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
-              snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
-              ListEmptyComponent={
-                <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
-                  <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
-                  <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
-                </View>}
-              contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
-              keyExtractor={(item,index) => item.adId}
-              horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
-              onViewableItemsChanged={this.onViewableItemsChanged}
-              viewabilityConfig={this.viewabilityConfig}
-            />
+            {this.state.adItemsAreLoading ?
+              <View style={{justifyContent:'center', alignContent:'center',flex:1}}><ActivityIndicator size='large' color={theme.colors.onSurface} /></View>
+              :
+              <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+                snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
+                ListEmptyComponent={
+                  <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
+                    <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+                    <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
+                  </View>
+                }
+                contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
+                keyExtractor={(item,index) => item.adId}
+                horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
+                onViewableItemsChanged={this.onViewableItemsChanged}
+                viewabilityConfig={this.viewabilityConfig}
+              />
+            }
           </View>
 
           <View name="filters" style={[styles.filtersContainer]}>
-            {this.multiSelectFilterSchema.length > 0 ?
+            {this.state.adItemsAreLoading ?
+              <View style={styles.filterButtons}><ActivityIndicator size='small' color={theme.colors.onSurface} /></View>
+              :
               <>
                 <View name="filter buttons" style={styles.filterButtons}>
                   <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
@@ -682,7 +756,8 @@ export default class App extends React.Component {
                     }} style={styles.filterButtonsClear}>
                       <Text style={{color: '#f44',fontSize: 16,fontWeight: 'bold'}}>clear</Text>
                     </TouchableOpacity>
-                    : <></>}
+                    : <></>
+                  }
                 </View>
                 <SectionedMultiSelect
                   ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
@@ -737,12 +812,12 @@ export default class App extends React.Component {
                   }}
                   onSelectedItemObjectsChange={(itemsObj) => {
                     // returned as the original objects not just ids
-                    console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
+                    //console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
                     this.setState({multiSelectedItemObjects: itemsObj});
                   }}
                   selectedItems={this.state.multiSelectedItems}
                   onToggleSelector={(modalOpen) => {
-                    console.log(`filter modal open? ${modalOpen}`);
+                    //console.log(`filter modal open? ${modalOpen}`);
                     if (modalOpen == false) this.applyFilters();
                   }}
                   onConfirm={this.applyFilters}
@@ -751,7 +826,7 @@ export default class App extends React.Component {
                   }}
                 />
               </>
-              : <></>}
+            }
           </View>
         </SideMenu>
       </View>

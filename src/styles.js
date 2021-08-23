@@ -20,7 +20,7 @@ const theme = {
       // also used for cancel actions
       error: '#612',
       onPrimary: '#ccf7ff',
-      // snackbar bg color
+      // snackbar bg color, loading indicators
       onSurface: '#ddd',
       text: '#333',
       // bottom nav

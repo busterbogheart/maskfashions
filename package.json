@@ -22,6 +22,7 @@
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-device-info": "^8.1.6",
+    "react-native-fs": "^2.18.0",
     "react-native-paper": "^4.9.2",
     "react-native-sectioned-multi-select": "^0.8.1",
     "react-native-share": "^6.4.0",

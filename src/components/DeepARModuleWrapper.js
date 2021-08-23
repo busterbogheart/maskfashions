@@ -19,12 +19,12 @@ export default class DeepARModuleWrapper extends React.Component {
     );
   }
 
-  switchTexture = (textureUrl) => {
-    //console.debug('switchtexture '+textureUrl);
+  switchTexture = (URLorFilename, isRemote) => {
+    console.debug(`switchtexture remote? ${isRemote}: ${URLorFilename}`);
     UIManager.dispatchViewManagerCommand(
       this.getDeepARViewHandle(),
       UIManager.getViewManagerConfig('DeepARModule').Commands.switchTexture,
-      [textureUrl]
+      [URLorFilename, isRemote]
     );
   }
 

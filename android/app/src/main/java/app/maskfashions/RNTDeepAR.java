@@ -439,32 +439,35 @@ public class RNTDeepAR extends FrameLayout implements AREventListener, SurfaceHo
         return tempPath.getAbsolutePath();
     }
 
-    public void switchTexture(String textureUrl) throws Exception {
-        ReactContext rc = (ReactContext) getContext();
-        // /data/user/0/app.maskfashions/files + /textures
-        // need more research on Android filesystem; whether this will change, etc
-        // also how does caching and cache checking factor in
-        String path = rc.getApplicationContext().getFilesDir().getAbsolutePath()+"/textures";
-//        Bitmap bitmap = BitmapFactory.decodeFile(path);
-//        deepAr.changeParameterTexture("mask-itself","MeshRenderer","s_texDiffuse", bitmap);
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(textureUrl, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                if(statusCode == 200){
-                  Bitmap bitmap = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
-                    // 'parameter' varies based on shader's json
-                  deepAr.changeParameterTexture("mask-itself","MeshRenderer",
-                          "s_texDiffuse", bitmap);
-                } else {
-                    Log.e(RNTDeepAR.LOG,"error loading texture: "+textureUrl);
-                }
-            }
+    public void switchTexture(String textureUrl, boolean isRemote) throws Exception {
+      if(isRemote) {
+          AsyncHttpClient client = new AsyncHttpClient();
+          client.get(textureUrl, new AsyncHttpResponseHandler() {
+              @Override
+              public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                  if (statusCode == 200) {
+                      Bitmap bitmap = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
+                      // 'parameter' varies based on shader's json
+                      deepAr.changeParameterTexture("mask-itself", "MeshRenderer",
+                              "s_texDiffuse", bitmap);
+                  } else {
+                      Log.e(RNTDeepAR.LOG, "error loading texture: " + textureUrl);
+                  }
+              }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.e(RNTDeepAR.LOG,"switchTexture failed w "+String.valueOf(statusCode)+", err: "+error.toString());
-            }
-        });
+              @Override
+              public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                  Log.e(RNTDeepAR.LOG, "switchTexture failed w " + String.valueOf(statusCode) + ", err: " + error.toString());
+              }
+          });
+      } else {
+        ReactContext rc = (ReactContext) getContext();
+        // /data/user/0/app.maskfashions/files
+//        String path = rc.getApplicationContext().getFilesDir().getAbsolutePath()+"aditems/"+"3215476";
+        String path = textureUrl;
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        deepAr.changeParameterTexture("mask-itself","MeshRenderer","s_texDiffuse", bitmap);
+      }
+
     }
 }

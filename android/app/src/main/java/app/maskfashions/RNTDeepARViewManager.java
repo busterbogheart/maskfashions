@@ -78,8 +78,9 @@ public class RNTDeepARViewManager extends SimpleViewManager<RNTDeepAR> {
             case SWITCH_TEXTURE: {
                 if (args != null) {
                     String texture = args.getString(0);
+                    boolean remote = args.getBoolean(1);
                     try{
-                        deepARView.switchTexture(texture);
+                        deepARView.switchTexture(texture, remote);
                     } catch (Exception e){
                         Log.e(RNTDeepAR.LOG,"whoa: couldn't get texture at "+texture+" ... err: "+e.toString());
                     }
