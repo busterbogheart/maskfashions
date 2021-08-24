@@ -227,9 +227,10 @@ export default class App extends React.Component {
             url: ad.creative_url,
             name: ad.name,
             metadata: ad.metadata,
-
           });
         }
+        //randomize
+        this.masterItemList = this.masterItemList.map((value) => ({value,sort: Math.random()})).sort((a,b) => a.sort - b.sort).map(({value}) => value);
         this.preloadAdItemImages();
         this.filteredItemList = this.masterItemList;
         console.debug('got ads and filter schema');
