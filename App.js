@@ -4,7 +4,7 @@ import React,{Fragment} from 'react';
 import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking,ActivityIndicator} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
-import {filterModalStyles,styles,theme} from './src/styles';
+import {styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
 import {Button,Snackbar,Portal,Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,15 +12,15 @@ import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {differenceInHours,differenceInMilliseconds,differenceInSeconds,getOverlappingDaysInIntervals,isThisHour} from 'date-fns';
+import {differenceInSeconds} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import SideMenu from 'react-native-side-menu-updated';
 import SideMenuContent from './src/components/SideMenuContent';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import FilterSchema from './src/FilterSchema';
 import AnimatedFav from './src/components/AnimatedFav';
 import RNFS from 'react-native-fs';
+import Filters from './src/components/Filters';
 
 export default class App extends React.Component {
 
@@ -31,7 +31,6 @@ export default class App extends React.Component {
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
-      multiSelectedItems: [],
       multiSelectedItemObjects: [],
       snackbarVisible: false,
       snackbarText: null,
@@ -53,6 +52,7 @@ export default class App extends React.Component {
     this.screenWidth = Dimensions.get('window').width;
     this.masterItemList = [];
     this.filteredItemList = [];
+    this.itemTrackingURLs; //{} keyed on adId
 
     this.multiSelectFilterSchema = [];
     this.firstTimeFace = null;
@@ -67,6 +67,7 @@ export default class App extends React.Component {
     this.maskSizeScale = .77;
     this.maskSize = this.screenWidth / 1.3;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
+    this.butler;
   }
 
   didAppear() {
@@ -162,8 +163,7 @@ export default class App extends React.Component {
   }
 
   showSnackbar = (text = '') => {
-    this.setState({snackbarText: text});
-    this.setState({snackbarVisible: true});
+    this.setState({snackbarText: text, snackbarVisible: true});
   }
 
   permissionsNotGranted = () => {
@@ -218,22 +218,22 @@ export default class App extends React.Component {
       })
     }
 
-    let butler = new AdButler();
+    this.butler = new AdButler();
     const _getReady = async () => {
-      return butler.getAdItemsWithSchema().then(allAds => {
+      return this.butler.getAdItemsWithSchema().then(allAds => {
         for (let ad of allAds) {
           this.masterItemList.push({
             adId: String(ad.id),
             url: ad.creative_url,
             name: ad.name,
             metadata: ad.metadata,
+
           });
         }
         this.preloadAdItemImages();
         this.filteredItemList = this.masterItemList;
-        butler.getAdTrackingURLS();
         console.debug('got ads and filter schema');
-        let schema = new FilterSchema(butler.getFilterSchema());
+        let schema = new FilterSchema(this.butler.getFilterSchema());
         this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
         this.setState({adItemsAreLoading: false});
         this.preloadMaskPNG();
@@ -247,6 +247,8 @@ export default class App extends React.Component {
         _getReady();
       })
 
+    this.butler.getAdTrackingURLS()
+      .then(urls => this.itemTrackingURLs = urls);
     this.setupAuthListener();
     this.setupUserLocal().then(
       uid => {
@@ -261,7 +263,6 @@ export default class App extends React.Component {
   }
 
   mockDelay = ms => new Promise(res => setTimeout(res,ms));
-
 
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
   // to Java and objc on local filesystem for the deepar native switchTexture method
@@ -514,17 +515,18 @@ export default class App extends React.Component {
   onViewableItemsChanged = ({changed,viewableItems}) => {
     for (let v of viewableItems) {
       let adId = v.item.adId;
-      if (this.adsAlreadyViewed.includes(adId) == false) {
-        console.log('logging impression: ',v.index,adId)
-        let url = 'https://maskfashions.app?';
+      let name = v.item.name;
+      if (!this.adsAlreadyViewed.includes(adId) && this.itemTrackingURLs[adId]) {
+        console.log(`logging impression for ${name} (${adId}) at ${v.index}`);
+        let url = this.itemTrackingURLs[adId].impUrl;
         this.trackImpression(url);
         this.adsAlreadyViewed.push(adId);
       }
     }
   }
 
-  applyFilters = () => {
-    let filters = this.state.multiSelectedItemObjects;
+  applyFilters = (selectedItemObjects) => {
+    let filters = selectedItemObjects;
     //console.log('filters: ',JSON.stringify(filters,null,1));
     if (filters.length == 0) {
       this.resetFlatList();
@@ -571,7 +573,7 @@ export default class App extends React.Component {
   resetFlatList = () => {
     this.filteredItemList = this.masterItemList;
     this.maskScrollRef.current.scrollToOffset({offset: 0,animated: true,});
-    this.setState({multiSelectedItems: [],multiSelectedItemObjects: [],forceRenderFlatList: !this.state.forceRenderFlatList});
+    this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
   }
 
   getFlatListEmptyComponent = () => {
@@ -640,124 +642,6 @@ export default class App extends React.Component {
         style={[styles.button,props.style]} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
         <Text style={{fontSize: 11,fontWeight: 'bold'}}>{props.text}</Text>
       </Button>
-    };
-
-    const filterIconRenderer = ({name,size = 18,style}) => {
-      let iconName;
-      switch (name) {
-        case 'search':
-          iconName = 'card-search'
-          break
-        case 'keyboard-arrow-up':
-          iconName = 'arrow-up-thick'
-          break
-        case 'keyboard-arrow-down':
-          iconName = 'arrow-down-thick'
-          break
-        case 'close':
-          iconName = 'close-box'
-          break
-        case 'check':
-          iconName = 'check-bold' //check
-          break
-        case 'cancel':
-          iconName = 'close'
-          break
-        default:
-          iconName = null
-          break
-      }
-      return <Icon style={style} size={size} name={iconName} />
-    }
-
-    const MultiSelect = (props) => {
-      //in case schema can't be fetched, just hide the filters
-      if (this.multiSelectFilterSchema.length > 0)
-        return (
-          <>
-            <View name="filter buttons" style={styles.filterButtons}>
-              <TouchableOpacity onPress={() => {this.multiSelectRef._toggleSelector()}} style={styles.filterButtonsFilter} >
-                <Icon name='format-list-bulleted-type' color='#ddd' size={28} style={{paddingHorizontal: 7}} />
-                <Text style={{color: '#ddd',textTransform: 'uppercase',fontWeight: 'bold',fontSize: 16}}>filter</Text>
-              </TouchableOpacity>
-              {this.state.multiSelectedItems.length > 0 ?
-                <TouchableOpacity onPress={() => {
-                  //this.multiSelectRef._removeAllItems();
-                  this.resetFlatList();
-                }} style={styles.filterButtonsClear}>
-                  <Text style={{color: '#f44',fontSize: 16,fontWeight: 'bold'}}>clear</Text>
-                </TouchableOpacity>
-                : <></>
-              }
-            </View>
-            <SectionedMultiSelect
-              ref={SectionedMultiSelect => this.multiSelectRef = SectionedMultiSelect}
-              styles={filterModalStyles}
-              colors={{
-                // confirm button bg, dropdown arrow color
-                primary: theme.colors.primary,
-                // check icon color
-                success: '#2a2',
-                // cancel button bg
-                cancel: '#333',
-                // main category bg
-                itemBackground: '#fff',
-                subItemBackground: '#fff',
-                // button text
-                selectToggleTextColor: theme.colors.text,
-              }}
-              items={this.multiSelectFilterSchema}
-              IconRenderer={filterIconRenderer}
-              uniqueKey="id"
-              subKey="children"
-              selectText=''
-              //selectText={<><Text style={{textTransform: 'uppercase',fontWeight: 'bold',fontSize: 15}}>filter masks </Text><Icon name='format-list-bulleted-type' size={20} /></>}
-              showDropDowns={true}
-              selectChildren={false}
-              // remove down arrow at start
-              selectToggleIconComponent={<></>}
-              // removeAllText={<Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>clear filters<Icon name='delete' size={18} /></Text>}
-              expandDropDowns={false}
-              // headerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>header</Text></View>}
-              // footerComponent={<View style={{backgroundColor:'#f4f',height:20}}><Text>foot</Text></View>}
-              // stickyFooterComponent={<View style={{backgroundColor:'#bfd',padding:5,height:30}}><Text style={{textAlign:'right'}}>hot tip: Be hot.</Text></View>}
-              readOnlyHeadings={false}
-              showRemoveAll={true}
-              animateDropDowns={false}
-              modalAnimationType='slide'
-              modalWithSafeAreaView={true}
-              modalWithTouchable={true}
-              hideSearch={true}
-              hideSelect={true}
-              showCancelButton={true}
-              showChips={false}
-              highlightChildren={true}
-              confirmText='APPLY'
-              selectedIconOnLeft={true}
-              selectedIconComponent={<Icon name='check-bold' color='#2c2' style={{paddingRight: 3}} />}
-              alwaysShowSelectText={false}
-              // customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
-              onSelectedItemsChange={(items) => {
-                //console.debug('selecteditemschange:',JSON.stringify(items,null,1))
-                this.setState({multiSelectedItems: items});
-              }}
-              onSelectedItemObjectsChange={(itemsObj) => {
-                // returned as the original objects not just ids
-                //console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
-                this.setState({multiSelectedItemObjects: itemsObj});
-              }}
-              selectedItems={this.state.multiSelectedItems}
-              onToggleSelector={(modalOpen) => {
-                //console.log(`filter modal open? ${modalOpen}`);
-                if (modalOpen == false) this.applyFilters();
-              }}
-              onConfirm={this.applyFilters}
-              onCancel={() => {
-                this.resetFlatList();
-              }}
-            /></>
-        )
-        else return <></>
     };
 
     return (
@@ -835,7 +719,7 @@ export default class App extends React.Component {
             {this.state.adItemsAreLoading ?
               <View style={styles.filterButtons}><ActivityIndicator size='small' color={theme.colors.onSurface} /></View>
               :
-              <MultiSelect />
+              <Filters filterSchema={this.multiSelectFilterSchema} app={this} />
             }
           </View>
         </SideMenu>

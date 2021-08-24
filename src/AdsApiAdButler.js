@@ -10,23 +10,14 @@ export default class AdsApiAdButler {
 
   #allAdItems = [];
   #adItemsInCampaigns = [];
-  #allTrackingUrls = [];
+  #allTrackingUrls = {}; //keyed on banner id aka adId
   #apiKey = 'b87ea9fb1559cbea91d941f0be63ce9b'; //test: da81d8cf585242c7818d43bdddcd0769
+  #liveAccountNo = '181924'; // test '181925'
   #filterSchema = {};
   #urlJSON = 'https://servedbyadbutler.com/adserve/';
   #urlREST = 'https://api.adbutler.com/v2/';
   // the data given to the FlatList, should be [{url:'', impUrl:'', clickUrl:'', adId:''}, ...]
   #allActiveAdItems = [];
-
-  // JSON call for tracking URLs
-  // REST call(s) for ad items and scheduling, filter schema
-  // 
-
-  constructor() {
-    // this.restAPI_Creatives();
-    // this.restAPI_AdItems();
-    // this.restAPI_SelfserveInfo();
-  }
 
   restAPI_SelfserveInfo = () => {
     this.#restAPI('self-serve/portals/405/orders',true)
@@ -41,7 +32,7 @@ export default class AdsApiAdButler {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
-        console.debug(json.data.length+' campaign assignments fetched')
+        console.debug(json.data.length + ' campaign assignments fetched')
         for (let k of json.data) {
           if (k.object == 'campaign_assignment' && k.advertisement && k.campaign) {
             const adId = k.advertisement.id;
@@ -119,7 +110,7 @@ export default class AdsApiAdButler {
       if (e.id == '520484750') {
         for (const k in e.metadata) {
           let arr = e.metadata[k].split(',');
-          let noEmpties = arr.filter( el => el!='');
+          let noEmpties = arr.filter(el => el != '');
           this.#filterSchema[k] = noEmpties.map(str => str.trim());
         }
         continue;
@@ -181,7 +172,7 @@ export default class AdsApiAdButler {
     params = {...params,...{limit: 9999}}
     return this.#adbutlerFetch(this.#urlREST,params,endpoint);
   }
-  
+
   //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json //standard dynamic w/ Versace
   //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
   //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
@@ -190,7 +181,7 @@ export default class AdsApiAdButler {
   // JSON API only gets ad items that are ASSIGNED to zones and NOT IN EXPIRED campaigns
   #jsonAPI = async (params) => {
     console.log(`fetching ${this.#urlJSON} with ${JSON.stringify(params)}`);
-    let response = await fetch(this.#urlJSON, {
+    let response = await fetch(this.#urlJSON,{
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -203,28 +194,39 @@ export default class AdsApiAdButler {
   }
 
 
-  getAdTrackingURLS = async() => {
-    this.#jsonAPI({
-      setID: '492969', //set = zone
-      type: 'jsonr',
-      ID: '181924',
-    })
-      .then(response => response.json())
-      .then(json => {
-        if (json.status != "SUCCESS") throw Error('JSON api failed');
-        for (let placement of json.placements) {
-          let impUrl = placement.accupixel_url;
-          let clickUrl = placement.redirect_url;
-          let id = placement.banner_id;
-          this.#allTrackingUrls.push({
-            id, impUrl, clickUrl
-          });
-        }
-        //console.log(JSON.stringify(this.#allTrackingUrls,null,1))
+  getAdTrackingURLS = async () => {
+    const _getURLS = async() => {
+      return this.#jsonAPI({
+        setID: '492969', //set = zone
+        type: 'jsonr',
+        ID: this.#liveAccountNo,
       })
-      .catch(err => {
-        console.warn(err);
-      });
+        .then(response => response.json())
+        .then(json => {
+          if (json.status != "SUCCESS") throw Error('JSON api failed');
+          for (let placement of json.placements) {
+            let id = placement.banner_id;
+            let impUrl = placement.accupixel_url;
+            let clickUrl = placement.redirect_url;
+            let convUrl = `https://servedbyadbutler.com/convtrack.spark?MID=${this.#liveAccountNo}&BID=${id}`;
+            this.#allTrackingUrls[id] = {
+              impUrl,clickUrl,convUrl
+            };
+          }
+        })
+    }
+
+    return _getURLS()
+      .then(() => {
+        console.log('got tracking URLs');
+        return this.#allTrackingUrls;
+      })
+      .catch(e => {
+        console.warn('get tracking failed, trying again');
+        _getURLS();
+        return this.#allTrackingUrls;
+      })
+
   }
 
 }

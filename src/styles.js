@@ -14,7 +14,7 @@ const theme = {
       // bottom nav, filter button bg
       secondary: '#333',
       // snackbar action button
-      accent: '#D11573',
+      accent: '#f67',
       background: '#EBEBEB',
       surface: '#000',
       // also used for cancel actions
@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
     right: 25,
     paddingHorizontal: 25,
     paddingVertical: 11,
+    backgroundColor: '#ffffff22',
   },
   filterButtonsFilter: {
     flex:1,
