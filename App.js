@@ -21,6 +21,8 @@ import FilterSchema from './src/FilterSchema';
 import AnimatedFav from './src/components/AnimatedFav';
 import RNFS from 'react-native-fs';
 import Filters from './src/components/Filters';
+import DebugButton from './src/components/DebugButton';
+
 
 export default class App extends React.Component {
 
@@ -42,7 +44,7 @@ export default class App extends React.Component {
       adItemsAreLoading: true,
     }
 
-    this.currentTexture = 0;
+    this.currentAdItem = 0; //adId 
     this.renderCount = 0;
     this.isRelease = true;
 
@@ -59,7 +61,7 @@ export default class App extends React.Component {
     this.viewabilityConfig = {
       minimumViewTime: 1000,
       //viewAreaCoveragePercentThreshold: 80,
-      itemVisiblePercentThreshold: 30,
+      itemVisiblePercentThreshold: 40,
       waitForInteraction: false,
     };
     this.adsAlreadyViewed = [];
@@ -88,8 +90,9 @@ export default class App extends React.Component {
     if (event.type === 'cameraSwitch') {
       this.setState({switchCameraInProgress: false})
     } else if (event.type === 'initialized') {
+      // initialized sometimes called twice (frame dimension changes, etc)
       this.deepARView.switchEffect('mask-09','effect');
-      this.switchToNextTexture();
+      this.switchToFirstTexture();
     } else if (event.type === 'didStartVideoRecording') {
 
     } else if (event.type === 'didFinishVideoRecording') {
@@ -210,6 +213,7 @@ export default class App extends React.Component {
           this.firstTimeFaceTimer = setTimeout(() => {
             this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
           },8000);
+          // will let DeepAR module load, which dispatches an 'initialized' event
           this.setState({permissionsGranted: true});
         } else {
           this.permissionsNotGranted();
@@ -233,10 +237,10 @@ export default class App extends React.Component {
         this.masterItemList = this.masterItemList.map((value) => ({value,sort: Math.random()})).sort((a,b) => a.sort - b.sort).map(({value}) => value);
         this.preloadAdItemImages();
         this.filteredItemList = this.masterItemList;
-        console.debug('got ads and filter schema');
+        console.debug('<<<<<<<<<<<<< got ads and filter schema');
+        this.setState({adItemsAreLoading: false});
         let schema = new FilterSchema(this.butler.getFilterSchema());
         this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
-        this.setState({adItemsAreLoading: false});
         this.preloadMaskPNG();
       })
     }
@@ -248,8 +252,7 @@ export default class App extends React.Component {
         _getAdsAndSchema();
       })
 
-    this.butler.getAdTrackingURLS()
-      .then(urls => this.itemTrackingURLs = urls);
+    this.butler.getAdTrackingURLS().then(urls => this.itemTrackingURLs = urls);
     this.setupAuthListener();
     this.setupUserLocal().then(
       uid => {
@@ -468,11 +471,11 @@ export default class App extends React.Component {
     })
   }
 
-  switchToNextTexture = () => {
+  switchToFirstTexture = () => {
+    // this should not be hit, since DeepAR (and anything else) is not added to DOM until ads are loaded
     if (this.filteredItemList.length == 0) return;
-    let ad = this.filteredItemList[this.currentTexture];
-    this.currentTexture = this.currentTexture + 1 == this.filteredItemList.length ? 0 : this.currentTexture + 1;
-    this.switchTexture(ad.url,ad.adId);
+    let firstAd = this.filteredItemList[0];
+    this.switchTexture(firstAd.url,firstAd.adId);
   }
 
   switchTexture = (url,adId) => {
@@ -481,13 +484,13 @@ export default class App extends React.Component {
     RNFS.exists(localDest)
       .then(doesExist => {
         if (doesExist) {
-          console.log(`switchtexture: ad item ${adId} exists locally`);
           URLorFilepath = localDest;
         } else {
           console.warn(`ad item ${adId} does NOT exist locally, using CDN`);
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
+        this.currentAdItem = adId;
       });
   }
 
@@ -683,9 +686,8 @@ export default class App extends React.Component {
 
               {this.isRelease == false ? (
                 <View name="test-buttons" style={styles.buttonContainer}>
-                  <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
                   <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
-                  {/* <DebugButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
+                  <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
                   {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
                   {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
                   {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
