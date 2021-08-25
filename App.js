@@ -6,7 +6,7 @@ import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {Button,Snackbar,Portal,Appbar} from 'react-native-paper';
+import {Snackbar,Portal,Appbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
@@ -42,8 +42,8 @@ export default class App extends React.Component {
       adItemsAreLoading: true,
     }
 
-    this.currentTexture = 0,
-      this.renderCount = 0;
+    this.currentTexture = 0;
+    this.renderCount = 0;
     this.isRelease = true;
 
     this.userId = null; //from unique device id
@@ -55,7 +55,7 @@ export default class App extends React.Component {
     this.itemTrackingURLs; //{} keyed on adId
 
     this.multiSelectFilterSchema = [];
-    this.firstTimeFace = null;
+    this.firstTimeFaceTimer = null;
     this.viewabilityConfig = {
       minimumViewTime: 1000,
       //viewAreaCoveragePercentThreshold: 80,
@@ -89,7 +89,7 @@ export default class App extends React.Component {
       this.setState({switchCameraInProgress: false})
     } else if (event.type === 'initialized') {
       this.deepARView.switchEffect('mask-09','effect');
-      if (Platform.OS == 'android') this.switchToNextTexture();
+      this.switchToNextTexture();
     } else if (event.type === 'didStartVideoRecording') {
 
     } else if (event.type === 'didFinishVideoRecording') {
@@ -105,9 +105,9 @@ export default class App extends React.Component {
     } else if (event.type === 'faceVisibilityChanged') {
       let faceIsDetected = event.value === "true";
       console.log('deepar faceVisible?: ' + faceIsDetected)
-      if (faceIsDetected && this.firstTimeFace) {
-        clearTimeout(this.firstTimeFace);
-        this.firstTimeFace = null;
+      if (faceIsDetected && this.firstTimeFaceTimer) {
+        clearTimeout(this.firstTimeFaceTimer);
+        this.firstTimeFaceTimer = null;
       }
     }
   }
@@ -163,7 +163,7 @@ export default class App extends React.Component {
   }
 
   showSnackbar = (text = '') => {
-    this.setState({snackbarText: text, snackbarVisible: true});
+    this.setState({snackbarText: text,snackbarVisible: true});
   }
 
   permissionsNotGranted = () => {
@@ -207,7 +207,7 @@ export default class App extends React.Component {
           result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
         ) {
           console.debug('permissions granted')
-          this.firstTimeFace = setTimeout(() => {
+          this.firstTimeFaceTimer = setTimeout(() => {
             this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
           },8000);
           this.setState({permissionsGranted: true});
@@ -219,7 +219,7 @@ export default class App extends React.Component {
     }
 
     this.butler = new AdButler();
-    const _getReady = async () => {
+    const _getAdsAndSchema = async () => {
       return this.butler.getAdItemsWithSchema().then(allAds => {
         for (let ad of allAds) {
           this.masterItemList.push({
@@ -241,11 +241,11 @@ export default class App extends React.Component {
       })
     }
 
-    _getReady()
+    _getAdsAndSchema()
       .catch(e => {
         console.error('error fetching ads, trying again',e);
         //go again
-        _getReady();
+        _getAdsAndSchema();
       })
 
     this.butler.getAdTrackingURLS()
@@ -637,14 +637,6 @@ export default class App extends React.Component {
 
     const {permissionsGranted} = this.state;
 
-    const MyButton = (props) => {
-      // also can use Icon.Button
-      return <Button
-        style={[styles.button,props.style]} icon={props.iconName} mode='contained' compact={true} onPress={props.onPress} >
-        <Text style={{fontSize: 11,fontWeight: 'bold'}}>{props.text}</Text>
-      </Button>
-    };
-
     return (
       <View style={styles.container} >
         <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
@@ -683,14 +675,14 @@ export default class App extends React.Component {
 
           {this.isRelease == false ? (
             <View name="test-buttons" style={styles.buttonContainer}>
-              <MyButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
-              <MyButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
-              {/* <MyButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
-              {/* <MyButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-              {/*<MyButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
-              {/* <MyButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
-              {this.state.userLoggedIn ? <MyButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
-                : <MyButton iconName='login' text='login' onPress={this.loginAnon} />
+              <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+              <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
+              {/* <DebugButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
+              {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
+              {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
+              {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
+              {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
+                : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
               }
             </View>
           ) : <></>}
