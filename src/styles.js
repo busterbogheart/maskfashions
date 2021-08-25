@@ -13,7 +13,7 @@ const theme = {
       primary: '#a2e3eb',
       // bottom nav, filter button bg
       secondary: '#333',
-      // snackbar action button
+      // snackbar action button, clear filters button
       accent: '#f67',
       background: '#EBEBEB',
       surface: '#000',
@@ -39,6 +39,12 @@ const theme = {
 };
 
 const styles = StyleSheet.create({
+  splash: {
+    flex: 1,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     paddingTop: Platform.OS === 'ios' ? statusBarHeight : 0,
@@ -96,7 +102,7 @@ const styles = StyleSheet.create({
   },
   filterButtonsClear: {
     position: 'absolute',
-    right: 25,
+    right: 10,
     paddingHorizontal: 25,
     paddingVertical: 11,
     backgroundColor: '#ffffff22',

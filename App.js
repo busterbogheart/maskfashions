@@ -637,87 +637,87 @@ export default class App extends React.Component {
 
     const {permissionsGranted} = this.state;
 
-    return (
-      <View style={styles.container} >
-        <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
-          menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
-          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
-        >
-          <Portal name="animated icons">
-            {this.state.animatedFavIcons.length > 0 ?
-              this.state.animatedFavIcons.map(el => el)
-              : <></>}
-          </Portal>
-
-          <Portal>
-            <Snackbar
-              visible={this.state.snackbarVisible} duration={5000}
-              onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}}
-              action={{label: 'Ok',onPress: () => this.setState({snackbarVisible: false})}}
-            >
-              {this.state.snackbarText ? this.state.snackbarText : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
-            </Snackbar>
-          </Portal>
-
-          <Appbar.Header style={styles.appbar}>
-            <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
-            <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
-          </Appbar.Header>
-
-          <View name="DeepAR container" style={styles.deeparContainer}>
-            {permissionsGranted ?
-              <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-              :
-              <Text>permissions not granted</Text>}
-          </View>
-
-          <BeltNav app={this} />
-
-          {this.isRelease == false ? (
-            <View name="test-buttons" style={styles.buttonContainer}>
-              <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
-              <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
-              {/* <DebugButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
-              {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-              {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
-              {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
-              {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
-                : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
-              }
-            </View>
-          ) : <></>}
-
-          <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
-            {this.state.adItemsAreLoading ?
-              <View style={{justifyContent: 'center',alignContent: 'center',flex: 1}}><ActivityIndicator size='large' color={theme.colors.onSurface} /></View>
-              :
-              <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
-                snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
-                ListEmptyComponent={
-                  <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
-                    <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
-                    <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
-                  </View>
-                }
-                contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
-                keyExtractor={(item,index) => item.adId}
-                horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
-                onViewableItemsChanged={this.onViewableItemsChanged}
-                viewabilityConfig={this.viewabilityConfig}
-              />
-            }
-          </View>
-
-          <View name="filter container" style={[styles.filtersContainer]}>
-            {this.state.adItemsAreLoading ?
-              <View style={styles.filterButtons}><ActivityIndicator size='small' color={theme.colors.onSurface} /></View>
-              :
-              <Filters filterSchema={this.multiSelectFilterSchema} app={this} />
-            }
-          </View>
-        </SideMenu>
+    const Splash = () => {return (
+      <View style={styles.splash}>
+        <Text style={{color: theme.colors.primary,fontWeight: 'bold',fontSize: 30}}>mask fashions.</Text>
       </View>
-    );
+      )}
+
+    if (this.state.adItemsAreLoading) {
+      return <Splash />;
+    } else {
+      return <View style={styles.container} >
+            <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
+              menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
+              onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
+            >
+              <Portal name="animated icons">
+                {this.state.animatedFavIcons.length > 0 ?
+                  this.state.animatedFavIcons.map(el => el)
+                  : <></>}
+              </Portal>
+
+              <Portal>
+                <Snackbar
+                  visible={this.state.snackbarVisible} duration={5000}
+                  onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}}
+                  action={{label: 'Ok',onPress: () => this.setState({snackbarVisible: false})}}
+                >
+                  {this.state.snackbarText ? this.state.snackbarText : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
+                </Snackbar>
+              </Portal>
+
+              <Appbar.Header style={styles.appbar}>
+                <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
+                <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
+              </Appbar.Header>
+
+              <View name="DeepAR container" style={styles.deeparContainer}>
+                {permissionsGranted ?
+                  <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
+                  :
+                  <Text>permissions not granted</Text>}
+              </View>
+
+              <BeltNav app={this} />
+
+              {this.isRelease == false ? (
+                <View name="test-buttons" style={styles.buttonContainer}>
+                  <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+                  <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
+                  {/* <DebugButton iconName='ticket' text='change texture' onPress={this.switchToNextTexture} /> */}
+                  {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
+                  {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
+                  {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
+                  {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
+                    : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
+                  }
+                </View>
+              ) : <></>}
+
+              <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
+                  <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+                    snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
+                    ListEmptyComponent={
+                      <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
+                        <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+                        <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
+                      </View>
+                    }
+                    contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
+                    keyExtractor={(item,index) => item.adId}
+                    horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
+                    onViewableItemsChanged={this.onViewableItemsChanged}
+                    viewabilityConfig={this.viewabilityConfig}
+                  />
+              </View>
+
+              <View name="filter container" style={[styles.filtersContainer]}>
+                <Filters filterSchema={this.multiSelectFilterSchema} app={this} />
+              </View>
+            </SideMenu>
+          </View>
+      }
   }
 
 }
