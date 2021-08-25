@@ -9,6 +9,7 @@
 #import "RNTDeepAR.h"
 #import "React/UIView+React.h"
 #import <DeepAR/CameraController.h>
+#import <React/RCTLog.h>
 
 @implementation RNTDeepAR {
   CGRect _frame;
@@ -78,7 +79,6 @@
 }
 
 - (void)reactSetFrame:(CGRect)frame {
-  NSLog(@"setting frame <<<<<<<<<<<<<<<<<");
   [super reactSetFrame: frame];
   _frame = frame;
   [self setupDeepARViewFrame];
@@ -167,6 +167,16 @@
   [_arview switchEffectWithSlot:slot path:path];
 }
 
+-(void)switchTexture:(NSString*)urlOrPath andIsRemote:(BOOL *)isRemote {
+//  urlOrPath = [NSString stringWithFormat:@"file:///%@", urlOrPath];
+  UIImage *image = [UIImage imageWithContentsOfFile:urlOrPath];
+  if(!image){
+    RCTLog(@"CANT FIND IT");
+  }
+  NSData *imgData = UIImageJPEGRepresentation(image, 1.0);
+  RCTLog(@"Size of Image(bytes):%lu",(unsigned long)[imgData length]);
+  [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
+}
 
 - (void)setFlashOn:(BOOL)flashOn{
   

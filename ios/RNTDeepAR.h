@@ -26,6 +26,7 @@
 -(void)finishRecording;
 -(void)takeScreenshot;
 -(void)switchEffect:(NSString*)effect andSlot:(NSString*)slot;
+-(void)switchTexture:(NSString*)urlOrPath andIsRemote:(BOOL*)isRemote;
 -(void)setFlashOn:(BOOL)flashOn;
 
 @end

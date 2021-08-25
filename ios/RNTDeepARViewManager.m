@@ -112,6 +112,19 @@ RCT_EXPORT_METHOD(switchEffect:(nonnull NSNumber *)reactTag andMaskPath:(NSStrin
   }];
 }
 
+
+RCT_EXPORT_METHOD(switchTexture:(nonnull NSNumber *)reactTag andTexturePath:(NSString*)urlOrPath andIsRemote:(BOOL*)isRemote)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNTDeepAR *> *viewRegistry) {
+    RNTDeepAR *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RNTDeepAR class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RCTWebView, got: %@", view);
+    } else {
+      [view switchTexture:urlOrPath andIsRemote:isRemote];
+    }
+  }];
+}
+
 RCT_EXPORT_METHOD(setFlashOn:(nonnull NSNumber *)reactTag andIsFlashOn:(BOOL)flashOn)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNTDeepAR *> *viewRegistry) {
