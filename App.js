@@ -12,7 +12,6 @@ import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {differenceInSeconds} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import SideMenu from 'react-native-side-menu-updated';
@@ -22,6 +21,8 @@ import AnimatedFav from './src/components/AnimatedFav';
 import RNFS from 'react-native-fs';
 import Filters from './src/components/Filters';
 import DebugButton from './src/components/DebugButton';
+import {differenceInHours} from 'date-fns/esm';
+import FavoriteItems from './src/components/FavoriteItems';
 
 
 export default class App extends React.Component {
@@ -35,7 +36,7 @@ export default class App extends React.Component {
       switchCameraInProgress: false,
       multiSelectedItemObjects: [],
       snackbarVisible: false,
-      snackbarText: null,
+      snackbarConfig: {text: '', button: null},
       sidemenuVisible: false,
       userLoggedIn: false,
       sideMenuData: null,
@@ -44,7 +45,7 @@ export default class App extends React.Component {
       adItemsAreLoading: true,
     }
 
-    this.currentAdItem = 0; //one of this.masterItemList objects 
+    this.currentAdItem = null; //one of this.masterItemList objects 
     this.renderCount = 0;
     this.isRelease = true;
 
@@ -70,6 +71,7 @@ export default class App extends React.Component {
     this.maskSize = this.screenWidth / 1.3;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
     this.butler;
+    this.sideMenuWidth = this.screenWidth / 2.2;
   }
 
   didAppear() {
@@ -90,7 +92,7 @@ export default class App extends React.Component {
     if (event.type === 'cameraSwitch') {
       this.setState({switchCameraInProgress: false})
     } else if (event.type === 'initialized') {
-      // initialized sometimes called twice (frame dimension changes, etc)
+      // initialized sometimes dispatched twice (frame dimension changes, etc)
       this.deepARView.switchEffect('mask-09','effect');
       this.switchToFirstTexture();
     } else if (event.type === 'didStartVideoRecording') {
@@ -165,8 +167,8 @@ export default class App extends React.Component {
     }
   }
 
-  showSnackbar = (text = '') => {
-    this.setState({snackbarText: text,snackbarVisible: true});
+  showSnackbar = (text = '',buttonText = null) => {
+    this.setState({snackbarConfig: {text: text,button: buttonText}, snackbarVisible: true});
   }
 
   permissionsNotGranted = () => {
@@ -209,10 +211,8 @@ export default class App extends React.Component {
           // result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) &&
           result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
         ) {
-          console.debug('permissions granted')
-          this.firstTimeFaceTimer = setTimeout(() => {
-            this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
-          },8000);
+          console.debug('permissions granted android')
+          this.showFirstTimeFaceHelp();
           // will let DeepAR module load, which dispatches an 'initialized' event
           this.setState({permissionsGranted: true});
         } else {
@@ -220,6 +220,8 @@ export default class App extends React.Component {
           this.setState({permissionsGranted: false});
         }
       })
+    } else if (Platform.OS === 'ios') {
+      this.showFirstTimeFaceHelp();
     }
 
     this.butler = new AdButler();
@@ -278,7 +280,7 @@ export default class App extends React.Component {
     const _downloadOne = (fromUrl,toFile) => {
       return RNFS.downloadFile({
         fromUrl,toFile,
-        begin: (status) => {console.log('started RNFS job ',status.jobId)},
+        begin: (status) => {console.log('starting RNFS download ',status.jobId)},
       })
     };
 
@@ -301,14 +303,14 @@ export default class App extends React.Component {
               })
               .catch(e => console.error(e));
           } else {
-            console.log(`image for ${item.adId} already exists locally`);
+            //console.log(`image for ${item.adId} already exists locally`);
           }
         })
     });
 
     this.masterItemList.forEach(v => {
       let uri = v.url;
-      console.debug(`preloading texture ${uri}`);
+      //console.debug(`preloading texture ${uri}`);
       Image.prefetch(uri)
         .then(
           successBool => {},
@@ -320,25 +322,28 @@ export default class App extends React.Component {
     });
   }
 
-  // authed user and device unique id required for favorites.  
-  // device unique id not required for auth.
-  // get them separately but ensure both exist later for r/w favorites.
-  checkFavorites = () => {
-    if (this.state.userLoggedIn === false || this.userId == null) {
-      console.debug(`checkfavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
+  checkFavorites = async () => {
+    // must be authed to read/write firestore, must have valid userId also
+    if (this.userId == null) {
+      console.debug(`checkfavs user id fail ${this.userId}`);
       return;
     }
+
+    if (this.state.userLoggedIn === false) {
+      await this.loginAnon();
+    }
+
+    this.showSnackbar(<Text>Click a mask to try it on again!  Hold the
+        <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
 
     console.debug(`checking favs for ${this.userId}`);
     firestore().collection('users').doc(this.userId).get()
       .then(doc => {
         console.debug(`favs for ${this.userId}?`);
         if (doc.exists) {
-          console.debug('got user doc',doc.data());
-          let el = <View style={{flex: 1,justifyContent: 'center',width: 100,height: 100}}>
-            {this.renderItem({item: this.masterItemList[0]})}
-            {this.renderItem({item: this.masterItemList[2]})}
-          </View>;
+          const favsArr = doc.data().favorites;
+          console.debug('got user favs',favsArr);
+          let el = <FavoriteItems favs={favsArr} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
           this.setState({sideMenuData: el});
         } else {
           //TODO
@@ -354,17 +359,27 @@ export default class App extends React.Component {
     this.setState({sideMenuData: <Text style={{padding: 20,fontSize: 20}}>DISCLAIMER</Text>});
   }
 
-  addToFavorites = (mouseEvent) => {
-    this.triggerAnimatedFav(mouseEvent.nativeEvent.pageX,mouseEvent.nativeEvent.pageY);
+  showFirstTimeFaceHelp = () => {
+    this.firstTimeFaceTimer = setTimeout(() => {
+      this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>
+        ,{} );
+    },8000);
+  }
 
-    return;
-    if (this.state.userLoggedIn === false || this.userId == null) {
-      console.debug(`addtofavs user ${this.userId} not authed or null user, auth ${this.state.userLoggedIn}`);
+  addToFavorites = async (mouseEvent) => {
+    // must be authed to write to firestore, must have valid userId also
+    if (this.userId == null) {
+      console.debug(`addtofavs user id fail ${this.userId}`);
       return;
     }
 
-    const adItemId = String(Math.floor(Math.random() * 99999));
-    console.debug(`setting favorites (${adItemId}) for ${this.userId}`)
+    this.triggerAnimatedFav(mouseEvent.nativeEvent.pageX,mouseEvent.nativeEvent.pageY);
+    if (this.state.userLoggedIn === false) {
+      await this.loginAnon();
+    }
+
+    const adItemId = this.currentAdItem.adId;
+    console.debug(`setting favorite adId (${adItemId}) for ${this.userId}`)
 
     // creates if doesnt exist
     let userDoc = firestore().collection('users').doc(this.userId);
@@ -389,14 +404,29 @@ export default class App extends React.Component {
       .catch(e => console.error('firestore get() error',e));
   }
 
+  removeFromFavorites = (item) => {
+    const adItemId = item.adId;
+    console.debug(`removing fav adId (${adItemId}) for ${this.userId}`)
+    let userDoc = firestore().collection('users').doc(this.userId);
+    userDoc.get()
+      .then(doc => {
+        if (doc.exists) {
+          userDoc.update({favorites: firestore.FieldValue.arrayRemove(adItemId)})
+            .then(() => console.log('firestore delete fav successful'))
+            .catch(e => console.error(e));
+        }
+      })
+      .catch(e => console.error('firestore update() fav error',e));
+  }
+
   setupUserLocal = async () => {
     // awaits exit the async function, giving control elsewhere until promise returns
     let userId = await AsyncStorage.getItem('userId')
-    console.log('userId from local ',userId,`authed? ${this.state.userLoggedIn}`);
+    console.log('userId from asyncstorage ',userId,`authed? ${this.state.userLoggedIn}`);
     if (userId == null) {
       try {
         userId = DeviceInfo.getUniqueId();
-        console.log('userId from device ',userId);
+        console.log('got userId from deviceinfo ',userId);
         await AsyncStorage.setItem('userId',userId);
       } catch (e) {
         console.warn(e);
@@ -417,9 +447,8 @@ export default class App extends React.Component {
 
     if (!isFirstLogin) {
       let lastLoginDate = new Date(JSON.parse(lastLogin));
-      // let hoursSinceLast = differenceInHours(Date.now(), lastLoginDate);
+      let hoursSinceLast = differenceInHours(Date.now(),lastLoginDate);
       // console.log(`last login: ${lastLoginDate}, been ${hoursSinceLast}h`);
-      console.log(`last login: ${lastLoginDate}, been ${differenceInSeconds(Date.now(),lastLoginDate)}s`);
     }
 
     // record current login for all users
@@ -452,14 +481,13 @@ export default class App extends React.Component {
     });
   }
 
-  loginAnon = () => {
-    console.log('loginanon');
-    firebase.auth().signInAnonymously()
+  loginAnon = async () => {
+    await firebase.auth().signInAnonymously()
       .then(() => {console.debug('user signed in anon')})
       .catch(e => {
         console.error('unable to auth anon, trying again',e);
         firebase.auth().signInAnonymously()
-          .then(() => console.debug('user signed in anon second time'))
+          .then(() => console.debug('unable to auth anon, second time'))
       });
   }
 
@@ -527,7 +555,7 @@ export default class App extends React.Component {
       let adId = v.item.adId;
       let name = v.item.name;
       if (!this.adsAlreadyViewed.includes(adId) && this.itemTrackingURLs[adId]) {
-        console.log(`logging impression for ${name} (${adId}) at ${v.index}`);
+        //console.log(`logging impression for ${name} (${adId}) at ${v.index}`);
         let url = this.itemTrackingURLs[adId].impUrl;
         this.trackImpression(url);
         this.adsAlreadyViewed.push(adId);
@@ -631,7 +659,7 @@ export default class App extends React.Component {
   };
 
   render() {
-    console.info(`app render >>>>>>>>>>>>> #${this.renderCount++}`);
+    console.info(`app render >>>>>>>>>>>>> #${this.renderCount++} ads loaded? ${!this.state.adItemsAreLoading}`);
 
     var onEventSent = (event) => {
       const onEventSentCallback = this.props.onEventSent;
@@ -646,87 +674,96 @@ export default class App extends React.Component {
 
     const {permissionsGranted} = this.state;
 
-    const Splash = () => {return (
-      <View style={styles.splash}>
-        <Text style={{color: theme.colors.primary,fontWeight: 'bold',fontSize: 30}}>mask fashions.</Text>
-      </View>
-      )}
+    const Splash = () => {
+      return (
+        <View style={styles.splash}>
+          <Text style={{color: theme.colors.primary,fontWeight: 'bold',fontSize: 30}}>mask fashions.</Text>
+        </View>
+      )
+    }
+
+    const SnackbarCustom = () => {
+      const {text,button} = this.state.snackbarConfig;
+      const action = button || {};
+      //{label: 'OK',onPress: () => this.setState({snackbarVisible: false})};
+      const snackbarText = text || <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>;
+      return (
+        <Snackbar
+          visible={this.state.snackbarVisible} duration={4000} action={action}
+          onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}} >
+          {snackbarText}
+        </Snackbar>
+      )
+    }
 
     if (this.state.adItemsAreLoading) {
       return <Splash />;
     } else {
-      console.debug('<<<<<<< ads loaded app render');
       return <View style={styles.container} >
-            <SideMenu menu={<SideMenuNav app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
-              menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
-              onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
-            >
-              <Portal name="animated icons">
-                {this.state.animatedFavIcons.length > 0 ?
-                  this.state.animatedFavIcons.map(el => el)
-                  : <></>}
-              </Portal>
+        <SideMenu menu={<SideMenuNav app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.sideMenuWidth}
+          menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
+          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
+        >
+          <Portal name="animated icons">
+            {this.state.animatedFavIcons.length > 0 ?
+              this.state.animatedFavIcons.map(el => el)
+              : <></>}
+          </Portal>
 
-              <Portal>
-                <Snackbar
-                  visible={this.state.snackbarVisible} duration={5000}
-                  onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}}
-                  action={{label: 'Ok',onPress: () => this.setState({snackbarVisible: false})}}
-                >
-                  {this.state.snackbarText ? this.state.snackbarText : <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>}
-                </Snackbar>
-              </Portal>
+          <Portal>
+            <SnackbarCustom />
+          </Portal>
 
-              <Appbar.Header style={styles.appbar}>
-                <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
-                <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
-              </Appbar.Header>
+          <Appbar.Header style={styles.appbar}>
+            <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
+            <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
+          </Appbar.Header>
 
-              <View name="DeepAR container" style={styles.deeparContainer}>
-                {permissionsGranted ?
-                  <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-                  :
-                  <Text>permissions not granted</Text>}
-              </View>
-
-              <BeltNav app={this} />
-
-              {this.isRelease == false ? (
-                <View name="test-buttons" style={styles.buttonContainer}>
-                  <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
-                  <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
-                  {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-                  {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
-                  {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
-                  {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
-                    : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
-                  }
-                </View>
-              ) : <></>}
-
-              <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
-                  <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
-                    snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
-                    ListEmptyComponent={
-                      <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
-                        <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
-                        <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
-                      </View>
-                    }
-                    contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
-                    keyExtractor={(item,index) => item.adId}
-                    horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
-                    onViewableItemsChanged={this.onViewableItemsChanged}
-                    viewabilityConfig={this.viewabilityConfig}
-                  />
-              </View>
-
-              <View name="filter container" style={[styles.filtersContainer]}>
-                <Filters filterSchema={this.multiSelectFilterSchema} app={this} />
-              </View>
-            </SideMenu>
+          <View name="DeepAR container" style={styles.deeparContainer}>
+            {permissionsGranted ?
+              <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
+              :
+              <Text>permissions not granted</Text>}
           </View>
-      }
+
+          <BeltNav app={this} />
+
+          {this.isRelease == false ? (
+            <View name="test-buttons" style={styles.buttonContainer}>
+              <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
+              <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
+              {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
+              {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
+              {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
+              {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
+                : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
+              }
+            </View>
+          ) : <></>}
+
+          <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
+            <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+              snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
+              ListEmptyComponent={
+                <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
+                  <Icon name='emoticon-confused' size={30} color={theme.colors.text} />
+                  <Text style={{fontSize: 15,}}>No results. Try removing some filters.</Text>
+                </View>
+              }
+              contentContainerStyle={{alignItems: 'center',flexGrow: 1,justifyContent: 'center'}}
+              keyExtractor={(item,index) => item.adId}
+              horizontal={true} data={this.filteredItemList} renderItem={this.renderItem}
+              onViewableItemsChanged={this.onViewableItemsChanged}
+              viewabilityConfig={this.viewabilityConfig}
+            />
+          </View>
+
+          <View name="filter container" style={[styles.filtersContainer]}>
+            <Filters filterSchema={this.multiSelectFilterSchema} app={this} />
+          </View>
+        </SideMenu>
+      </View>
+    }
   }
 
 }

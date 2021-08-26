@@ -32,7 +32,7 @@ export default class AdsApiAdButler {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
-        console.debug(json.data.length + ' campaign assignments fetched')
+        //console.debug(json.data.length + ' campaign assignments fetched')
         for (let k of json.data) {
           if (k.object == 'campaign_assignment' && k.advertisement && k.campaign) {
             const adId = k.advertisement.id;
@@ -95,7 +95,7 @@ export default class AdsApiAdButler {
       throw Error('REST API status not 200')
     }
     let json = await res.json();
-    console.log(json.data.length + " ad items fetched");
+    //console.log(json.data.length + " ad items fetched");
     //console.log(JSON.stringify(json.data,null,1));
 
     for (const k in json.data) {
@@ -130,6 +130,7 @@ export default class AdsApiAdButler {
       console.log(ad);
     }
   }
+  mockDelay = ms => new Promise(res => setTimeout(res,ms));
 
   getAdItemsWithSchema = async () => {
     // cached?
@@ -218,7 +219,7 @@ export default class AdsApiAdButler {
 
     return _getURLS()
       .then(() => {
-        console.log('got tracking URLs');
+        //console.log('got tracking URLs');
         return this.#allTrackingUrls;
       })
       .catch(e => {
