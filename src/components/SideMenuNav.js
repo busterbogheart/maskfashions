@@ -6,7 +6,7 @@ import Share from 'react-native-share';
 import DeviceInfo from 'react-native-device-info';
 import shimAllSettled from "promise.allsettled/shim";
 
-const SideMenuContent = ({app,content}) => {
+const SideMenuNav = ({app,content}) => {
     const theme = useTheme();
     const {width: screenWidth,height: screenHeight} = Dimensions.get('window');
     const iconSize = 34;
@@ -36,9 +36,11 @@ const SideMenuContent = ({app,content}) => {
         const email = 'mailto:hello@maskfashions.app'
         shimAllSettled();
         Promise.allSettled([
+            Platform.OS,
+            Platform.Version,
+            DeviceInfo.getBrand(),
             DeviceInfo.getBaseOs(),
             DeviceInfo.getApiLevel(),
-            DeviceInfo.getBrand(),
             DeviceInfo.getUniqueId(),
             DeviceInfo.getCodename(),
             DeviceInfo.getDeviceId(),
@@ -78,4 +80,4 @@ const SideMenuContent = ({app,content}) => {
     </>)
 }
 
-export default SideMenuContent;
+export default SideMenuNav;

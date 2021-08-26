@@ -16,7 +16,7 @@ import {differenceInSeconds} from 'date-fns';
 import DeepARModuleWrapper from './src/components/DeepARModuleWrapper';
 import BeltNav from './src/components/BeltNav';
 import SideMenu from 'react-native-side-menu-updated';
-import SideMenuContent from './src/components/SideMenuContent';
+import SideMenuNav from './src/components/SideMenuNav';
 import FilterSchema from './src/FilterSchema';
 import AnimatedFav from './src/components/AnimatedFav';
 import RNFS from 'react-native-fs';
@@ -44,7 +44,7 @@ export default class App extends React.Component {
       adItemsAreLoading: true,
     }
 
-    this.currentAdItem = 0; //adId 
+    this.currentAdItem = 0; //one of this.masterItemList objects 
     this.renderCount = 0;
     this.isRelease = true;
 
@@ -278,7 +278,7 @@ export default class App extends React.Component {
     const _downloadOne = (fromUrl,toFile) => {
       return RNFS.downloadFile({
         fromUrl,toFile,
-        begin: (status) => {console.log('started job ',status.jobId)},
+        begin: (status) => {console.log('started RNFS job ',status.jobId)},
       })
     };
 
@@ -290,7 +290,7 @@ export default class App extends React.Component {
           if (!doesExist) {
             _downloadOne(CDNurl,localDest)
               .promise.then((res) => {
-                console.log(`finished ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
+                console.log(`finished RNFS download, ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
                 if (res.statusCode !== 200) {
                   // go again
                   _downloadOne(CDNurl,localDest);
@@ -474,11 +474,11 @@ export default class App extends React.Component {
   switchToFirstTexture = () => {
     // this should not be hit, since DeepAR (and anything else) is not added to DOM until ads are loaded
     if (this.filteredItemList.length == 0) return;
-    let firstAd = this.filteredItemList[0];
-    this.switchTexture(firstAd.url,firstAd.adId);
+    this.switchTexture(this.filteredItemList[0]);
   }
 
-  switchTexture = (url,adId) => {
+  switchTexture = (adItem) => {
+    const {url,adId} = adItem;
     const localDest = this.localAdItemsDir + adId + '.jpg';
     let URLorFilepath;
     RNFS.exists(localDest)
@@ -490,15 +490,21 @@ export default class App extends React.Component {
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
-        this.currentAdItem = adId;
+        this.currentAdItem = adItem;
       });
   }
 
   switchToRandomAdItem = () => {
+    let i;
+    do {
+      i = Math.floor(Math.random() * this.filteredItemList.length);
+    }
+    while (this.filteredItemList[i] == this.currentAdItem);
     this.maskScrollRef.current.scrollToIndex({
-      index: Math.floor(Math.random() * this.filteredItemList.length),
+      index: i,
       viewOffset: (this.screenWidth - this.maskSize) / 2,
     })
+    this.currentAdItem = this.filteredItemList[i];
   }
 
   shareApp = () => {
@@ -606,7 +612,7 @@ export default class App extends React.Component {
     // TODO check androidrenderingmode software
     return (
       <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
-        onPressIn={() => {this.switchTexture(item.url,item.adId)}} delayPressIn={80} activeOpacity={.5} >
+        onPressIn={() => {this.switchTexture(item)}} delayPressIn={80} activeOpacity={.5} >
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
@@ -649,8 +655,9 @@ export default class App extends React.Component {
     if (this.state.adItemsAreLoading) {
       return <Splash />;
     } else {
+      console.debug('<<<<<<< ads loaded app render');
       return <View style={styles.container} >
-            <SideMenu menu={<SideMenuContent app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
+            <SideMenu menu={<SideMenuNav app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.screenWidth / 2.2}
               menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
               onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
             >
