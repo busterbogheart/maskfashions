@@ -258,7 +258,7 @@
 
 // Called when the face appears or disappears.
 - (void)faceVisiblityDidChange:(BOOL)faceVisible {
-  
+  self.onEventSent(@{@"type":@"faceVisibilityChanged", @"value": faceVisible ? @"true" : @"false"});
 }
 
 -(void)imageVisibilityChanged:(BOOL)imageVisible {
