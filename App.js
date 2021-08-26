@@ -527,9 +527,14 @@ export default class App extends React.Component {
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
-        this.currentAdItem = adItem;
-        // trigger updating mask name text field
-        this.setState({});
+        // first load
+        if (this.currentAdItem == null) {
+          // trigger updating mask name text field
+          this.currentAdItem = adItem;
+          this.setState({});
+        } else {
+          this.currentAdItem = adItem;
+        }
       });
   }
 
@@ -745,10 +750,13 @@ export default class App extends React.Component {
     const AdItemTitleText = () => {
       if (this.currentAdItem && this.currentAdItem.name) {
         const ad = this.currentAdItem;
-        const allText = {color: '#ffffff88',textAlign: 'center',fontWeight: 'bold'};
+        const allText = {
+          color: '#ffffff88',textShadowColor: '#000',textShadowOffset: {width: 1,height: 1},
+          textAlign: 'center',fontWeight: 'bold'
+        };
         return (
           <View style={{
-            position: 'absolute',bottom: 5,width: this.screenWidth,
+            position: 'absolute',bottom: 5,width: this.screenWidth, 
           }}>
             <Text style={[{fontSize: 24},allText]}>{ad.name}</Text>
             <Text style={[{},allText]}>by</Text>

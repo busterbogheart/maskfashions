@@ -168,14 +168,20 @@
 }
 
 -(void)switchTexture:(NSString*)urlOrPath andIsRemote:(BOOL *)isRemote {
-//  urlOrPath = [NSString stringWithFormat:@"file:///%@", urlOrPath];
-  UIImage *image = [UIImage imageWithContentsOfFile:urlOrPath];
-  if(!image){
-    RCTLog(@"CANT FIND IT");
+  if(isRemote){
+    NSData * imageData = [[NSData alloc] initWithContentsOfURL: [NSURL URLWithString: urlOrPath]];
+    UIImage *image = [UIImage imageWithData: imageData];
+    if(!image){
+      RCTLogError(@"CANT FIND IT");
+    }
+    [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
+  } else {
+    UIImage *image = [UIImage imageWithContentsOfFile:urlOrPath];
+    if(!image){
+      RCTLogError(@"CANT FIND IT");
+    }
+    [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
   }
-  NSData *imgData = UIImageJPEGRepresentation(image, 1.0);
-  RCTLog(@"Size of Image(bytes):%lu",(unsigned long)[imgData length]);
-  [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
 }
 
 - (void)setFlashOn:(BOOL)flashOn{
