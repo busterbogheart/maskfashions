@@ -361,9 +361,9 @@ export default class App extends React.Component {
 
   showAppInfo = () => {
     const el = <>
-      <Text style={{fontWeight}}>Mask health disclaimer</Text>
-      <Text style={{fontWeight}}>CDC info</Text>
-      <Text style={{fontWeight}}>Privacy Policy</Text>
+      <Text style={{fontWeight: 'bold'}}>Mask health disclaimer{`\n\n`}</Text>
+      <Text style={{fontWeight:'bold'}}>CDC info{`\n\n`}</Text>
+      <Text style={{fontWeight:'bold'}}>Privacy Policy{`\n\n`}</Text>
     </>;
     this.setState({sideMenuData: el});
   }
