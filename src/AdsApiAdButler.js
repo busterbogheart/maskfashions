@@ -8,8 +8,12 @@ import {AdCampaign,AdItem} from "./AdsApiMapping";
 //('ad-items') // just all creatives and data, no links
 export default class AdsApiAdButler {
 
+  constructor() {
+  }
+
   #allAdItems = [];
-  #adItemsInCampaigns = [];
+  #adItemsInCampaigns = {};
+  #advertisers = {};
   #allTrackingUrls = {}; //keyed on banner id aka adId
   #apiKey = 'b87ea9fb1559cbea91d941f0be63ce9b'; //test: da81d8cf585242c7818d43bdddcd0769
   #liveAccountNo = '181924'; // test '181925'
@@ -18,6 +22,7 @@ export default class AdsApiAdButler {
   #urlREST = 'https://api.adbutler.com/v2/';
   // the data given to the FlatList, should be [{url:'', impUrl:'', clickUrl:'', adId:''}, ...]
   #allActiveAdItems = [];
+  #RESTlimit = 100;
 
   restAPI_SelfserveInfo = () => {
     this.#restAPI('self-serve/portals/405/orders',true)
@@ -28,24 +33,43 @@ export default class AdsApiAdButler {
       .catch((err) => console.warn(err));
   }
 
-  async fetchCampaigns() {
+  fetchCampaigns = async() => {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
         //console.debug(json.data.length + ' campaign assignments fetched')
-        for (let k of json.data) {
+        for (const k of json.data) {
           if (k.object == 'campaign_assignment' && k.advertisement && k.campaign) {
             const adId = k.advertisement.id;
-            const selfServe = k.advertisement.is_self_serve;
+            const is_self_serve = k.advertisement.is_self_serve;
             const weight = k.weight;
-            this.#adItemsInCampaigns.push(adId);
+            const advertiserId = k.campaign.advertiser;
+            this.#adItemsInCampaigns[adId] = {
+              is_self_serve, weight, advertiserId
+            };
           }
         }
       })
   }
 
+  fetchAdvertisers = async() => {
+    await this.#restAPI('advertisers',true)
+      .then(response => response.json())
+      .then(json => {
+        for (const adr of json.data) {
+          if (adr.object == 'advertiser') {
+            this.#advertisers[adr.id] = {
+              name: adr.name,
+            };
+          }
+        }
+      })
+      .catch((err) => console.warn(err));
+  }
+
+
   //basically just for getting schedule data
-  // this.adsAPI('placements', true, { limit: 9999 })
+  // this.adsAPI('placements', true, { limit: this.#RESTlimit })
   //   .then((response) => response.json()).then((json) => {
   //     console.log(JSON.stringify(json));
   //     for (let k in json.data) {
@@ -76,6 +100,7 @@ export default class AdsApiAdButler {
     console.log(`fetching ${apiUrl} with ${JSON.stringify(params)} to ${endpoint}`);
     const data = params ? new URLSearchParams(params) : '';
     const url = this.#urlREST + endpoint + "?" + data;
+    console.debug('rest url:',url)
     let response = await fetch(url,{
       method: 'GET',
       mode: 'cors',
@@ -83,6 +108,7 @@ export default class AdsApiAdButler {
         'Content-Type': 'application/json',
         'Authorization': 'Basic ' + this.#apiKey,
       },
+
     });
     return response;
   }
@@ -91,10 +117,14 @@ export default class AdsApiAdButler {
   #restAPI_AdItems = async () => {
     let res = await this.#restAPI('ad-items',true);
     await this.fetchCampaigns();
+    await this.fetchAdvertisers();
     if (res.status != 200) {
       throw Error('REST API status not 200')
     }
     let json = await res.json();
+    if (json.has_more == true) {
+      console.warn('hit REST limit');
+    }
     //console.log(json.data.length + " ad items fetched");
     //console.log(JSON.stringify(json.data,null,1));
 
@@ -115,10 +145,20 @@ export default class AdsApiAdButler {
         }
         continue;
       }
-      if (this.#adItemsInCampaigns.includes(e.id)) {
+
+      if (this.#adItemsInCampaigns[e.id]) {
+        const cmp = this.#adItemsInCampaigns[e.id];
+        e.weight = cmp.weight;
+        e.advertiserId = cmp.advertiserId;
+        e.is_self_serve = cmp.is_self_serve;
         this.#allAdItems.push(e);
       }
+      if (this.#advertisers[e.advertiserId] && this.#advertisers[e.advertiserId].name) {
+        const adv = this.#advertisers[e.advertiserId];
+        e.advertiserName = adv.name;
+      }
     }
+    //console.log(JSON.stringify(this.#allAdItems,null,1))
   };
 
   getFilterSchema() {
@@ -149,6 +189,28 @@ export default class AdsApiAdButler {
       .then(json => {
         for (const k in json.data) {
         }
+        //console.log(JSON.stringify(json,null,1));
+      })
+      .catch((err) => console.warn(err));
+  }
+
+  restAPI_Campaigns = () => {
+    this.#restAPI('campaigns',true)
+      .then(response => response.json())
+      .then(json => {
+        for (const k in json.data) {
+        }
+        //console.log(JSON.stringify(json,null,1));
+      })
+      .catch((err) => console.warn(err));
+  }
+
+  restAPI_Placements = () => {
+    this.#restAPI('placements',true)
+      .then(response => response.json())
+      .then(json => {
+        for (const k in json.data) {
+        }
         console.log(JSON.stringify(json,null,1));
       })
       .catch((err) => console.warn(err));
@@ -170,7 +232,7 @@ export default class AdsApiAdButler {
     if (expandAll) {
       params = {...params,...{expand: "all"}};
     }
-    params = {...params,...{limit: 9999}}
+    params = {...params,...{limit: this.#RESTlimit}}
     return this.#adbutlerFetch(this.#urlREST,params,endpoint);
   }
 
@@ -193,7 +255,6 @@ export default class AdsApiAdButler {
     })
     return response;
   }
-
 
   getAdTrackingURLS = async () => {
     const _getURLS = async() => {

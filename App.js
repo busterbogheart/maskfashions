@@ -23,6 +23,8 @@ import Filters from './src/components/Filters';
 import DebugButton from './src/components/DebugButton';
 import {differenceInHours} from 'date-fns/esm';
 import FavoriteItems from './src/components/FavoriteItems';
+import {AdItem} from './src/AdsApiMapping';
+import shimAllSettled from 'promise.allsettled/shim';
 
 
 export default class App extends React.Component {
@@ -36,7 +38,7 @@ export default class App extends React.Component {
       switchCameraInProgress: false,
       multiSelectedItemObjects: [],
       snackbarVisible: false,
-      snackbarConfig: {text: '', button: null},
+      snackbarConfig: {text: '',button: null},
       sidemenuVisible: false,
       userLoggedIn: false,
       sideMenuData: null,
@@ -168,7 +170,7 @@ export default class App extends React.Component {
   }
 
   showSnackbar = (text = '',buttonText = null) => {
-    this.setState({snackbarConfig: {text: text,button: buttonText}, snackbarVisible: true});
+    this.setState({snackbarConfig: {text: text,button: buttonText},snackbarVisible: true});
   }
 
   permissionsNotGranted = () => {
@@ -233,6 +235,7 @@ export default class App extends React.Component {
             url: ad.creative_url,
             name: ad.name,
             metadata: ad.metadata,
+            advertiser: ad.advertiserName,
           });
         }
         //randomize
@@ -333,9 +336,6 @@ export default class App extends React.Component {
       await this.loginAnon();
     }
 
-    this.showSnackbar(<Text>Click a mask to try it on again!  Hold the
-        <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
-
     console.debug(`checking favs for ${this.userId}`);
     firestore().collection('users').doc(this.userId).get()
       .then(doc => {
@@ -343,12 +343,16 @@ export default class App extends React.Component {
         if (doc.exists) {
           const favsArr = doc.data().favorites;
           console.debug('got user favs',favsArr);
+          // TODO check with first time actions in asyncstorage
+          if (favsArr.length > 0) {
+            //this.showSnackbar(<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
+          }
           let el = <FavoriteItems favs={favsArr} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
           this.setState({sideMenuData: el});
         } else {
-          //TODO
-          // show tutorial, cta to add
           console.info('doc no existo for ',this.userId)
+          let el = <FavoriteItems favs={[]} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
+          this.setState({sideMenuData: el});
         }
       })
       .catch(e => console.warn(`doc get failed for ${this.userId}`,e));
@@ -356,13 +360,18 @@ export default class App extends React.Component {
   }
 
   showAppInfo = () => {
-    this.setState({sideMenuData: <Text style={{padding: 20,fontSize: 20}}>DISCLAIMER</Text>});
+    const el = <>
+      <Text style={{fontWeight}}>Mask health disclaimer</Text>
+      <Text style={{fontWeight}}>CDC info</Text>
+      <Text style={{fontWeight}}>Privacy Policy</Text>
+    </>;
+    this.setState({sideMenuData: el});
   }
 
   showFirstTimeFaceHelp = () => {
     this.firstTimeFaceTimer = setTimeout(() => {
       this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>
-        ,{} );
+        ,{});
     },8000);
   }
 
@@ -519,6 +528,8 @@ export default class App extends React.Component {
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
         this.currentAdItem = adItem;
+        // trigger updating mask name text field
+        this.setState({});
       });
   }
 
@@ -636,6 +647,41 @@ export default class App extends React.Component {
     this.setState({animatedFavIcons: arrCopy})
   }
 
+
+
+  reportBugEmail = () => {
+    const email = 'mailto:hello@maskfashions.app'
+    shimAllSettled();
+    Promise.allSettled([
+      this.userId,
+      DeviceInfo.getUniqueId(),
+      `authed${this.state.userLoggedIn}`,
+      Platform.OS,
+      Platform.Version,
+      DeviceInfo.getBrand(),
+      DeviceInfo.getBaseOs(),
+      DeviceInfo.getApiLevel(),
+      DeviceInfo.getCodename(),
+      DeviceInfo.getDeviceId(),
+      DeviceInfo.getLastUpdateTime(),
+      DeviceInfo.getReadableVersion(),
+    ])
+      .then(results => {
+        let debugData = '';
+        results.forEach(res => {
+          if (res.status == 'fulfilled') {
+            debugData += `${res.value},`;
+          }
+        })
+        Linking.openURL(`${email}?subject=Mask Fashions bug report&body=\n\n\n*Please include the following in your message* \n${debugData}`);
+      });
+  }
+
+  suggestFeatureEmail = () => {
+    const email = 'mailto:hello@maskfashions.app'
+    Linking.openURL(`${email}?subject=Mask Fashions feature suggestion&body=\n\n\n(Thank you for helping to make it better!)`);
+  }
+
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
     return (
@@ -696,11 +742,28 @@ export default class App extends React.Component {
       )
     }
 
+    const AdItemTitleText = () => {
+      if (this.currentAdItem && this.currentAdItem.name) {
+        const ad = this.currentAdItem;
+        const allText = {color: '#ffffff88',textAlign: 'center',fontWeight: 'bold'};
+        return (
+          <View style={{
+            position: 'absolute',bottom: 5,width: this.screenWidth,
+          }}>
+            <Text style={[{fontSize: 24},allText]}>{ad.name}</Text>
+            <Text style={[{},allText]}>by</Text>
+            <Text style={[{},allText]}>{ad.advertiser}</Text></View>
+        );
+      } else {
+        return <></>;
+      }
+    }
+
     if (this.state.adItemsAreLoading) {
       return <Splash />;
     } else {
       return <View style={styles.container} >
-        <SideMenu menu={<SideMenuNav app={this} content={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.sideMenuWidth}
+        <SideMenu menu={<SideMenuNav app={this} sideMenuData={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.sideMenuWidth}
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
           onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
         >
@@ -719,12 +782,13 @@ export default class App extends React.Component {
             <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
           </Appbar.Header>
 
-          <View name="DeepAR container" style={styles.deeparContainer}>
-            {permissionsGranted ?
+          {permissionsGranted ?
+            <View name="DeepAR container" style={styles.deeparContainer}>
               <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-              :
-              <Text>permissions not granted</Text>}
-          </View>
+              <AdItemTitleText />
+            </View>
+            :
+            <Text>permissions not granted</Text>}
 
           <BeltNav app={this} />
 

@@ -1,0 +1,70 @@
+{
+	"object": "list",
+	"has_more": false,
+	"limit": 10,
+	"offset": 0,
+	"url": "/v2/advertisers",
+	"data": [
+	 {
+	  "object": "advertiser",
+	  "self": "/v2/advertisers/164040",
+	  "id": 164040,
+	  "can_change_password": false,
+	  "can_add_ad_items": false,
+	  "user_access": false,
+	  "email": "",
+	  "name": "Etsy seller: BibbidiBobbidiByJan",
+	  "has_password": false,
+	  "parent": "admin"
+	 },
+	 {
+	  "object": "advertiser",
+	  "self": "/v2/advertisers/161773",
+	  "id": 161773,
+	  "can_change_password": false,
+	  "can_add_ad_items": false,
+	  "user_access": false,
+	  "email": "",
+	  "name": "Etsy seller: JKLMmaskdesigns",
+	  "has_password": true,
+	  "parent": "admin"
+	 },
+	 {
+	  "object": "advertiser",
+	  "self": "/v2/advertisers/164041",
+	  "id": 164041,
+	  "can_change_password": false,
+	  "can_add_ad_items": false,
+	  "user_access": false,
+	  "email": "",
+	  "name": "Etsy seller: NobleSteedGifts",
+	  "has_password": false,
+	  "parent": "admin"
+	 },
+	 {
+	  "object": "advertiser",
+	  "self": "/v2/advertisers/164039",
+	  "id": 164039,
+	  "can_change_password": false,
+	  "can_add_ad_items": false,
+	  "user_access": false,
+	  "email": "",
+	  "name": "geekchic",
+	  "has_password": false,
+	  "parent": "admin"
+	 },
+	 {
+	  "object": "advertiser",
+	  "self": "/v2/advertisers/159837",
+	  "id": 159837,
+	  "can_change_password": false,
+	  "can_add_ad_items": true,
+	  "user_access": true,
+	  "email": "ek@attunedesigns.com",
+	  "name": "Versace",
+	  "has_password": true,
+	  "parent": "admin"
+	 }
+	]
+   }
+   

@@ -1,0 +1,110 @@
+{
+	"object": "list",
+	"has_more": false,
+	"limit": 10,
+	"offset": 0,
+	"url": "/v2/campaigns",
+	"data": [
+	 {
+	  "object": "standard_campaign",
+	  "self": "/v2/campaigns/standard/578785",
+	  "id": 578785,
+	  "advertiser": {
+	   "object": "advertiser",
+	   "self": "/v2/advertisers/164040",
+	   "id": 164040,
+	   "can_change_password": false,
+	   "can_add_ad_items": false,
+	   "user_access": false,
+	   "email": "",
+	   "name": "Etsy seller: BibbidiBobbidiByJan",
+	   "has_password": false,
+	   "parent": "admin"
+	  },
+	  "name": "campaigntest",
+	  "roadblock_tags": null,
+	  "flexible_type": 0
+	 },
+	 {
+	  "object": "standard_campaign",
+	  "self": "/v2/campaigns/standard/578792",
+	  "id": 578792,
+	  "advertiser": {
+	   "object": "advertiser",
+	   "self": "/v2/advertisers/164041",
+	   "id": 164041,
+	   "can_change_password": false,
+	   "can_add_ad_items": false,
+	   "user_access": false,
+	   "email": "",
+	   "name": "Etsy seller: NobleSteedGifts",
+	   "has_password": false,
+	   "parent": "admin"
+	  },
+	  "name": "campaigntest",
+	  "roadblock_tags": null,
+	  "flexible_type": 0
+	 },
+	 {
+	  "object": "standard_campaign",
+	  "self": "/v2/campaigns/standard/578795",
+	  "id": 578795,
+	  "advertiser": {
+	   "object": "advertiser",
+	   "self": "/v2/advertisers/164039",
+	   "id": 164039,
+	   "can_change_password": false,
+	   "can_add_ad_items": false,
+	   "user_access": false,
+	   "email": "",
+	   "name": "geekchic",
+	   "has_password": false,
+	   "parent": "admin"
+	  },
+	  "name": "campaigntest",
+	  "roadblock_tags": null,
+	  "flexible_type": 0
+	 },
+	 {
+	  "object": "standard_campaign",
+	  "self": "/v2/campaigns/standard/576756",
+	  "id": 576756,
+	  "advertiser": {
+	   "object": "advertiser",
+	   "self": "/v2/advertisers/161773",
+	   "id": 161773,
+	   "can_change_password": false,
+	   "can_add_ad_items": false,
+	   "user_access": false,
+	   "email": "",
+	   "name": "Etsy seller: JKLMmaskdesigns",
+	   "has_password": true,
+	   "parent": "admin"
+	  },
+	  "name": "jklm campaign1 (ended)",
+	  "roadblock_tags": null,
+	  "flexible_type": 0
+	 },
+	 {
+	  "object": "standard_campaign",
+	  "self": "/v2/campaigns/standard/577231",
+	  "id": 577231,
+	  "advertiser": {
+	   "object": "advertiser",
+	   "self": "/v2/advertisers/161773",
+	   "id": 161773,
+	   "can_change_password": false,
+	   "can_add_ad_items": false,
+	   "user_access": false,
+	   "email": "",
+	   "name": "Etsy seller: JKLMmaskdesigns",
+	   "has_password": true,
+	   "parent": "admin"
+	  },
+	  "name": "jklm campaign2",
+	  "roadblock_tags": null,
+	  "flexible_type": 0
+	 }
+	]
+   }
+   

@@ -1,13 +1,11 @@
 import React from "react"
 import {Dimensions,Linking,Platform,ScrollView,Text,TouchableOpacity,View} from "react-native";
-import {Appbar,useTheme} from "react-native-paper";
+import {Appbar} from "react-native-paper";
 import {createIconSet} from "react-native-vector-icons";
 import Share from 'react-native-share';
-import DeviceInfo from 'react-native-device-info';
-import shimAllSettled from "promise.allsettled/shim";
+import {theme} from '../styles';
 
-const SideMenuNav = ({app,content}) => {
-    const theme = useTheme();
+const SideMenuNav = ({app, sideMenuData}) => {
     const {width: screenWidth,height: screenHeight} = Dimensions.get('window');
     const iconSize = 34;
     const glyphmap = {
@@ -32,48 +30,20 @@ const SideMenuNav = ({app,content}) => {
         )
     };
 
-    const emailMe = async () => {
-        const email = 'mailto:hello@maskfashions.app'
-        shimAllSettled();
-        Promise.allSettled([
-            Platform.OS,
-            Platform.Version,
-            DeviceInfo.getBrand(),
-            DeviceInfo.getBaseOs(),
-            DeviceInfo.getApiLevel(),
-            DeviceInfo.getUniqueId(),
-            DeviceInfo.getCodename(),
-            DeviceInfo.getDeviceId(),
-            DeviceInfo.getLastUpdateTime(),
-            DeviceInfo.getReadableVersion(),
-        ])
-            .then(results => {
-                let debugData = '';
-                results.forEach(res => {
-                    if (res.status == 'fulfilled') {
-                        debugData += `${res.value},`;
-                    }
-                })
-                Linking.openURL(`${email}?subject=Mask Fashions bug report&body=\n\n\n*Please include the following in your message* \n${debugData}`);
-            });
-
-    }
-
     return (<>
-        {content ?
-            <View style={{flex: 1,backgroundColor: theme.colors.background}}>
-                {content}
+        {sideMenuData ?
+            <View style={{padding:20, flex: 1, backgroundColor: theme.colors.background}}>
+                {sideMenuData}
             </View>
             :
             <View style={{
-
                 flex: 1,alignItems: 'center',flexDirection: 'column',justifyContent: 'space-evenly',
-                padding: 40,backgroundColor: theme.colors.background
+                padding: 20,backgroundColor: theme.colors.background
             }}>
                 <IconNav title='favorites' icon={iconByPlatform('ios-heart','folder-heart')} onPress={app.checkFavorites} />
                 <IconNav title='share app' onPress={app.shareApp} icon={iconByPlatform('ios-share','share-variant')} />
-                <IconNav title='report bug' onPress={emailMe} icon={iconByPlatform('ios-bug','spider-thread')} />
-                <IconNav title='suggest feature' icon='bullhorn' onPress={() => {}} />
+                <IconNav title='report bug' onPress={app.reportBugEmail} icon={iconByPlatform('ios-bug','spider-thread')} />
+                <IconNav title='suggest feature' icon='bullhorn' onPress={app.suggestFeatureEmail} />
                 <IconNav title='app info' icon='information' onPress={app.showAppInfo} />
             </View>
         }

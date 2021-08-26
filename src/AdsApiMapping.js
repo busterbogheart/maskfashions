@@ -9,7 +9,10 @@ export class AdItem {
     object;
     metadata;
     campaignId;
-        
+    advertiserId;
+    advertiserName;
+    weight;
+
     constructor(data){
       Object.assign(this, data);
     }

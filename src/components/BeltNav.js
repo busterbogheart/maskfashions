@@ -25,7 +25,7 @@ const BeltNav = (props) => {
     return (
         <View style={styles.beltNav}>
             <IconNav title='random' icon='dice-3' onPress={app.switchToRandomAdItem} />
-            <IconNav title='save' icon='heart-plus' onPress={app.addToFavorites} />
+            <IconNav title='save' icon='heart-plus' onPress={app.addToFavorites}  />
             <IconNav title='' icon='camera' iconSize={58} iconTop={8} onPress={app.takeScreenshot} />
             {/*<IconNav title='vid' icon='video' onPress={()=>{}} />*/}
             <IconNav title='buy mask' 

@@ -7,7 +7,7 @@ import {styles,theme} from '../styles';
 export default FavoriteItems = (props) => {
 	const {favs: favsArrAdIds,adItems,sideMenuWidth,app} = props;
 	const noFavs = favsArrAdIds.length == 0;
-	const maskSize = sideMenuWidth + 15;
+	const maskSize = sideMenuWidth;
 	const maskMaskScale = .7;
 	// initial state: filter from the master list of ad items
 	const [favItems, setFavItems] = useState(adItems.filter(item => favsArrAdIds.includes(item.adId)));
@@ -20,10 +20,14 @@ export default FavoriteItems = (props) => {
 	}
 
 	if (noFavs) {
-		return <Text>no favs saved.</Text>
+		return (
+			<View style={{justifyContent: 'center',alignItems: 'center',}}>
+				<Text style={{fontSize: 16}}>No favorites saved.{`\n\n`}Hit the <Icon name='heart-plus' size={28}/> on a mask you like!</Text>
+			</View>
+		);
 	} else {
 		return (
-			<ScrollView decelerationRate={.96} snapToInterval={maskSize/2} contentContainerStyle={{justifyContent: 'center',alignItems: 'center',}}>
+			<ScrollView showsVerticalScrollIndicator={false} decelerationRate={.96} snapToInterval={maskSize/2} contentContainerStyle={{justifyContent: 'center',alignItems: 'center',}}>
 				{favItems.map(item => {
 					return (
 						<View key={item.adId} style={{justifyContent:'center',alignItems:'center'}}>
@@ -43,8 +47,11 @@ export default FavoriteItems = (props) => {
 								</MaskedView>
 							</TouchableOpacity>
 							<View style={{flexDirection: 'row',bottom: 40,opacity: .5}}>
-								<TouchableOpacity onLongPress={() => removeFav(item)} activeOpacity={.1} delayPressIn={200}><Icon style={{paddingHorizontal: 11}} name='heart-remove' color={theme.colors.bad} size={34} /></TouchableOpacity>
-								<TouchableOpacity onPressIn={() => {app.switchTexture(item)}} activeOpacity={.1} delayPressIn={80}><Icon style={{paddingHorizontal: 11}} name='face-recognition' color={'#000'} size={34} /></TouchableOpacity>
+								<TouchableOpacity onLongPress={() => removeFav(item)} activeOpacity={.1}><Icon style={{paddingHorizontal: 11}} name='heart-remove' color={theme.colors.bad} size={34} /></TouchableOpacity>
+								<TouchableOpacity onPressIn={() => {app.switchTexture(item)}} activeOpacity={.1} delayPressIn={80}><Icon style={{paddingHorizontal: 11}}
+									//name='face-recognition'
+									name='face'
+									color={'#000'} size={34} /></TouchableOpacity>
 							</View>
 						</View>)
 				})}
