@@ -25,6 +25,7 @@ import {differenceInHours} from 'date-fns/esm';
 import FavoriteItems from './src/components/FavoriteItems';
 import {AdItem} from './src/AdsApiMapping';
 import shimAllSettled from 'promise.allsettled/shim';
+import CameraFlash from './src/components/CameraFlash';
 
 
 export default class App extends React.Component {
@@ -69,6 +70,7 @@ export default class App extends React.Component {
     };
     this.adsAlreadyViewed = [];
     this.maskScrollRef = React.createRef();
+    this.cameraFlashRef = React.createRef();
     this.maskSizeScale = .77;
     this.maskSize = this.screenWidth / 1.3;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
@@ -119,33 +121,10 @@ export default class App extends React.Component {
     }
   }
 
-  onChangeEffect = (direction) => {
-    if (!this.deepARView) {
-      return
-    }
-
-
-    return;
-
-    const {currentTexture: currentEffectIndex} = this.state
-    var newIndex = direction > 0 ? currentEffectIndex + 1 : currentEffectIndex - 1
-    if (newIndex >= effectsData.length) {
-      newIndex = 0
-    }
-    if (newIndex < 0) {
-      newIndex = effectsData.length - 1
-    }
-
-    const newEffect = effectsData[newIndex]
-    this.deepARView.switchEffect(newEffect.name,'effect')
-
-    this.setState({currentEffectIndex: newIndex})
-
-  }
-
-  takeScreenshot = () => {
+  takePhoto = () => {
     if (this.deepARView) {
       this.deepARView.takeScreenshot()
+      this.cameraFlashRef.current.flash();
     }
   }
 
@@ -766,6 +745,8 @@ export default class App extends React.Component {
       }
     }
 
+
+
     if (this.state.adItemsAreLoading) {
       return <Splash />;
     } else {
@@ -789,8 +770,8 @@ export default class App extends React.Component {
               <Icon size={32} name='menu' color={theme.colors.text} />
             </TouchableOpacity>
             <View>
-              <Text style={{fontSize: 15,fontWeight: 'bold'}} >Mask Fashions</Text>
-              <Text style={{fontSize:11}}>Stay safe. Look good.</Text>
+              <Text style={{fontSize: 15,fontWeight: 'bold',lineHeight:15}} >Mask Fashions</Text>
+              <Text style={{fontSize:11, lineHeight:11}}>Stay safe. Look good.</Text>
             </View>
           </View>
 
@@ -798,6 +779,7 @@ export default class App extends React.Component {
             <View name="DeepAR container" style={styles.deeparContainer}>
               <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
               <AdItemTitleText />
+              <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef}/>
             </View>
             :
             <Text>permissions not granted</Text>}
@@ -810,7 +792,6 @@ export default class App extends React.Component {
               <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
               {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
               {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
-              {/* <DebugButton iconName='drama-masks' text='change mask' onPress={this.onChangeEffect} /> */}
               {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
                 : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
               }

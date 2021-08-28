@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   appbar: {
     alignItems:'center',
     justifyContent: 'center',
-    flexBasis: 40,
+    flexBasis: 38,
     flexDirection: 'row',
     backgroundColor: theme.colors.primary,
     width: screenWidth,
