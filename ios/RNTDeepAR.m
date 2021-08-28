@@ -178,7 +178,7 @@
   } else {
     UIImage *image = [UIImage imageWithContentsOfFile:urlOrPath];
     if(!image){
-      RCTLogError(@"CANT FIND IT");
+      RCTLogError(@"cant find image file: %@", urlOrPath);
     }
     [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
   }
