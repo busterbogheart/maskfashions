@@ -527,9 +527,8 @@ export default class App extends React.Component {
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
-        // first load
+        // first load; trigger updating mask name text field
         if (this.currentAdItem == null) {
-          // trigger updating mask name text field
           this.currentAdItem = adItem;
           this.setState({});
         } else {
@@ -785,10 +784,15 @@ export default class App extends React.Component {
             <SnackbarCustom />
           </Portal>
 
-          <Appbar.Header style={styles.appbar}>
-            <Appbar.Action size={32} icon='menu' onPress={this.showSideMenu} />
-            <Appbar.Content titleStyle={{fontSize: 15,fontWeight: 'bold'}} subtitleStyle={{fontSize: 11,}} title='Mask Fashions' subtitle='Stay safe. Look good.' />
-          </Appbar.Header>
+          <View style={styles.appbar}>
+            <TouchableOpacity style={{position:'absolute', left: 10}} onPressIn={this.showSideMenu} activeOpacity={.5} delayPressIn={0}>
+              <Icon size={32} name='menu' color={theme.colors.text} />
+            </TouchableOpacity>
+            <View>
+              <Text style={{fontSize: 15,fontWeight: 'bold'}} >Mask Fashions</Text>
+              <Text style={{fontSize:11}}>Stay safe. Look good.</Text>
+            </View>
+          </View>
 
           {permissionsGranted ?
             <View name="DeepAR container" style={styles.deeparContainer}>

@@ -122,12 +122,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     width: screenWidth,
-    height: 58,
+    flexBasis: 58,
     backgroundColor: theme.colors.primary
   },
   appbar: {
-    flexBasis: 38,
-    justifyContent: 'space-around',
+    alignItems:'center',
+    justifyContent: 'center',
+    flexBasis: 40,
+    flexDirection: 'row',
+    backgroundColor: theme.colors.primary,
     width: screenWidth,
   },
 });

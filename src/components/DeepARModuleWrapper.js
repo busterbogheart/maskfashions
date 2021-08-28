@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 import { Dimensions, findNodeHandle, requireNativeComponent,UIManager} from "react-native";
 import {styles} from '../styles';
@@ -118,8 +117,5 @@ export default class DeepARModuleWrapper extends React.Component {
   }
 }
 
-DeepARModuleWrapper.propTypes = {
-  onEventSent: PropTypes.func,
-};
 
 const DeepARModule = requireNativeComponent('DeepARModule', DeepARModuleWrapper);
