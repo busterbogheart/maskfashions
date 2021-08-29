@@ -9,7 +9,7 @@ const BeltNav = (props) => {
 
     const IconNav = (props) => {
         return (
-            <TouchableOpacity onPressIn={props.onPress} delayPressIn={0} activeOpacity={.5} >
+            <TouchableOpacity onPress={props.onPress} activeOpacity={.3} >
                 <View style={{top:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
                     <Appbar.Action color={theme.colors.text} style={{padding:0,margin:0,top: props.iconTop || 0}} size={props.iconSize || iconSize} icon={props.icon} />
                     <Text style={{color:theme.colors.text, top: props.textTop || -9, fontSize:11, fontWeight:'bold', textTransform:'uppercase',padding:0,margin:0}}>{props.title}</Text>
@@ -17,10 +17,6 @@ const BeltNav = (props) => {
             </TouchableOpacity>
         )
     };
-
-    const buyLinkClicked = () => {
-        Linking.openURL('https://etsy.com');
-    }
 
     return (
         <View style={styles.beltNav}>
@@ -32,7 +28,7 @@ const BeltNav = (props) => {
                 //icon='cart'
                 // icon='rocket-launch'
                  icon='open-in-new'
-            onPress={buyLinkClicked} />
+            onPress={app.buyButtonClicked} />
         </View>
     );
 }

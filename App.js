@@ -39,7 +39,7 @@ export default class App extends React.Component {
       switchCameraInProgress: false,
       multiSelectedItemObjects: [],
       snackbarVisible: false,
-      snackbarConfig: {text: '',button: null},
+      snackbarConfig: {text: '',button: null, duration:null},
       sidemenuVisible: false,
       userLoggedIn: false,
       sideMenuData: null,
@@ -76,6 +76,12 @@ export default class App extends React.Component {
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
     this.butler;
     this.sideMenuWidth = this.screenWidth / 2.2;
+    // init session with these, fetch from asyncstorage
+    this.firstTimeActions = {
+      buyMaskButtonExplanation: false,
+      favoritesSnackbar: false,
+      havingTroubleDarkSnackbar: false,
+    };
   }
 
   didAppear() {
@@ -148,8 +154,8 @@ export default class App extends React.Component {
     }
   }
 
-  showSnackbar = (text = '',buttonText = null) => {
-    this.setState({snackbarConfig: {text: text,button: buttonText},snackbarVisible: true});
+  showSnackbar = (text = '',buttonText = null,duration = null) => {
+    this.setState({snackbarConfig: {text: text,button: buttonText, duration:duration},snackbarVisible: true});
   }
 
   permissionsNotGranted = () => {
@@ -193,7 +199,6 @@ export default class App extends React.Component {
           result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
         ) {
           console.debug('permissions granted android')
-          this.showFirstTimeFaceHelp();
           // will let DeepAR module load, which dispatches an 'initialized' event
           this.setState({permissionsGranted: true});
         } else {
@@ -202,8 +207,19 @@ export default class App extends React.Component {
         }
       })
     } else if (Platform.OS === 'ios') {
-      this.showFirstTimeFaceHelp();
+
     }
+
+    this.setupUserLocal().then(uid => {
+      this.showFirstTimeFaceHelp();
+      if (uid != null) {
+        console.debug(`got user: ${uid}`);
+        this.userId = uid;
+      } else {
+        // TODO ??
+        console.warn('uid null from setupuserlocal');
+      }
+    },reason => console.warn('failed: ' + reason));
 
     this.butler = new AdButler();
     const _getAdsAndSchema = async () => {
@@ -238,16 +254,6 @@ export default class App extends React.Component {
 
     this.butler.getAdTrackingURLS().then(urls => this.itemTrackingURLs = urls);
     this.setupAuthListener();
-    this.setupUserLocal().then(
-      uid => {
-        if (uid != null) {
-          console.debug(`got user: ${uid}`);
-          this.userId = uid;
-        } else {
-          // TODO ??
-          console.warn('uid null from setuplocaluser');
-        }
-      },reason => console.warn('failed: ' + reason));
   }
 
   mockDelay = ms => new Promise(res => setTimeout(res,ms));
@@ -322,9 +328,12 @@ export default class App extends React.Component {
         if (doc.exists) {
           const favsArr = doc.data().favorites;
           console.debug('got user favs',favsArr);
-          // TODO check with first time actions in asyncstorage
-          if (favsArr.length > 0) {
-            //this.showSnackbar(<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
+          if (favsArr.length > 0 && this.firstTimeActionNotComplete('favoritesSnackbar')) {
+            this.showSnackbar(
+              <Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>
+              ,null,8000
+            );
+            this.setFirstTimeActionComplete('favoritesSnackbar');
           }
           let el = <FavoriteItems favs={favsArr} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
           this.setState({sideMenuData: el});
@@ -341,17 +350,45 @@ export default class App extends React.Component {
   showAppInfo = () => {
     const el = <>
       <Text style={{fontWeight: 'bold'}}>Mask health disclaimer{`\n\n`}</Text>
-      <Text style={{fontWeight:'bold'}}>CDC info{`\n\n`}</Text>
-      <Text style={{fontWeight:'bold'}}>Privacy Policy{`\n\n`}</Text>
+      <Text style={{fontWeight: 'bold'}}>CDC info{`\n\n`}</Text>
+      <Text style={{fontWeight: 'bold'}}>Privacy Policy{`\n\n`}</Text>
     </>;
     this.setState({sideMenuData: el});
   }
 
   showFirstTimeFaceHelp = () => {
-    this.firstTimeFaceTimer = setTimeout(() => {
-      this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>
-        ,{});
-    },8000);
+    if (this.firstTimeActionNotComplete('havingTroubleDarkSnackbar')) {
+      this.firstTimeFaceTimer = setTimeout(() => {
+        this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>,{});
+        this.setFirstTimeActionComplete('havingTroubleDarkSnackbar');
+      },8000);
+    }
+  }
+
+  buyButtonClicked = () => {
+    if (this.firstTimeActionNotComplete('buyMaskButtonExplanation')) {
+      Alert.alert(
+        "Here's the deal:",
+        "A one-time explanation of how the buy button will act.",
+        [
+          {
+            text: 'Ok',style: 'default',onPress: () => {
+              Linking.openURL('https://etsy.com');
+              this.setFirstTimeActionComplete('buyMaskButtonExplanation');
+            }
+          },
+          {text: 'Cancel',style: 'cancel',onPress: () => {}},
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => {
+            console.debug('DISMISSED alert')
+          }
+        },
+      );
+    } else {
+      Linking.openURL('https://etsy.com');
+    }
   }
 
   addToFavorites = async (mouseEvent) => {
@@ -408,8 +445,8 @@ export default class App extends React.Component {
   }
 
   setupUserLocal = async () => {
-    // awaits exit the async function, giving control elsewhere until promise returns
-    let userId = await AsyncStorage.getItem('userId')
+    let asyncKeys = await AsyncStorage.getAllKeys();
+    let userId = await AsyncStorage.getItem('userId');
     console.log('userId from asyncstorage ',userId,`authed? ${this.state.userLoggedIn}`);
     if (userId == null) {
       try {
@@ -430,13 +467,13 @@ export default class App extends React.Component {
     console.log(`userId from ${Platform.OS} device`,userId);
 
     let lastLogin = await AsyncStorage.getItem('userLastLogin');
-    let isFirstLogin = Boolean(lastLogin) == false;
+    let isFirstLogin = !asyncKeys.includes('userLastLogin');
     console.debug('last login from local:',lastLogin,`is first? ${isFirstLogin}`);
 
     if (!isFirstLogin) {
       let lastLoginDate = new Date(JSON.parse(lastLogin));
       let hoursSinceLast = differenceInHours(Date.now(),lastLoginDate);
-      // console.log(`last login: ${lastLoginDate}, been ${hoursSinceLast}h`);
+      console.log(`last login: ${lastLoginDate}, been ${hoursSinceLast}h`);
     }
 
     // record current login for all users
@@ -445,7 +482,6 @@ export default class App extends React.Component {
       await AsyncStorage.setItem('userLastLogin',now);
     } catch (e) {
       console.warn(e);
-      // do it again!
       try {
         await AsyncStorage.setItem('userLastLogin',now);
       } catch (e) {
@@ -453,7 +489,31 @@ export default class App extends React.Component {
       }
     }
 
+    if (!asyncKeys.includes('firstTimeActions')) {
+      await AsyncStorage.setItem('firstTimeActions',JSON.stringify(this.firstTimeActions));
+      console.debug('wrote firsttimeactions to async');
+    } else { //fetch to store in session
+      this.firstTimeActions = JSON.parse(await AsyncStorage.getItem('firstTimeActions'));
+      console.debug('current first time actions:',this.firstTimeActions);
+    }
+
     return userId;
+  }
+
+  setFirstTimeActionComplete = async (actionKey) => {
+    console.debug('setting ' + actionKey,this.firstTimeActions);
+    if (this.firstTimeActions[actionKey] == true) {
+      return;
+    } else {
+      this.firstTimeActions[actionKey] = true;
+    }
+    console.debug('setting ' + actionKey);
+    await AsyncStorage.setItem('firstTimeActions',JSON.stringify(this.firstTimeActions));
+  }
+
+  firstTimeActionNotComplete = (actionKey) => {
+    console.debug('checking ' + this.firstTimeActions[actionKey], this.firstTimeActions);
+    return (actionKey in this.firstTimeActions && this.firstTimeActions[actionKey] == false);
   }
 
   setupAuthListener = () => {
@@ -506,13 +566,9 @@ export default class App extends React.Component {
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
-        // first load; trigger updating mask name text field
-        if (this.currentAdItem == null) {
-          this.currentAdItem = adItem;
-          this.setState({});
-        } else {
-          this.currentAdItem = adItem;
-        }
+        this.currentAdItem = adItem;
+        // trigger mask name title update
+        this.setState({});
       });
   }
 
@@ -712,13 +768,13 @@ export default class App extends React.Component {
     }
 
     const SnackbarCustom = () => {
-      const {text,button} = this.state.snackbarConfig;
+      const {text,button,duration} = this.state.snackbarConfig;
       const action = button || {};
       //{label: 'OK',onPress: () => this.setState({snackbarVisible: false})};
       const snackbarText = text || <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>;
       return (
         <Snackbar
-          visible={this.state.snackbarVisible} duration={4000} action={action}
+          visible={this.state.snackbarVisible} duration={duration || 4000} action={action}
           onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}} >
           {snackbarText}
         </Snackbar>
@@ -734,7 +790,7 @@ export default class App extends React.Component {
         };
         return (
           <View style={{
-            position: 'absolute',bottom: 5,width: this.screenWidth, 
+            position: 'absolute',bottom: 5,width: this.screenWidth,
           }}>
             <Text style={[{fontSize: 24},allText]}>{ad.name}</Text>
             <Text style={[{},allText]}>by</Text>
@@ -766,12 +822,12 @@ export default class App extends React.Component {
           </Portal>
 
           <View style={styles.appbar}>
-            <TouchableOpacity style={{position:'absolute', left: 10}} onPressIn={this.showSideMenu} activeOpacity={.5} delayPressIn={0}>
+            <TouchableOpacity style={{position: 'absolute',left: 10}} onPressIn={this.showSideMenu} activeOpacity={.5} delayPressIn={0}>
               <Icon size={32} name='menu' color={theme.colors.text} />
             </TouchableOpacity>
             <View>
-              <Text style={{fontSize: 15,fontWeight: 'bold',lineHeight:15}} >Mask Fashions</Text>
-              <Text style={{fontSize:11, lineHeight:11}}>Stay safe. Look good.</Text>
+              <Text style={{fontSize: 15,fontWeight: 'bold',lineHeight: 15}} >Mask Fashions</Text>
+              <Text style={{fontSize: 11,lineHeight: 11}}>Stay safe. Look good.</Text>
             </View>
           </View>
 
@@ -779,7 +835,7 @@ export default class App extends React.Component {
             <View name="DeepAR container" style={styles.deeparContainer}>
               <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
               <AdItemTitleText />
-              <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef}/>
+              <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef} />
             </View>
             :
             <Text>permissions not granted</Text>}
