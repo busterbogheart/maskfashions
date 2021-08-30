@@ -53,14 +53,17 @@
 
 -(void)switchCamera {
   if (_arview) {
-    AVCaptureDevicePosition position =  AVCaptureDevicePositionFront;
-    
+    AVCaptureDevicePosition currPosition = cameraController.position;
+
     NSString* message;
-    if (position == AVCaptureDevicePositionBack) {
-      message = @"back";
-    } else {
+    if(currPosition == AVCaptureDevicePositionBack){
       message = @"front";
+      cameraController.position = AVCaptureDevicePositionFront;
+    } else {
+      message = @"back";
+      cameraController.position = AVCaptureDevicePositionBack;
     }
+    
     self.onEventSent(@{ @"type": @"cameraSwitch", @"value": message});
   }
 }

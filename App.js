@@ -54,7 +54,6 @@ export default class App extends React.Component {
 
     this.currentAdItem = null; //one of this.masterItemList objects 
     this.renderCount = 0;
-    this.isRelease = true;
 
     this.userId = null; //from unique device id
     this.authUnsub = null; // function for unsubscribing from auth changes
@@ -151,33 +150,21 @@ export default class App extends React.Component {
   switchCamera = () => {
     const {switchCameraInProgress} = this.state;
     if (!switchCameraInProgress && this.deepARView) {
-      this.setState({switchCameraInProgress: true});
+      console.debug('switchcamera?????????????')
+      this.state.switchCameraInProgress = true;
       this.deepARView.switchCamera();
     }
   }
 
   showSnackbar = (text = '') => {
-    Snackbar.show({text: text, duration: Snackbar.LENGTH_LONG});
+    Snackbar.show({text: text,duration: Snackbar.LENGTH_LONG});
   }
 
   permissionsNotGranted = () => {
     Alert.alert(
       "Permissions were not granted",
-      "Mask Fashions requires your permission to ....  Please close the app and open again to allow.",
+      "Mask Fashions requires your permission to use the camera.  Please close the app and start again to allow.",
       [],{cancelable: false}
-    );
-  }
-
-  showNativeDialog = () => {
-    Alert.alert(
-      "Here's the deal",
-      "Some explanation of how the buy button will act.",
-      [
-        {text: 'ok'},
-        {text: 'less than ok',style: 'cancel'},
-        {text: 'VERY ok',style: 'destructive'},
-      ],
-      {cancelable: true}
     );
   }
 
@@ -234,6 +221,7 @@ export default class App extends React.Component {
             name: ad.name,
             metadata: ad.metadata,
             advertiser: ad.advertiserName,
+            location: ad.location,
           });
         }
         //randomize
@@ -332,8 +320,8 @@ export default class App extends React.Component {
           if (favsArr.length > 0 && this.firstTimeActionNotComplete('favoritesSnackbar')) {
             this.showSnackbar(
               'Click on a mask to try it on again!  Hold the red heart to remove from your favorites');
-              //<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
-              this.setFirstTimeActionComplete('favoritesSnackbar');
+            //<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
+            this.setFirstTimeActionComplete('favoritesSnackbar');
           }
           let el = <FavoriteItems favs={favsArr} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
           this.setState({sideMenuData: el});
@@ -374,7 +362,7 @@ export default class App extends React.Component {
         [
           {
             text: 'Ok',style: 'default',onPress: () => {
-              Linking.openURL('https://etsy.com');
+              this.openBuyUrl();
               this.setFirstTimeActionComplete('buyMaskButtonExplanation');
             }
           },
@@ -388,8 +376,17 @@ export default class App extends React.Component {
         },
       );
     } else {
-      Linking.openURL('https://etsy.com');
+      this.openBuyUrl();
     }
+  }
+
+  openBuyUrl = () => {
+    let adId = this.currentAdItem.adId;
+    let clickUrl = this.itemTrackingURLs[adId].clickUrl;
+    let pageUrl = this.currentAdItem.location;
+    console.log('logging click');
+    this.hitURLNoReturn(clickUrl);
+    Linking.openURL(pageUrl);
   }
 
   addToFavorites = async (mouseEvent) => {
@@ -594,7 +591,8 @@ export default class App extends React.Component {
     });
   }
 
-  trackImpression = (url) => {
+  hitURLNoReturn = (url) => {
+    console.debug('hiturlnoreturn: ' + url);
     fetch(url).then(res => {if (res.status !== 200) fetch(url)})
       .catch(err => {
         console.error(err);
@@ -606,9 +604,9 @@ export default class App extends React.Component {
       let adId = v.item.adId;
       let name = v.item.name;
       if (!this.adsAlreadyViewed.includes(adId) && this.itemTrackingURLs[adId]) {
-        //console.log(`logging impression for ${name} (${adId}) at ${v.index}`);
         let url = this.itemTrackingURLs[adId].impUrl;
-        this.trackImpression(url);
+        console.log(`logging impression for ${name} (${adId}) at ${v.index}`);
+        this.hitURLNoReturn(url);
         this.adsAlreadyViewed.push(adId);
       }
     }
@@ -752,6 +750,7 @@ export default class App extends React.Component {
     'ios-share': '',
     'ios-bug': '',
     'ios-heart': '',
+    'camera-reverse': '',
   },'Ionicons','Ionicons.ttf');
 
   iconByPlatform = (iosIconName,androidIconName) => {
@@ -806,7 +805,6 @@ export default class App extends React.Component {
 
 
     if (this.state.adItemsAreLoading) {
-      AsyncStorage.clear();
       return <Splash />;
     } else {
       return <View style={styles.container} >
@@ -878,23 +876,15 @@ export default class App extends React.Component {
               <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
               <AdItemTitleText />
               <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef} />
+              <TouchableOpacity delayPressIn={20} onPressIn={this.switchCamera}
+                style={{position: 'absolute',opacity: .4, top: 8, right: 8}}>
+                {<this.IosIcons name='camera-reverse' size={44} color='#fff' />}
+              </TouchableOpacity>
             </View>
             :
             <Text>permissions not granted</Text>}
 
           <BeltNav app={this} />
-
-          {this.isRelease == false ? (
-            <View name="test-buttons" style={styles.buttonContainer}>
-              <DebugButton iconName='eye-settings' text='app settings' onPress={() => {Linking.openSettings()}} />
-              <DebugButton iconName='camera-switch' text='swap cam' onPress={this.switchCamera} />
-              {/* <DebugButton iconName='exclamation' text='dialog' onPress={this.showNativeDialog} /> */}
-              {/*<DebugButton iconName='bell-alert' text='alert' onPress={this.showSnackbar} />*/}
-              {this.state.userLoggedIn ? <DebugButton style={{backgroundColor: '#aea'}} iconName='thumb-up' text='authed' onPress={() => {}} />
-                : <DebugButton iconName='login' text='login' onPress={this.loginAnon} />
-              }
-            </View>
-          ) : <></>}
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
             <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}

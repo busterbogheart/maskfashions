@@ -64,15 +64,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: theme.colors.background,
   },
-  buttonContainer:{
-    flex:1,
-    // flexWrap: 'wrap',  //set on container,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    top: Platform.OS == 'ios' ? 80 : 65,
-    position: 'absolute',
-    width: screenWidth,
-  },
   button: {
     width: 105,
     height: 30,
