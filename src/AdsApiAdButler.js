@@ -170,7 +170,6 @@ export default class AdsApiAdButler {
       console.log(ad);
     }
   }
-  mockDelay = ms => new Promise(res => setTimeout(res,ms));
 
   getAdItemsWithSchema = async () => {
     // cached?

@@ -1,33 +1,20 @@
 import React from "react"
-import {Dimensions,Linking,Platform,ScrollView,Text,TouchableOpacity,View} from "react-native";
-import {Appbar} from "react-native-paper";
-import {createIconSet} from "react-native-vector-icons";
-import Share from 'react-native-share';
+import {Platform,View} from "react-native";
 import {theme} from '../styles';
+import IconNav from '../components/IconNav';
+import {createIconSet} from "react-native-vector-icons";
 
 const SideMenuNav = ({app, sideMenuData}) => {
-    const {width: screenWidth,height: screenHeight} = Dimensions.get('window');
-    const iconSize = 34;
-    const glyphmap = {
+	let glyphmap = {
         'ios-share': '',
         'ios-bug': '',
         'ios-heart': '',
     };
-    const IosIcons = createIconSet(glyphmap,'Ionicons','Ionicons.ttf');
-    const iconByPlatform = (iosIconName,androidIconName) => {
-        if (Platform.OS == 'android') return androidIconName;
+	IosIcons = createIconSet(glyphmap,'Ionicons','Ionicons.ttf');
+	
+    iconByPlatform = (iosIconName,androidIconName) => {
+		if (Platform.OS == 'android') return androidIconName;
         else return ({size,color}) => <IosIcons size={size} color={color} name={iosIconName} />
-    };
-
-    const IconNav = (props) => {
-        return (
-            <TouchableOpacity style={{padding:8}} onPressIn={props.onPress} delayPressIn={0} >
-                <View style={{top: 0,flexDirection: 'column',justifyContent: 'center',alignItems: 'center'}}>
-                    <Appbar.Action color={theme.colors.textSecondary} style={{padding: 0,margin: 0,top: 0}} size={iconSize} icon={props.icon} />
-                    <Text style={{textAlign: 'center',color: theme.colors.textSecondary,top: 0,fontSize: 12,textTransform: 'uppercase',fontWeight: 'bold'}}>{props.title}</Text>
-                </View>
-            </TouchableOpacity>
-        )
     };
 
     return (<>

@@ -1,12 +1,12 @@
 "use strict";
 
 import React,{Fragment} from 'react';
-import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking,ActivityIndicator} from 'react-native';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {Snackbar,Portal,Appbar} from 'react-native-paper';
+import {Portal} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
@@ -23,10 +23,14 @@ import Filters from './src/components/Filters';
 import DebugButton from './src/components/DebugButton';
 import {differenceInHours} from 'date-fns/esm';
 import FavoriteItems from './src/components/FavoriteItems';
-import {AdItem} from './src/AdsApiMapping';
 import shimAllSettled from 'promise.allsettled/shim';
 import CameraFlash from './src/components/CameraFlash';
-
+import Modal from 'react-native-modal';
+import U from './src/Utilities';
+import IconNav from './src/components/IconNav';
+import {createIconSet} from 'react-native-vector-icons';
+import CameraRoll from '@react-native-community/cameraroll';
+import Snackbar from 'react-native-snackbar';
 
 export default class App extends React.Component {
 
@@ -38,14 +42,14 @@ export default class App extends React.Component {
       permissionsGranted: Platform.OS === 'ios',
       switchCameraInProgress: false,
       multiSelectedItemObjects: [],
-      snackbarVisible: false,
-      snackbarConfig: {text: '',button: null, duration:null},
       sidemenuVisible: false,
       userLoggedIn: false,
       sideMenuData: null,
       forceRenderFlatList: true,
       animatedFavIcons: [],
       adItemsAreLoading: true,
+      photoPreviewModalVisible: false,
+      photoReadyToBeSaved: false,
     }
 
     this.currentAdItem = null; //one of this.masterItemList objects 
@@ -82,6 +86,7 @@ export default class App extends React.Component {
       favoritesSnackbar: false,
       havingTroubleDarkSnackbar: false,
     };
+    this.photoPreviewPath = null;
   }
 
   didAppear() {
@@ -129,21 +134,18 @@ export default class App extends React.Component {
 
   takePhoto = () => {
     if (this.deepARView) {
-      this.deepARView.takeScreenshot()
       this.cameraFlashRef.current.flash();
+      this.deepARView.takeScreenshot();
     }
   }
 
   screenshotTaken = (screenshotPath) => {
-    const path = 'file://' + screenshotPath;
-    console.debug(`screenshot at ${path}`);
-    Share.open({
-      url: path,
-      title: "Share your mask fashion.",
-      message: 'It\'s a message\n\n',
-    })
-      .then(res => console.debug(res))
-      .catch(err => console.info(err));
+    if (screenshotPath != null && (typeof screenshotPath) == 'string') {
+      this.photoPreviewPath = 'file://' + screenshotPath;
+      console.debug(`screenshot at ${this.photoPreviewPath}`);
+      this.state.photoReadyToBeSaved = true;
+      this.showPhotoPreview();
+    }
   }
 
   switchCamera = () => {
@@ -154,8 +156,8 @@ export default class App extends React.Component {
     }
   }
 
-  showSnackbar = (text = '',buttonText = null,duration = null) => {
-    this.setState({snackbarConfig: {text: text,button: buttonText, duration:duration},snackbarVisible: true});
+  showSnackbar = (text = '') => {
+    Snackbar.show({text: text, duration: Snackbar.LENGTH_LONG});
   }
 
   permissionsNotGranted = () => {
@@ -181,6 +183,7 @@ export default class App extends React.Component {
 
   showSideMenu = () => this.setState({sidemenuVisible: true});
   hideDrawer = () => this.setState({sidemenuVisible: false});
+  showPhotoPreview = () => this.setState({photoPreviewModalVisible: true});
 
   componentDidMount() {
     console.debug('componentdidmount');
@@ -256,8 +259,6 @@ export default class App extends React.Component {
     this.setupAuthListener();
   }
 
-  mockDelay = ms => new Promise(res => setTimeout(res,ms));
-
   // CDN urls should be parsed and pre-loaded for the listview, and also made available 
   // to Java and objc on local filesystem for the deepar native switchTexture method
   // CDN url as backup if file doesnt exist localy (then download it local?)
@@ -330,10 +331,9 @@ export default class App extends React.Component {
           console.debug('got user favs',favsArr);
           if (favsArr.length > 0 && this.firstTimeActionNotComplete('favoritesSnackbar')) {
             this.showSnackbar(
-              <Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>
-              ,null,8000
-            );
-            this.setFirstTimeActionComplete('favoritesSnackbar');
+              'Click on a mask to try it on again!  Hold the red heart to remove from your favorites');
+              //<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
+              this.setFirstTimeActionComplete('favoritesSnackbar');
           }
           let el = <FavoriteItems favs={favsArr} adItems={this.masterItemList} sideMenuWidth={this.sideMenuWidth} app={this} />;
           this.setState({sideMenuData: el});
@@ -359,7 +359,8 @@ export default class App extends React.Component {
   showFirstTimeFaceHelp = () => {
     if (this.firstTimeActionNotComplete('havingTroubleDarkSnackbar')) {
       this.firstTimeFaceTimer = setTimeout(() => {
-        this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>,{});
+        this.showSnackbar('Having trouble?  It may be too dark.');
+        //this.showSnackbar(<Text>Having trouble?  It may be too dark. <Icon name='lightbulb-on' size={18} color={theme.colors.text} /></Text>);
         this.setFirstTimeActionComplete('havingTroubleDarkSnackbar');
       },8000);
     }
@@ -512,7 +513,7 @@ export default class App extends React.Component {
   }
 
   firstTimeActionNotComplete = (actionKey) => {
-    console.debug('checking ' + this.firstTimeActions[actionKey], this.firstTimeActions);
+    console.debug('checking ' + this.firstTimeActions[actionKey],this.firstTimeActions);
     return (actionKey in this.firstTimeActions && this.firstTimeActions[actionKey] == false);
   }
 
@@ -677,7 +678,7 @@ export default class App extends React.Component {
     // add another to the array, add a key, render later with map()
     const count = this.state.animatedFavIcons.length;
     // need to get point relative to AnimatedFav
-    const destX = -(pageX) + 15;
+    const destX = -(pageX) + 9;
     const destY = -(pageY) + (Platform.OS === 'ios' ? styles.container.paddingTop : 5);
     const icon = <Fragment key={count}>
       <AnimatedFav destX={destX} destY={destY} myKey={count} style={{position: 'absolute',left: pageX,top: pageY,zIndex: 9999}} />
@@ -690,6 +691,7 @@ export default class App extends React.Component {
 
   reportBugEmail = () => {
     const email = 'mailto:hello@maskfashions.app'
+    console.debug('device info start ****************************')
     shimAllSettled();
     Promise.allSettled([
       this.userId,
@@ -704,8 +706,11 @@ export default class App extends React.Component {
       DeviceInfo.getDeviceId(),
       DeviceInfo.getLastUpdateTime(),
       DeviceInfo.getReadableVersion(),
+      DeviceInfo.getBuildNumber(),
+      DeviceInfo.getBuildId(),
     ])
       .then(results => {
+        console.debug('device info end   ****************************')
         let debugData = '';
         results.forEach(res => {
           if (res.status == 'fulfilled') {
@@ -743,6 +748,17 @@ export default class App extends React.Component {
     )
   };
 
+  IosIcons = createIconSet({
+    'ios-share': '',
+    'ios-bug': '',
+    'ios-heart': '',
+  },'Ionicons','Ionicons.ttf');
+
+  iconByPlatform = (iosIconName,androidIconName) => {
+    if (Platform.OS == 'android') return androidIconName;
+    else return ({size,color}) => <IosIcons size={size} color={color} name={iosIconName} />
+  };
+
   render() {
     console.info(`app render >>>>>>>>>>>>> #${this.renderCount++} ads loaded? ${!this.state.adItemsAreLoading}`);
 
@@ -764,20 +780,6 @@ export default class App extends React.Component {
         <View style={styles.splash}>
           <Text style={{color: theme.colors.primary,fontWeight: 'bold',fontSize: 30}}>mask fashions.</Text>
         </View>
-      )
-    }
-
-    const SnackbarCustom = () => {
-      const {text,button,duration} = this.state.snackbarConfig;
-      const action = button || {};
-      //{label: 'OK',onPress: () => this.setState({snackbarVisible: false})};
-      const snackbarText = text || <><Text>this is only a test ({Platform.Version}) </Text><Icon name='check-circle-outline' /></>;
-      return (
-        <Snackbar
-          visible={this.state.snackbarVisible} duration={duration || 4000} action={action}
-          onDismiss={() => {console.debug('dismiss?'); this.setState({snackbarVisible: false});}} >
-          {snackbarText}
-        </Snackbar>
       )
     }
 
@@ -804,6 +806,7 @@ export default class App extends React.Component {
 
 
     if (this.state.adItemsAreLoading) {
+      AsyncStorage.clear();
       return <Splash />;
     } else {
       return <View style={styles.container} >
@@ -811,15 +814,54 @@ export default class App extends React.Component {
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
           onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
         >
+
           <Portal name="animated icons">
             {this.state.animatedFavIcons.length > 0 ?
               this.state.animatedFavIcons.map(el => el)
               : <></>}
           </Portal>
 
-          <Portal>
-            <SnackbarCustom />
-          </Portal>
+          <Modal style={{marginHorizontal: 20,marginVertical: this.screenHeight / 6,}} backdropColor='#00000066' animationInTiming={400} animationOutTiming={200} coverScreen={false}
+            isVisible={this.state.photoPreviewModalVisible} useNativeDriverForBackdrop={true} useNativeDriver={true}
+            onBackButtonPress={() => {
+              console.debug('back button');
+              this.setState({photoPreviewModalVisible: false});
+            }}
+            onBackdropPress={() => {
+              console.debug('backdrop pressed');
+              this.setState({photoPreviewModalVisible: false});
+            }}
+            onModalHide={() => {
+              console.debug('modalhide')
+            }} >
+            <View style={{margin: 10,backgroundColor: theme.colors.background,flex: 1,justifyContent: 'space-around',alignItems: 'center'}} >
+              <Image resizeMode='contain' source={{uri: this.photoPreviewPath,width: (this.screenWidth - 20 * 2) - 40,height: (this.screenHeight / 6 * 2) - 40}} />
+              <Text style={{fontSize: 17,fontStyle: 'italic'}}>
+                Lookin good.
+              </Text>
+              <TouchableOpacity style={{width: '100%',flexDirection: 'row',justifyContent: 'space-around'}}>
+                <IconNav icon='close' title='Cancel' onPress={() => {this.setState({photoPreviewModalVisible: false}); this.photoPreviewPath = null;}} />
+                <IconNav icon={this.iconByPlatform('ios-share','share-variant')} title='Share' onPress={() => {
+                  Share.open({
+                    title: 'Share your Mask Fashion',
+                    url: this.photoPreviewPath,
+                    showAppsToView: true,
+                  });
+                }} />
+                {this.state.photoReadyToBeSaved ?
+                  <IconNav icon='download' title='Save' onPress={async () => {
+                    CameraRoll.save(this.photoPreviewPath,{album: 'Mask Fashions'})
+                      .then((res) => {
+                        this.setState({photoReadyToBeSaved: false});
+                        console.debug('saved photo to ' + res)
+                      },(rej) => console.warn(rej))
+                  }} />
+                  :
+                  <IconNav icon='check' title={'Saved to\n' + (Platform.OS === 'ios' ? 'Photos' : 'Gallery')} color='#6c8' />
+                }
+              </TouchableOpacity>
+            </View>
+          </Modal>
 
           <View style={styles.appbar}>
             <TouchableOpacity style={{position: 'absolute',left: 10}} onPressIn={this.showSideMenu} activeOpacity={.5} delayPressIn={0}>

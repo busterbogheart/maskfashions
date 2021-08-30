@@ -8,7 +8,7 @@ export default class AnimatedFav extends Component {
 		super(props);
 
 		this.state = {
-			pos: new Animated.ValueXY({x: 0,y: -40}),
+			pos: new Animated.ValueXY({x: -10,y: -50}),
 			opacity: new Animated.Value(0),
 			finished: false,
 		}
@@ -17,9 +17,12 @@ export default class AnimatedFav extends Component {
 	componentDidMount = () => {
 		const {destX,destY} = this.props;
 		Animated.parallel([
-			Animated.timing(this.state.pos.x,{toValue:destX, easing:Easing.bounce, duration:1500, delay:200, useNativeDriver:true}),
+			Animated.sequence([
+				Animated.timing(this.state.pos.x,{toValue:destX, easing:Easing.bounce, duration:1400, useNativeDriver:true}),
+				Animated.timing(this.state.pos.x,{toValue:destX-40, duration: 400, useNativeDriver:true}),
+			]),
 			Animated.timing(this.state.pos.y,{toValue: destY,duration: 1400,useNativeDriver: true}),
-			Animated.timing(this.state.opacity,{toValue: 1,duration: 1400,useNativeDriver: true}),
+			Animated.timing(this.state.opacity,{toValue: 1,duration: 300,useNativeDriver: true}),
 		]).start(({finished}) => {
 			this.setState({finished: true})
 		});
