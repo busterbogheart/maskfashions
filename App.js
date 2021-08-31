@@ -31,6 +31,8 @@ import IconNav from './src/components/IconNav';
 import {createIconSet} from 'react-native-vector-icons';
 import CameraRoll from '@react-native-community/cameraroll';
 import Snackbar from 'react-native-snackbar';
+import NetInfo from '@react-native-community/netinfo';
+import AdItemTitleText from './src/components/AdItemTitleText';
 
 export default class App extends React.Component {
 
@@ -50,9 +52,11 @@ export default class App extends React.Component {
       adItemsAreLoading: true,
       photoPreviewModalVisible: false,
       photoReadyToBeSaved: false,
+      currentWornAdItem: null, //stateful because it triggers title updates
     }
 
-    this.currentAdItem = null; //one of this.masterItemList objects 
+    this.currentCenterAdItem = null; //represents currently shown mask in scroll, could also be worn
+
     this.renderCount = 0;
 
     this.userId = null; //from unique device id
@@ -86,7 +90,7 @@ export default class App extends React.Component {
       havingTroubleDarkSnackbar: false,
     };
     this.photoPreviewPath = null;
-    this.bustCache = true;
+    this.bustCache = !true;
   }
 
   didAppear() {
@@ -200,6 +204,30 @@ export default class App extends React.Component {
 
     }
 
+
+    const checkConnection = async () => {
+      NetInfo.fetch().then(state => {
+        console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
+        let connected = (state.isConnected == true && state.isInternetReachable == true);
+        if (connected) {
+          this.init();
+        } else {
+          Alert.alert(
+            "No internet connection",
+            "",
+            [{text: 'Retry',onPress: () => checkConnection()}],
+            {cancelable: false}
+          );
+        }
+      })
+    }
+
+    //checkConnection();
+    this.init();
+
+  }
+
+  init = () => {
     this.setupUserLocal().then(uid => {
       this.showFirstTimeFaceHelp();
       if (uid != null) {
@@ -263,7 +291,7 @@ export default class App extends React.Component {
 
     this.masterItemList.forEach(item => {
       const localDest = this.localAdItemsDir + item.adId + ".jpg";
-      const CDNurl = item.url+(this.bustCache? '?'+Math.random():'');
+      const CDNurl = item.url + (this.bustCache ? '?' + Math.random() : '');
       RNFS.exists(localDest)
         .then(doesExist => {
           if (!doesExist) {
@@ -272,11 +300,11 @@ export default class App extends React.Component {
                 console.log(`finished RNFS download, ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
                 if (res.statusCode !== 200) {
                   // go again
-                  console.log('RNFS download trying again '+item.adId)
+                  console.log('RNFS download trying again ' + item.adId)
                   _downloadOne(CDNurl,localDest);
                 }
               },rejected => {
-                console.warn(rejected, 'RNFS download trying again for '+item.adId);
+                console.warn(rejected,'RNFS download trying again for ' + item.adId);
                 _downloadOne(CDNurl,localDest);
               })
               .catch(e => console.error(e));
@@ -299,7 +327,6 @@ export default class App extends React.Component {
         .catch(e => console.error(e))
     });
   }
-
   checkFavorites = async () => {
     // must be authed to read/write firestore, must have valid userId also
     if (this.userId == null) {
@@ -382,9 +409,9 @@ export default class App extends React.Component {
   }
 
   openBuyUrl = () => {
-    let adId = this.currentAdItem.adId;
+    let adId = this.state.currentWornAdItem.adId;
     let clickUrl = this.itemTrackingURLs[adId].clickUrl;
-    let pageUrl = this.currentAdItem.location;
+    let pageUrl = this.state.currentWornAdItem.location;
     console.log('logging click');
     this.hitURLNoReturn(clickUrl);
     Linking.openURL(pageUrl);
@@ -402,7 +429,7 @@ export default class App extends React.Component {
       await this.loginAnon();
     }
 
-    const adItemId = this.currentAdItem.adId;
+    const adItemId = this.state.currentWornAdItem.adId;
     console.debug(`setting favorite adId (${adItemId}) for ${this.userId}`)
 
     // creates if doesnt exist
@@ -553,11 +580,13 @@ export default class App extends React.Component {
   }
 
   switchTexture = (adItem) => {
+    if (adItem == this.state.currentWornAdItem) return;
     const {url,adId} = adItem;
     const localDest = this.localAdItemsDir + adId + '.jpg';
     let URLorFilepath;
     RNFS.exists(localDest)
       .then(doesExist => {
+        console.log('switch texture exists?');
         if (doesExist) {
           URLorFilepath = localDest;
         } else {
@@ -565,23 +594,27 @@ export default class App extends React.Component {
           URLorFilepath = url;
         }
         this.deepARView.switchTexture(URLorFilepath,!doesExist);
-        this.currentAdItem = adItem;
         // trigger mask name title update
-        this.setState({});
+        this.setState({currentWornAdItem: adItem});
+        this.currentCenterAdItem = adItem;
       });
   }
 
   switchToRandomAdItem = () => {
+    console.log('random');
+    if (this.filteredItemList.length < 2) return;
+    
     let i;
     do {
       i = Math.floor(Math.random() * this.filteredItemList.length);
     }
-    while (this.filteredItemList[i] == this.currentAdItem);
+    while (this.filteredItemList[i] == this.currentCenterAdItem);
     this.maskScrollRef.current.scrollToIndex({
       index: i,
       viewOffset: (this.screenWidth - this.maskSize) / 2,
     })
-    this.currentAdItem = this.filteredItemList[i];
+    console.log(this.currentCenterAdItem.adId,this.filteredItemList[i].adId);
+    this.currentCenterAdItem = this.filteredItemList[i];
   }
 
   shareApp = () => {
@@ -656,12 +689,14 @@ export default class App extends React.Component {
   refreshFlatList = () => {
     this.maskScrollRef.current.scrollToOffset({offset: 0,animated: false,});
     this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
+    this.currentCenterAdItem = this.filteredItemList[0];
   }
 
   resetFlatList = () => {
     this.filteredItemList = this.masterItemList;
     this.maskScrollRef.current.scrollToOffset({offset: 0,animated: true,});
     this.setState({forceRenderFlatList: !this.state.forceRenderFlatList});
+    this.currentCenterAdItem = this.filteredItemList[0];
   }
 
   getFlatListEmptyComponent = () => {
@@ -783,28 +818,6 @@ export default class App extends React.Component {
       )
     }
 
-    const AdItemTitleText = () => {
-      if (this.currentAdItem && this.currentAdItem.name) {
-        const ad = this.currentAdItem;
-        const allText = {
-          color: '#ffffff88',textShadowColor: '#000',textShadowOffset: {width: 1,height: 1},
-          textAlign: 'center',fontWeight: 'bold'
-        };
-        return (
-          <View style={{
-            position: 'absolute',bottom: 5,width: this.screenWidth,
-          }}>
-            <Text style={[{fontSize: 24},allText]}>{ad.name}</Text>
-            <Text style={[{},allText]}>by</Text>
-            <Text style={[{},allText]}>{ad.advertiser}</Text></View>
-        );
-      } else {
-        return <></>;
-      }
-    }
-
-
-
     if (this.state.adItemsAreLoading) {
       return <Splash />;
     } else {
@@ -872,13 +885,14 @@ export default class App extends React.Component {
             </View>
           </View>
 
+
           {permissionsGranted ?
             <View name="DeepAR container" style={styles.deeparContainer}>
               <DeepARModuleWrapper onEventSent={this.onEventSent} ref={ref => this.deepARView = ref} />
-              <AdItemTitleText />
               <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef} />
+              <AdItemTitleText currentAdItem={this.state.currentWornAdItem} />
               <TouchableOpacity delayPressIn={20} onPressIn={this.switchCamera}
-                style={{position: 'absolute',opacity: .4, top: 8, right: 8}}>
+                style={{position: 'absolute',opacity: .4,top: 8,right: 8}}>
                 {<this.IosIcons name='camera-reverse' size={44} color='#fff' />}
               </TouchableOpacity>
             </View>

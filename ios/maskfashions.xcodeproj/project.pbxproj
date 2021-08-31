@@ -19,6 +19,7 @@
 		D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */ = {isa = PBXBuildFile; fileRef = D0A3A6E626D1A484006B8B46 /* mask-09 */; };
 		D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */; };
 		D0D8D5B426B7369900E6692A /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D0D8D5B326B7369900E6692A /* fonts */; };
+		D0F839D026DDC9F7005AC417 /* mask-10 in Resources */ = {isa = PBXBuildFile; fileRef = D0F839CF26DDC9F7005AC417 /* mask-10 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -81,6 +82,7 @@
 		D0F7199826B4CAE800F7C3A4 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		D0F7199926B4CAE800F7C3A4 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		D0F7199A26B4CAE800F7C3A4 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		D0F839CF26DDC9F7005AC417 /* mask-10 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-10"; sourceTree = "<group>"; };
 		E268D7AFB3C9CD246118801F /* Pods-deeparRNExample-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample-tvOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample-tvOSTests/Pods-deeparRNExample-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FDA6A134E236DD8BF2B8EABD /* Pods-deeparRNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-deeparRNExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-deeparRNExample/Pods-deeparRNExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				D0A3A6E626D1A484006B8B46 /* mask-09 */,
+				D0F839CF26DDC9F7005AC417 /* mask-10 */,
 			);
 			name = effects;
 			path = ../assets/effects;
@@ -291,6 +294,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */,
 				D0D8D5B426B7369900E6692A /* fonts in Resources */,
+				D0F839D026DDC9F7005AC417 /* mask-10 in Resources */,
 				D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */,
 				D02A43FC26B4BA4200F9884D /* GoogleService-Info.plist in Resources */,
 			);

@@ -42,7 +42,7 @@ export default FavoriteItems = (props) => {
 									</View>
 								}>
 									<Image
-										fadeDuration={100} progressiveRenderingEnabled={true} style={{width: maskSize,height: maskSize,top: -(maskSize * .18)}} key={Date.now() + item.adId}
+										fadeDuration={100} progressiveRenderingEnabled={true} style={{width: maskSize,height: maskSize,top: -(maskSize * .12)}} key={Date.now() + item.adId}
 										width={maskSize} height={maskSize} source={{uri: item.url}} />
 								</MaskedView>
 							</TouchableOpacity>
