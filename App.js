@@ -91,6 +91,7 @@ export default class App extends React.Component {
     };
     this.photoPreviewPath = null;
     this.bustCache = !true;
+    this.unsubNetInfo;
   }
 
   didAppear() {
@@ -205,26 +206,34 @@ export default class App extends React.Component {
     }
 
 
-    const checkConnection = async () => {
+    const checkConnection = () => {
       NetInfo.fetch().then(state => {
         console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
-        let connected = (state.isConnected == true && state.isInternetReachable == true);
+        let connected = (state.isConnected == true);
         if (connected) {
           this.init();
         } else {
           Alert.alert(
-            "No internet connection",
-            "",
-            [{text: 'Retry',onPress: () => checkConnection()}],
+            null,
+            'No internet connection',
+            [{text: 'Retry', onPress: () => checkConnection()}],
             {cancelable: false}
           );
         }
       })
     }
 
-    //checkConnection();
-    this.init();
+    checkConnection();
 
+
+    //this.unsubNetInfo = NetInfo.addEventListener(state => {
+    //  console.log('connection state: ' + state.isConnected, state.isInternetReachable)
+    //  let connected = (state.isConnected == true && state.isInternetReachable == true);
+    //  if (connected) {
+    //    this.init();
+    //    return;
+    //  }
+    //});
   }
 
   init = () => {
@@ -586,7 +595,6 @@ export default class App extends React.Component {
     let URLorFilepath;
     RNFS.exists(localDest)
       .then(doesExist => {
-        console.log('switch texture exists?');
         if (doesExist) {
           URLorFilepath = localDest;
         } else {
@@ -601,7 +609,6 @@ export default class App extends React.Component {
   }
 
   switchToRandomAdItem = () => {
-    console.log('random');
     if (this.filteredItemList.length < 2) return;
     
     let i;
@@ -613,7 +620,6 @@ export default class App extends React.Component {
       index: i,
       viewOffset: (this.screenWidth - this.maskSize) / 2,
     })
-    console.log(this.currentCenterAdItem.adId,this.filteredItemList[i].adId);
     this.currentCenterAdItem = this.filteredItemList[i];
   }
 
@@ -664,7 +670,7 @@ export default class App extends React.Component {
           //console.log('toggle',filter.name);
           allMatch = (itemMetadata.indexOf(filter.name) !== -1);
         } else if (filter.type == 'category') {
-          console.log('category',filter.children);
+          //console.log('category',filter.children);
           // test individual, throw out non matching
           for (let ch of filter.children) {
             let match = (itemMetadata.indexOf(ch.name) !== -1);
@@ -725,7 +731,6 @@ export default class App extends React.Component {
 
   reportBugEmail = () => {
     const email = 'mailto:hello@maskfashions.app'
-    console.debug('device info start ****************************')
     shimAllSettled();
     Promise.allSettled([
       this.userId,
@@ -744,7 +749,6 @@ export default class App extends React.Component {
       DeviceInfo.getBuildId(),
     ])
       .then(results => {
-        console.debug('device info end   ****************************')
         let debugData = '';
         results.forEach(res => {
           if (res.status == 'fulfilled') {
@@ -836,15 +840,12 @@ export default class App extends React.Component {
           <Modal style={{marginHorizontal: 20,marginVertical: this.screenHeight / 6,}} backdropColor='#00000066' animationInTiming={400} animationOutTiming={200} coverScreen={false}
             isVisible={this.state.photoPreviewModalVisible} useNativeDriverForBackdrop={true} useNativeDriver={true}
             onBackButtonPress={() => {
-              console.debug('back button');
               this.setState({photoPreviewModalVisible: false});
             }}
             onBackdropPress={() => {
-              console.debug('backdrop pressed');
               this.setState({photoPreviewModalVisible: false});
             }}
             onModalHide={() => {
-              console.debug('modalhide')
             }} >
             <View style={{margin: 10,backgroundColor: theme.colors.background,flex: 1,justifyContent: 'space-around',alignItems: 'center'}} >
               <Image resizeMode='contain' source={{uri: this.photoPreviewPath,width: (this.screenWidth - 20 * 2) - 40,height: (this.screenHeight / 6 * 2) - 40}} />

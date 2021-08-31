@@ -11,7 +11,6 @@ export default FavoriteItems = (props) => {
 	const maskMaskScale = .7;
 	// initial state: filter from the master list of ad items
 	const [favItems, setFavItems] = useState(adItems.filter(item => favsArrAdIds.includes(item.adId)));
-	console.debug('favs',favsArrAdIds,favItems);
 
 	const removeFav = (item) => {
 		const newFavs = favItems.filter(el => el.adId !== item.adId);

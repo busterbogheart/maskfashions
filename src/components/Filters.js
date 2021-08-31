@@ -79,12 +79,12 @@ export default Filters = (props) => {
 					alwaysShowSelectText={false}
 					// customChipsRenderer={(uniqueKey, subKey, displayKey, items, selectedItems, colors, styles)=>{}}
 					onSelectedItemsChange={(items) => {
-						console.debug('selecteditemschange:',JSON.stringify(items,null,1))
+						//console.debug('selecteditemschange:',JSON.stringify(items,null,1))
 						setSelectedItems(items);
 					}}
 					onSelectedItemObjectsChange={(itemsObj) => {
 						// returned as the original objects not just ids
-						console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
+						//console.debug('selecteditemsobjectchange:',JSON.stringify(itemsObj,null,1))
 						setSelectedItemObjects(itemsObj);
 					}}
 					selectedItems={selectedItems}
