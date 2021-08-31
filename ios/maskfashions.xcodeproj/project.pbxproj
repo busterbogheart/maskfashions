@@ -12,29 +12,11 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		9A476490240D54D700E07300 /* RNTDeepARViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */; };
 		9A476493240D552100E07300 /* RNTDeepAR.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A476492240D552100E07300 /* RNTDeepAR.m */; };
-		9A4764C0240E89A200E07300 /* tape_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764AF240E89A200E07300 /* tape_face */; };
-		9A4764C1240E89A200E07300 /* topology in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B0240E89A200E07300 /* topology */; };
-		9A4764C2240E89A200E07300 /* pumpkin in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B1240E89A200E07300 /* pumpkin */; };
-		9A4764C3240E89A200E07300 /* hair_segmentation in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B2240E89A200E07300 /* hair_segmentation */; };
-		9A4764C4240E89A200E07300 /* frankenstein in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B3240E89A200E07300 /* frankenstein */; };
-		9A4764C5240E89A200E07300 /* scuba in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B4240E89A200E07300 /* scuba */; };
-		9A4764C6240E89A200E07300 /* fairy_lights in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B5240E89A200E07300 /* fairy_lights */; };
-		9A4764C7240E89A200E07300 /* plastic_ocean in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B6240E89A200E07300 /* plastic_ocean */; };
-		9A4764C8240E89A200E07300 /* beard in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B7240E89A200E07300 /* beard */; };
-		9A4764C9240E89A200E07300 /* beauty in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B8240E89A200E07300 /* beauty */; };
-		9A4764CA240E89A200E07300 /* ball_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764B9240E89A200E07300 /* ball_face */; };
-		9A4764CB240E89A200E07300 /* manly_face in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BA240E89A200E07300 /* manly_face */; };
-		9A4764CC240E89A200E07300 /* background_segmentation in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BB240E89A200E07300 /* background_segmentation */; };
-		9A4764CD240E89A200E07300 /* tiny_sunglasses in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BC240E89A200E07300 /* tiny_sunglasses */; };
-		9A4764CE240E89A200E07300 /* aviators in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BD240E89A200E07300 /* aviators */; };
-		9A4764CF240E89A200E07300 /* flower_crown in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BE240E89A200E07300 /* flower_crown */; };
-		9A4764D0240E89A200E07300 /* lion in Resources */ = {isa = PBXBuildFile; fileRef = 9A4764BF240E89A200E07300 /* lion */; };
 		A9C4556DF5176AB71DAF2F64 /* libPods-maskfashions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76517B9676D168F3E52BC495 /* libPods-maskfashions.a */; };
 		D02A43FC26B4BA4200F9884D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D02A43FB26B4BA4200F9884D /* GoogleService-Info.plist */; };
 		D02DF1A626CB21070034B919 /* DeepAR.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02DF1A526CB21060034B919 /* DeepAR.xcframework */; };
 		D02DF1A726CB21140034B919 /* DeepAR.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D02DF1A526CB21060034B919 /* DeepAR.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */ = {isa = PBXBuildFile; fileRef = D0A3A6E626D1A484006B8B46 /* mask-09 */; };
-		D0C440AD26C046C2002B882B /* mask-08 in Resources */ = {isa = PBXBuildFile; fileRef = D0C440AC26C046C2002B882B /* mask-08 */; };
 		D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB21A68108700A75B9A /* LaunchScreen.storyboard */; };
 		D0D8D5B426B7369900E6692A /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D0D8D5B326B7369900E6692A /* fonts */; };
 /* End PBXBuildFile section */
@@ -77,29 +59,11 @@
 		9A47648F240D54D700E07300 /* RNTDeepARViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepARViewManager.m; sourceTree = "<group>"; };
 		9A476491240D551100E07300 /* RNTDeepAR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTDeepAR.h; sourceTree = "<group>"; };
 		9A476492240D552100E07300 /* RNTDeepAR.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTDeepAR.m; sourceTree = "<group>"; };
-		9A4764AF240E89A200E07300 /* tape_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = tape_face; sourceTree = "<group>"; };
-		9A4764B0240E89A200E07300 /* topology */ = {isa = PBXFileReference; lastKnownFileType = text; path = topology; sourceTree = "<group>"; };
-		9A4764B1240E89A200E07300 /* pumpkin */ = {isa = PBXFileReference; lastKnownFileType = text; path = pumpkin; sourceTree = "<group>"; };
-		9A4764B2240E89A200E07300 /* hair_segmentation */ = {isa = PBXFileReference; lastKnownFileType = text; path = hair_segmentation; sourceTree = "<group>"; };
-		9A4764B3240E89A200E07300 /* frankenstein */ = {isa = PBXFileReference; lastKnownFileType = text; path = frankenstein; sourceTree = "<group>"; };
-		9A4764B4240E89A200E07300 /* scuba */ = {isa = PBXFileReference; lastKnownFileType = text; path = scuba; sourceTree = "<group>"; };
-		9A4764B5240E89A200E07300 /* fairy_lights */ = {isa = PBXFileReference; lastKnownFileType = text; path = fairy_lights; sourceTree = "<group>"; };
-		9A4764B6240E89A200E07300 /* plastic_ocean */ = {isa = PBXFileReference; lastKnownFileType = text; path = plastic_ocean; sourceTree = "<group>"; };
-		9A4764B7240E89A200E07300 /* beard */ = {isa = PBXFileReference; lastKnownFileType = text; path = beard; sourceTree = "<group>"; };
-		9A4764B8240E89A200E07300 /* beauty */ = {isa = PBXFileReference; lastKnownFileType = text; path = beauty; sourceTree = "<group>"; };
-		9A4764B9240E89A200E07300 /* ball_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = ball_face; sourceTree = "<group>"; };
-		9A4764BA240E89A200E07300 /* manly_face */ = {isa = PBXFileReference; lastKnownFileType = text; path = manly_face; sourceTree = "<group>"; };
-		9A4764BB240E89A200E07300 /* background_segmentation */ = {isa = PBXFileReference; lastKnownFileType = text; path = background_segmentation; sourceTree = "<group>"; };
-		9A4764BC240E89A200E07300 /* tiny_sunglasses */ = {isa = PBXFileReference; lastKnownFileType = text; path = tiny_sunglasses; sourceTree = "<group>"; };
-		9A4764BD240E89A200E07300 /* aviators */ = {isa = PBXFileReference; lastKnownFileType = file; path = aviators; sourceTree = "<group>"; };
-		9A4764BE240E89A200E07300 /* flower_crown */ = {isa = PBXFileReference; lastKnownFileType = text; path = flower_crown; sourceTree = "<group>"; };
-		9A4764BF240E89A200E07300 /* lion */ = {isa = PBXFileReference; lastKnownFileType = text; path = lion; sourceTree = "<group>"; };
 		D02A43FB26B4BA4200F9884D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D02DF1A526CB21060034B919 /* DeepAR.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = DeepAR.xcframework; sourceTree = "<group>"; };
 		D078565A26A245640000F659 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		D078565C26A245AA0000F659 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		D0A3A6E626D1A484006B8B46 /* mask-09 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-09"; sourceTree = "<group>"; };
-		D0C440AC26C046C2002B882B /* mask-08 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mask-08"; sourceTree = "<group>"; };
 		D0D8D5B326B7369900E6692A /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fonts; sourceTree = "<group>"; };
 		D0F7198A26B4C92B00F7C3A4 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		D0F7198C26B4CAE700F7C3A4 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
@@ -260,24 +224,6 @@
 			isa = PBXGroup;
 			children = (
 				D0A3A6E626D1A484006B8B46 /* mask-09 */,
-				D0C440AC26C046C2002B882B /* mask-08 */,
-				9A4764AF240E89A200E07300 /* tape_face */,
-				9A4764B0240E89A200E07300 /* topology */,
-				9A4764B1240E89A200E07300 /* pumpkin */,
-				9A4764B2240E89A200E07300 /* hair_segmentation */,
-				9A4764B3240E89A200E07300 /* frankenstein */,
-				9A4764B4240E89A200E07300 /* scuba */,
-				9A4764B5240E89A200E07300 /* fairy_lights */,
-				9A4764B6240E89A200E07300 /* plastic_ocean */,
-				9A4764B7240E89A200E07300 /* beard */,
-				9A4764B8240E89A200E07300 /* beauty */,
-				9A4764B9240E89A200E07300 /* ball_face */,
-				9A4764BA240E89A200E07300 /* manly_face */,
-				9A4764BB240E89A200E07300 /* background_segmentation */,
-				9A4764BC240E89A200E07300 /* tiny_sunglasses */,
-				9A4764BD240E89A200E07300 /* aviators */,
-				9A4764BE240E89A200E07300 /* flower_crown */,
-				9A4764BF240E89A200E07300 /* lion */,
 			);
 			name = effects;
 			path = ../assets/effects;
@@ -342,29 +288,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A4764C8240E89A200E07300 /* beard in Resources */,
-				9A4764C2240E89A200E07300 /* pumpkin in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				D0A3A6E726D1A484006B8B46 /* mask-09 in Resources */,
 				D0D8D5B426B7369900E6692A /* fonts in Resources */,
-				9A4764C7240E89A200E07300 /* plastic_ocean in Resources */,
-				9A4764C1240E89A200E07300 /* topology in Resources */,
-				9A4764C5240E89A200E07300 /* scuba in Resources */,
 				D0CAE05F26C9901100CFA80C /* LaunchScreen.storyboard in Resources */,
-				9A4764C3240E89A200E07300 /* hair_segmentation in Resources */,
-				9A4764C9240E89A200E07300 /* beauty in Resources */,
-				9A4764CE240E89A200E07300 /* aviators in Resources */,
-				9A4764CC240E89A200E07300 /* background_segmentation in Resources */,
-				D0C440AD26C046C2002B882B /* mask-08 in Resources */,
-				9A4764CD240E89A200E07300 /* tiny_sunglasses in Resources */,
-				9A4764CB240E89A200E07300 /* manly_face in Resources */,
-				9A4764C0240E89A200E07300 /* tape_face in Resources */,
-				9A4764C6240E89A200E07300 /* fairy_lights in Resources */,
-				9A4764CF240E89A200E07300 /* flower_crown in Resources */,
-				9A4764C4240E89A200E07300 /* frankenstein in Resources */,
 				D02A43FC26B4BA4200F9884D /* GoogleService-Info.plist in Resources */,
-				9A4764D0240E89A200E07300 /* lion in Resources */,
-				9A4764CA240E89A200E07300 /* ball_face in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

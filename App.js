@@ -74,7 +74,7 @@ export default class App extends React.Component {
     this.adsAlreadyViewed = [];
     this.maskScrollRef = React.createRef();
     this.cameraFlashRef = React.createRef();
-    this.maskSizeScale = .77;
+    this.maskSizeScale = .64; //used to scale masking png
     this.maskSize = this.screenWidth / 1.3;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
     this.butler;
@@ -86,6 +86,7 @@ export default class App extends React.Component {
       havingTroubleDarkSnackbar: false,
     };
     this.photoPreviewPath = null;
+    this.bustCache = true;
   }
 
   didAppear() {
@@ -107,7 +108,7 @@ export default class App extends React.Component {
       this.setState({switchCameraInProgress: false})
     } else if (event.type === 'initialized') {
       // initialized sometimes dispatched twice (frame dimension changes, etc)
-      this.deepARView.switchEffect('mask-09','effect');
+      this.deepARView.switchEffect('mask-10','effect');
       this.switchToFirstTexture();
     } else if (event.type === 'didStartVideoRecording') {
 
@@ -150,7 +151,6 @@ export default class App extends React.Component {
   switchCamera = () => {
     const {switchCameraInProgress} = this.state;
     if (!switchCameraInProgress && this.deepARView) {
-      console.debug('switchcamera?????????????')
       this.state.switchCameraInProgress = true;
       this.deepARView.switchCamera();
     }
@@ -263,7 +263,7 @@ export default class App extends React.Component {
 
     this.masterItemList.forEach(item => {
       const localDest = this.localAdItemsDir + item.adId + ".jpg";
-      const CDNurl = item.url;
+      const CDNurl = item.url+(this.bustCache? '?'+Math.random():'');
       RNFS.exists(localDest)
         .then(doesExist => {
           if (!doesExist) {
@@ -272,10 +272,11 @@ export default class App extends React.Component {
                 console.log(`finished RNFS download, ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
                 if (res.statusCode !== 200) {
                   // go again
+                  console.log('RNFS download trying again '+item.adId)
                   _downloadOne(CDNurl,localDest);
                 }
               },rejected => {
-                console.warn(rejected);
+                console.warn(rejected, 'RNFS download trying again for '+item.adId);
                 _downloadOne(CDNurl,localDest);
               })
               .catch(e => console.error(e));
@@ -728,7 +729,7 @@ export default class App extends React.Component {
     // TODO check androidrenderingmode software
     return (
       <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
-        onPressIn={() => {this.switchTexture(item)}} delayPressIn={80} activeOpacity={.5} >
+        onPressIn={() => {this.switchTexture(item)}} delayPressIn={90} activeOpacity={.5} >
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
@@ -739,7 +740,7 @@ export default class App extends React.Component {
           }>
           <Image
             fadeDuration={100} progressiveRenderingEnabled={true}
-            style={{width: this.maskSize,height: this.maskSize,top: -(this.maskSize * .18)}} key={Date.now() + item.adId}
+            style={{width: this.maskSize,height: this.maskSize,top: -(this.maskSize * .14)}} key={Date.now() + item.adId}
             width={this.maskSize} height={this.maskSize} source={{uri: item.url}} />
         </MaskedView>
       </TouchableOpacity>
