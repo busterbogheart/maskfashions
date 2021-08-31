@@ -40,7 +40,7 @@ export default Filters = (props) => {
 						// check icon color
 						success: '#2a2',
 						// cancel button bg
-						cancel: '#333',
+						cancel: theme.colors.accent,
 						// main category bg
 						itemBackground: '#fff',
 						subItemBackground: '#fff',

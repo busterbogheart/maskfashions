@@ -14,7 +14,7 @@ const theme = {
       // bottom nav, filter button bg, splash bg
       secondary: '#333',
       // snackbar action button, clear filters button
-      accent: '#f67',
+      accent: '#c45',
       bad: '#c53',
       background: '#EBEBEB',
       surface: '#000',
@@ -136,7 +136,7 @@ const filterModalStyles = StyleSheet.create({
   },
   // covers the screen
   backdrop: {
-    //backgroundColor: theme.colors.background
+    backgroundColor: '#00000066',
   },
   // covers the screen
   modalWrapper: {

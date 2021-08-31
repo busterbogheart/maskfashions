@@ -79,7 +79,7 @@ export default class App extends React.Component {
     this.maskScrollRef = React.createRef();
     this.cameraFlashRef = React.createRef();
     this.maskSizeScale = .64; //used to scale masking png
-    this.maskSize = this.screenWidth / 1.3;
+    this.maskSize = this.screenWidth / 1.7;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
     this.butler;
     this.sideMenuWidth = this.screenWidth / 2.2;
@@ -91,7 +91,6 @@ export default class App extends React.Component {
     };
     this.photoPreviewPath = null;
     this.bustCache = !true;
-    this.unsubNetInfo;
   }
 
   didAppear() {
@@ -205,33 +204,42 @@ export default class App extends React.Component {
 
     }
 
+    this.init();
 
-    const checkConnection = () => {
-      NetInfo.fetch().then(state => {
-        console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
-        let connected = (state.isConnected == true);
-        if (connected) {
-          this.init();
-        } else {
-          Alert.alert(
-            null,
-            'No internet connection',
-            [{text: 'Retry', onPress: () => checkConnection()}],
-            {cancelable: false}
-          );
-        }
-      })
-    }
 
-    checkConnection();
+    //const checkConnection = () => {
+    //  NetInfo.fetch().then(state => {
+    //    console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
+    //    let connected = (state.isConnected == true);
+    //    if (connected) {
+          
+    //      this.init();
+    //    } else {
+    //      setTimeout(() => {
+    //        checkConnection();
+    //      }, 1000);
+    //      Alert.alert(
+    //        null,
+    //        'No internet connection',
+    //        [{text: 'Retry', onPress: () => checkConnection()}],
+    //        {cancelable: false}
+    //      );
+    //    }
+    //  })
+    //}
 
+    //checkConnection();
 
     //this.unsubNetInfo = NetInfo.addEventListener(state => {
-    //  console.log('connection state: ' + state.isConnected, state.isInternetReachable)
+    //  console.log(' ##########  connection state: ' + state.isConnected, state.isInternetReachable);
     //  let connected = (state.isConnected == true && state.isInternetReachable == true);
     //  if (connected) {
+    //    this.unsubNetInfo();
+    //    this.setState({isConnected:true})
     //    this.init();
     //    return;
+    //  } else {
+    //    this.setState({isConnected: false})
     //  }
     //});
   }
@@ -356,7 +364,7 @@ export default class App extends React.Component {
           console.debug('got user favs',favsArr);
           if (favsArr.length > 0 && this.firstTimeActionNotComplete('favoritesSnackbar')) {
             this.showSnackbar(
-              'Click on a mask to try it on again!  Hold the red heart to remove from your favorites');
+              'Click on a mask to try it on again!  Hold the red heart to remove from your favorites.');
             //<Text>Click on a mask to try it on again!  Hold the <Icon name='heart-remove' size={24} color={theme.colors.bad} /> to remove from your favorites.</Text>);
             this.setFirstTimeActionComplete('favoritesSnackbar');
           }
@@ -395,7 +403,7 @@ export default class App extends React.Component {
     if (this.firstTimeActionNotComplete('buyMaskButtonExplanation')) {
       Alert.alert(
         "Here's the deal:",
-        "A one-time explanation of how the buy button will act.",
+        "(A one-time explanation of what the buy button will do-- taking you outside the app.)",
         [
           {
             text: 'Ok',style: 'default',onPress: () => {
@@ -903,7 +911,7 @@ export default class App extends React.Component {
           <BeltNav app={this} />
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
-            <FlatList ref={this.maskScrollRef} decelerationRate={.95} extraData={this.state.forceRenderFlatList}
+            <FlatList ref={this.maskScrollRef} decelerationRate={.94} extraData={this.state.forceRenderFlatList}
               snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
               ListEmptyComponent={
                 <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
