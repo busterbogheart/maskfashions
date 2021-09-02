@@ -33,12 +33,13 @@ import CameraRoll from '@react-native-community/cameraroll';
 import Snackbar from 'react-native-snackbar';
 import NetInfo from '@react-native-community/netinfo';
 import AdItemTitleText from './src/components/AdItemTitleText';
+import Config from 'react-native-config';
 
 export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    console.debug('\n\n__________SESSION START__________________________');
+    console.debug(`\n\n\n__________________SESSION START_____________(release? ${(Config.IS_RELEASE==='true')})__________________`);
 
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
@@ -90,7 +91,8 @@ export default class App extends React.Component {
       havingTroubleDarkSnackbar: false,
     };
     this.photoPreviewPath = null;
-    this.bustCache = !true;
+    this.isRelease = (Config.IS_RELEASE === 'true');
+    this.bustCache = (this.isRelease == false);
   }
 
   didAppear() {
@@ -596,6 +598,7 @@ export default class App extends React.Component {
     this.switchTexture(this.filteredItemList[0]);
   }
 
+  // some ad creatives will not be loaded by the time this is called
   switchTexture = (adItem) => {
     if (adItem == this.state.currentWornAdItem) return;
     const {url,adId} = adItem;
@@ -609,10 +612,10 @@ export default class App extends React.Component {
           console.warn(`ad item ${adId} does NOT exist locally, using CDN`);
           URLorFilepath = url;
         }
-        this.deepARView.switchTexture(URLorFilepath,!doesExist);
         // trigger mask name title update
         this.setState({currentWornAdItem: adItem});
         this.currentCenterAdItem = adItem;
+        this.deepARView.switchTexture(URLorFilepath,!doesExist);
       });
   }
 
@@ -892,6 +895,10 @@ export default class App extends React.Component {
               <Text style={{fontSize: 15,fontWeight: 'bold',lineHeight: 15}} >Mask Fashions</Text>
               <Text style={{fontSize: 11,lineHeight: 11}}>Stay safe. Look good.</Text>
             </View>
+            {this.isRelease == false ?
+              <Text style={{color: '#ffffff99',position: 'absolute',right: 5, fontWeight:'bold'}}>DEV RELEASE</Text>
+              : <></>
+            }
           </View>
 
 

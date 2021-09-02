@@ -171,11 +171,12 @@
 }
 
 -(void)switchTexture:(NSString*)urlOrPath andIsRemote:(BOOL *)isRemote {
+  RCTLog(@"switchtexture: %@, %d", urlOrPath, isRemote);
   if(isRemote){
     NSData * imageData = [[NSData alloc] initWithContentsOfURL: [NSURL URLWithString: urlOrPath]];
     UIImage *image = [UIImage imageWithData: imageData];
     if(!image){
-      RCTLogError(@"CANT FIND IT");
+      RCTLogError(@"CANT FIND IT:%@ ", urlOrPath);
     }
     [_arview changeParameter:@"mask-itself" component:@"MeshRenderer" parameter:@"s_texDiffuse" image:image];
   } else {

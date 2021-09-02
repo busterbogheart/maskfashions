@@ -1,5 +1,6 @@
 import {isFuture,isPast} from "date-fns";
 import {AdCampaign,AdItem} from "./AdsApiMapping";
+import Config from 'react-native-config';
 
 //('creatives/image') //file names only, ids, "media_group"? 
 //('campaigns') //all campaigns aka "advertisement" in JSON, gives Advertiser name, id
@@ -9,20 +10,22 @@ import {AdCampaign,AdItem} from "./AdsApiMapping";
 export default class AdsApiAdButler {
 
   constructor() {
+    console.debug('ADBUTLER <<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ' + Config.IS_RELEASE);
+    this.#apiKey = Config.ADBUTLER_API_KEY + (Config.ASTROBAGEL_KEY.substr(0,2));
   }
 
   #allAdItems = [];
   #adItemsInCampaigns = {};
   #advertisers = {};
   #allTrackingUrls = {}; //keyed on banner id aka adId
-  #apiKey = 'b87ea9fb1559cbea91d941f0be63ce9b'; //test: da81d8cf585242c7818d43bdddcd0769
-  #liveAccountNo = '181924'; // test '181925'
+  #apiKey; 
+  #accountNo = Config.ADBUTLER_ACCT;
   #filterSchema = {};
   #urlJSON = 'https://servedbyadbutler.com/adserve/';
   #urlREST = 'https://api.adbutler.com/v2/';
   // the data given to the FlatList, should be [{url:'', impUrl:'', clickUrl:'', adId:''}, ...]
-  #allActiveAdItems = [];
   #RESTlimit = 100;
+  #mainZoneId = Config.ADBUTLER_MAIN_ZONE;
 
   restAPI_SelfserveInfo = () => {
     this.#restAPI('self-serve/portals/405/orders',true)
@@ -136,8 +139,8 @@ export default class AdsApiAdButler {
       if (e.name == 'Default Ad Item') {
         continue;
       }
-      // the all important filter schema
-      if (e.id == '520484750') {
+      // the all important filter schema, prod and test env respectively
+      if (e.id == '520484750' || e.id == '520496803') {
         for (const k in e.metadata) {
           let arr = e.metadata[k].split(',');
           let noEmpties = arr.filter(el => el != '');
@@ -210,7 +213,7 @@ export default class AdsApiAdButler {
       .then(json => {
         for (const k in json.data) {
         }
-        console.log(JSON.stringify(json,null,1));
+        //console.log(JSON.stringify(json,null,1));
       })
       .catch((err) => console.warn(err));
   }
@@ -258,9 +261,9 @@ export default class AdsApiAdButler {
   getAdTrackingURLS = async () => {
     const _getURLS = async() => {
       return this.#jsonAPI({
-        setID: '492969', //set = zone
+        setID: this.#mainZoneId, //set = zone
         type: 'jsonr',
-        ID: this.#liveAccountNo,
+        ID: this.#accountNo,
       })
         .then(response => response.json())
         .then(json => {
@@ -269,7 +272,7 @@ export default class AdsApiAdButler {
             let id = placement.banner_id;
             let impUrl = placement.accupixel_url;
             let clickUrl = placement.redirect_url;
-            let convUrl = `https://servedbyadbutler.com/convtrack.spark?MID=${this.#liveAccountNo}&BID=${id}`;
+            let convUrl = `https://servedbyadbutler.com/convtrack.spark?MID=${this.#accountNo}&BID=${id}`;
             this.#allTrackingUrls[id] = {
               impUrl,clickUrl,convUrl
             };

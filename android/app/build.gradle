@@ -133,7 +133,7 @@ android {
         applicationId "app.maskfashions"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
+        versionCode 4
         versionName "1.0"
     }
     splits {
@@ -195,6 +195,7 @@ dependencies {
     implementation files('lib\\deepar.aar')
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation 'com.loopj.android:android-async-http:1.4.9'
+    implementation project(':react-native-config')
 
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:28.3.0')
@@ -228,5 +229,11 @@ project.ext.vectoricons = [
     iconFontNames: [ 'MaterialIcons.ttf']
 ]
 
+project.ext.envConfigFiles = [
+    debug: ".env.dev",
+    release: ".env.prod"
+]
+
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
