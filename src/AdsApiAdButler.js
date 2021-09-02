@@ -1,6 +1,6 @@
-import {isFuture,isPast} from "date-fns";
 import {AdCampaign,AdItem} from "./AdsApiMapping";
 import Config from 'react-native-config';
+import {isFuture, isPast, parseJSON} from "date-fns";
 
 //('creatives/image') //file names only, ids, "media_group"? 
 //('campaigns') //all campaigns aka "advertisement" in JSON, gives Advertiser name, id
@@ -18,44 +18,37 @@ export default class AdsApiAdButler {
   #adItemsInCampaigns = {};
   #advertisers = {};
   #allTrackingUrls = {}; //keyed on banner id aka adId
-  #apiKey; 
+  #apiKey;
   #accountNo = Config.ADBUTLER_ACCT;
   #filterSchema = {};
   #urlJSON = 'https://servedbyadbutler.com/adserve/';
   #urlREST = 'https://api.adbutler.com/v2/';
-  // the data given to the FlatList, should be [{url:'', impUrl:'', clickUrl:'', adId:''}, ...]
   #RESTlimit = 100;
   #mainZoneId = Config.ADBUTLER_MAIN_ZONE;
 
-  restAPI_SelfserveInfo = () => {
-    this.#restAPI('self-serve/portals/405/orders',true)
-      .then(response => response.json())
-      .then(json => {
-        console.log(JSON.stringify(json,null,1));
-      })
-      .catch((err) => console.warn(err));
-  }
 
-  fetchCampaigns = async() => {
+  // represents ad items and campaign id relationship
+  fetchCampaigns = async () => {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
         //console.debug(json.data.length + ' campaign assignments fetched')
+        //console.log("CAMPAIGNS\n\n",JSON.stringify(json.data,null,1));
         for (const k of json.data) {
           if (k.object == 'campaign_assignment' && k.advertisement && k.campaign) {
             const adId = k.advertisement.id;
-            const is_self_serve = k.advertisement.is_self_serve;
             const weight = k.weight;
             const advertiserId = k.campaign.advertiser;
+            const campaignId = k.campaign.id;
             this.#adItemsInCampaigns[adId] = {
-              is_self_serve, weight, advertiserId
+              weight,advertiserId,campaignId
             };
           }
         }
       })
   }
 
-  fetchAdvertisers = async() => {
+  fetchAdvertisers = async () => {
     await this.#restAPI('advertisers',true)
       .then(response => response.json())
       .then(json => {
@@ -70,40 +63,47 @@ export default class AdsApiAdButler {
       .catch((err) => console.warn(err));
   }
 
-
-  //basically just for getting schedule data
-  // this.adsAPI('placements', true, { limit: this.#RESTlimit })
-  //   .then((response) => response.json()).then((json) => {
-  //     console.log(JSON.stringify(json));
-  //     for (let k in json.data) {
-  //       let schedule = json.data[k].schedule;
-  //       // TIMEZONE IS LOS ANGELES
-  //       let startDate = schedule.start_date ? parseJSON(schedule.start_date): null;
-  //       let endDate = schedule.end_date ? parseJSON(schedule.end_date) : null;
-  //       let unlimitedRun = startDate == null || endDate == null;
-  //       let hide = !unlimitedRun && (isFuture(startDate) || isPast(endDate));
-  //       // non-campaign objects returned include ad items (ad items without campaigns eg default zone ads)
-  //       if (json.data[k].advertisement.object == "standard_campaign" && !hide) {
-  //         // add valid, active ad items to the master list
-  //         let campaignId = json.data[k].advertisement.id;
-  //         if(adItemsByCampaign[campaignId]){
-  //             activeAdItems.push(adItemsByCampaign[campaignId]);
-  //         }
-  //       }
-  //     }
-
-  // for (let k in this.activeAdItems) {
-  //     console.log(`active: ${this.activeAdItems[k].name}`);
-  //   }
-
-  //   //check empty activeaditems
-  // })
+  fetchPlacements = async () => {
+    await this.#restAPI('placements',true)
+      .then(response => response.json())
+      .then(json => {
+        //console.log(JSON.stringify(json,null,1));
+        for (const k in json.data) {
+          const placement = json.data[k];
+          if (placement && placement.object == 'placement' && placement.advertisement.object == 'standard_campaign') {
+            // adId is not in this response
+            const isActive = placement.active; //for ad items, not campaigns
+            const schedule = placement.schedule;
+            const campaign = placement.advertisement;
+            const advertiserId = campaign.advertiser;
+            const campaignId = campaign.id;
+            const campName = campaign.name;
+            // TIMEZONE IS LOS ANGELES
+            let startDate = schedule.start_date ? parseJSON(schedule.start_date) : null;
+            let endDate = schedule.end_date ? parseJSON(schedule.end_date) : null;
+            let unlimitedRun = startDate == null || endDate == null;
+            let hide = !unlimitedRun && (isFuture(startDate) || isPast(endDate));
+            // add schedule data to individual ad items
+            for (const adId in this.#adItemsInCampaigns) {
+              const ad = this.#adItemsInCampaigns[adId];
+              if (ad.campaignId == campaignId) {
+                ad.isEnded = isPast(endDate);
+                ad.isFuture = isFuture(startDate);
+                ad.unlimitedRun = unlimitedRun;
+                ad.campName = campName;
+                ad.isActive = !hide;
+              }
+            }
+          }
+        }
+      })
+      .catch((err) => console.warn(err));
+  }
 
   #adbutlerFetch = async (apiUrl = this.#urlREST,params = {},endpoint = '') => {
-    console.log(`fetching ${apiUrl} with ${JSON.stringify(params)} to ${endpoint}`);
+    console.log(`fetching REST api with ${JSON.stringify(params)} to ${endpoint}`);
     const data = params ? new URLSearchParams(params) : '';
     const url = this.#urlREST + endpoint + "?" + data;
-    console.debug('rest url:',url)
     let response = await fetch(url,{
       method: 'GET',
       mode: 'cors',
@@ -121,6 +121,7 @@ export default class AdsApiAdButler {
     let res = await this.#restAPI('ad-items',true);
     await this.fetchCampaigns();
     await this.fetchAdvertisers();
+    await this.fetchPlacements();
     if (res.status != 200) {
       throw Error('REST API status not 200')
     }
@@ -129,8 +130,7 @@ export default class AdsApiAdButler {
       console.warn('hit REST limit');
     }
     //console.log(json.data.length + " ad items fetched");
-    //console.log(JSON.stringify(json.data,null,1));
-
+    //console.log("AD ITEMS\n\n",JSON.stringify(json.data,null,1));
     for (const k in json.data) {
       const e = new AdItem(json.data[k]);
       if (e.creative) { // some don't have creative data (not added from Library)
@@ -151,9 +151,7 @@ export default class AdsApiAdButler {
 
       if (this.#adItemsInCampaigns[e.id]) {
         const cmp = this.#adItemsInCampaigns[e.id];
-        e.weight = cmp.weight;
-        e.advertiserId = cmp.advertiserId;
-        e.is_self_serve = cmp.is_self_serve;
+        Object.assign(e,cmp);
         this.#allAdItems.push(e);
       }
       if (this.#advertisers[e.advertiserId] && this.#advertisers[e.advertiserId].name) {
@@ -207,28 +205,6 @@ export default class AdsApiAdButler {
       .catch((err) => console.warn(err));
   }
 
-  restAPI_Placements = () => {
-    this.#restAPI('placements',true)
-      .then(response => response.json())
-      .then(json => {
-        for (const k in json.data) {
-        }
-        //console.log(JSON.stringify(json,null,1));
-      })
-      .catch((err) => console.warn(err));
-  }
-
-  restAPI_ManualTracking = () => {
-    this.#restAPI('manual-tracking-links',true,{ad_item: '520485932',placement: '1589807'})
-      .then(response => response.json())
-      .then(json => {
-        for (const k in json.data) {
-        }
-        //console.log(JSON.stringify(json,null,1));
-      })
-      .catch((err) => console.warn(err));
-  }
-
   //wrapper
   #restAPI = async (endpoint,expandAll = true,params = {}) => {
     if (expandAll) {
@@ -238,14 +214,9 @@ export default class AdsApiAdButler {
     return this.#adbutlerFetch(this.#urlREST,params,endpoint);
   }
 
-  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=0x0;     setID=492969; type=json //standard dynamic w/ Versace
-  //live: https://servedbyadbutler.com/adserve/;ID=181924;  size=300x250; setID=490324; type=json
-  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=300x250; setID=491194; type=json //standard zone
-  //test: https://servedbyadbutler.com/adserve/;ID=181925;  size=0x0;     setID=491503; type=json //dynamic zone
-
   // JSON API only gets ad items that are ASSIGNED to zones and NOT IN EXPIRED campaigns
   #jsonAPI = async (params) => {
-    console.log(`fetching ${this.#urlJSON} with ${JSON.stringify(params)}`);
+    console.log(`fetching JSON api with ${JSON.stringify(params)}`);
     let response = await fetch(this.#urlJSON,{
       method: 'POST',
       mode: 'cors',
@@ -259,7 +230,7 @@ export default class AdsApiAdButler {
   }
 
   getAdTrackingURLS = async () => {
-    const _getURLS = async() => {
+    const _getURLS = async () => {
       return this.#jsonAPI({
         setID: this.#mainZoneId, //set = zone
         type: 'jsonr',
@@ -267,6 +238,7 @@ export default class AdsApiAdButler {
       })
         .then(response => response.json())
         .then(json => {
+          //console.log(JSON.stringify(json,null,1));
           if (json.status != "SUCCESS") throw Error('JSON api failed');
           for (let placement of json.placements) {
             let id = placement.banner_id;

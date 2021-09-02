@@ -1,163 +1,376 @@
-{
-    "object": "list",
-    "has_more": false,
-    "limit": 10,
-    "offset": 0,
-    "url": "/v2/campaign-assignment",
-    "data": [
-        {
-            "object": "campaign_assignment",
-            "self": "/v2/campaign-assignments/1021461",
-            "id": 1021461,
-            "active": true,
-            "advertisement": {
-                "object": "image_ad_item",
-                "self": "/v2/ad-items/image/520456650",
-                "id": 520456650,
-                "created_date": "2021-07-05 17:29:53",
-                "creative": 3185100,
-                "creative_url": null,
-                "height": 250,
-                "html_alt_text": null,
-                "html_content_below": "etc html",
-                "html_target": "_blank",
-                "last_modified": "2021-07-08 13:21:18",
-                "location": "http://addtocart.link/",
-                "name": "gucci mask1",
-                "tracking_pixel": "http://trackingpixel.gif",
-                "width": 300,
-                "flexible_type": 0,
-                "is_self_serve": false,
-                "metadata": {
-                    "etcmetadata": "stuff",
-                    "texturename": "texture.jpg"
-                }
-            },
-            "campaign": {
-                "object": "standard_campaign",
-                "self": "/v2/campaigns/standard/566000",
-                "id": 566000,
-                "advertiser": 159974,
-                "name": "gucci campaign 001",
-                "roadblock_tags": null,
-                "flexible_type": 0
-            },
-            "weight": 1,
-            "data_key_target": 0
-        },
-        {
-            "object": "campaign_assignment",
-            "self": "/v2/campaign-assignments/1021462",
-            "id": 1021462,
-            "active": true,
-            "advertisement": {
-                "object": "image_ad_item",
-                "self": "/v2/ad-items/image/520456651",
-                "id": 520456651,
-                "created_date": "2021-07-05 17:30:04",
-                "creative": null,
-                "creative_url": "https://i.pinimg.com/originals/5d/82/ed/5d82ede9be1c3a95c56934aabfb13641.jpg",
-                "height": 250,
-                "html_alt_text": null,
-                "html_content_below": "etc html",
-                "html_target": "_blank",
-                "last_modified": "2021-07-05 17:30:04",
-                "location": "http://addtocart.link/",
-                "name": "gucci mask2",
-                "tracking_pixel": "http://trackingpixel.gif",
-                "width": 300,
-                "flexible_type": 0,
-                "is_self_serve": false,
-                "metadata": {
-                    "etcmetadata": "stuff",
-                    "texturename": "texture.jpg"
-                }
-            },
-            "campaign": {
-                "object": "standard_campaign",
-                "self": "/v2/campaigns/standard/566000",
-                "id": 566000,
-                "advertiser": 159974,
-                "name": "gucci campaign 001",
-                "roadblock_tags": null,
-                "flexible_type": 0
-            },
-            "weight": 1,
-            "data_key_target": 0
-        },
-        {
-            "object": "campaign_assignment",
-            "self": "/v2/campaign-assignments/1022269",
-            "id": 1022269,
-            "active": true,
-            "advertisement": {
-                "object": "image_ad_item",
-                "self": "/v2/ad-items/image/520457724",
-                "id": 520457724,
-                "created_date": "2021-07-07 11:43:39",
-                "creative": null,
-                "creative_url": "https://editorialist.com/wp-content/uploads/2020/10/il_1588xN.2622401929_hwdx.jpg",
-                "height": 0,
-                "html_alt_text": null,
-                "html_content_below": null,
-                "html_target": "_blank",
-                "last_modified": "2021-07-07 11:43:39",
-                "location": "http://addtocart.link/",
-                "name": "gucci mask3",
-                "tracking_pixel": null,
-                "width": 0,
-                "flexible_type": 0,
-                "is_self_serve": false,
-                "metadata": {}
-            },
-            "campaign": {
-                "object": "standard_campaign",
-                "self": "/v2/campaigns/standard/566412",
-                "id": 566412,
-                "advertiser": 159974,
-                "name": "gucci campaign 2",
-                "roadblock_tags": null,
-                "flexible_type": 0
-            },
-            "weight": 1,
-            "data_key_target": 0
-        },
-        {
-            "object": "campaign_assignment",
-            "self": "/v2/campaign-assignments/1022959",
-            "id": 1022959,
-            "active": true,
-            "advertisement": {
-                "object": "image_ad_item",
-                "self": "/v2/ad-items/image/520458581",
-                "id": 520458581,
-                "created_date": "2021-07-08 14:20:56",
-                "creative": 3185174,
-                "creative_url": null,
-                "height": 772,
-                "html_alt_text": null,
-                "html_content_below": null,
-                "html_target": "_blank",
-                "last_modified": "2021-07-08 14:20:56",
-                "location": null,
-                "name": "etsymask1",
-                "tracking_pixel": null,
-                "width": 1588,
-                "flexible_type": 0,
-                "is_self_serve": false,
-                "metadata": {}
-            },
-            "campaign": {
-                "object": "standard_campaign",
-                "self": "/v2/campaigns/standard/566869",
-                "id": 566869,
-                "advertiser": 159976,
-                "name": "Etsy campaign 1",
-                "roadblock_tags": null,
-                "flexible_type": 0
-            },
-            "weight": 1,
-            "data_key_target": 0
-        }
-    ]
-}
+
+ [
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055891",
+     "id": 1055891,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496829",
+      "id": 520496829,
+      "created_date": "2021-09-01 11:03:57",
+      "creative": 3228479,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:03:57",
+      "location": "https://www.etsy.com/listing/933564690/hungarian-handmade-embroidered-masks?ref=maskfashions",
+      "name": "Embroidered White Flowers",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "accepts filter": "yes",
+       "colors": "white",
+       "material": "cotton",
+       "pattern": "floral",
+       "style": "formal/elegant"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583321",
+      "id": 583321,
+      "advertiser": 164876,
+      "name": "bibbidibobbidi-testcampaign-noend",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055894",
+     "id": 1055894,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496832",
+      "id": 520496832,
+      "created_date": "2021-09-01 11:05:02",
+      "creative": 3228481,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:05:02",
+      "location": "https://www.etsy.com/listing/911500608/art-deco-reversible-adjustable-masks?ref=maskfashions",
+      "name": "Art Deco",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "pink, blue",
+       "material": "cotton",
+       "style": "boho, hippie, colorful"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583324",
+      "id": 583324,
+      "advertiser": 164877,
+      "name": "clover718-testcampaign-nosched",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055896",
+     "id": 1055896,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496834",
+      "id": 520496834,
+      "created_date": "2021-09-01 11:05:56",
+      "creative": 3228484,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:05:56",
+      "location": "https://www.etsy.com/listing/911500130/mushrooms-reversible-adjustable-masks?ref=maskfashions",
+      "name": "Mushrooms",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "blue",
+       "material": "cotton",
+       "style": "nature"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583324",
+      "id": 583324,
+      "advertiser": 164877,
+      "name": "clover718-testcampaign-nosched",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055897",
+     "id": 1055897,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496835",
+      "id": 520496835,
+      "created_date": "2021-09-01 11:07:02",
+      "creative": 3228485,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:07:02",
+      "location": "https://geekchicclothing.com/collections/face-masks/products/face-mask-micro-floral",
+      "name": "Micro Floral",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "accepts filter": "yes",
+       "colors": "black",
+       "style": "space"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583326",
+      "id": 583326,
+      "advertiser": 164878,
+      "name": "geekchic-testcampaign-futurestart",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055898",
+     "id": 1055898,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496836",
+      "id": 520496836,
+      "created_date": "2021-09-01 11:07:53",
+      "creative": 3228486,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:07:53",
+      "location": "https://geekchicclothing.com/collections/face-masks/products/face-mask-prism",
+      "name": "Prism",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "pink,blue,white,black",
+       "pattern": "geometric"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583326",
+      "id": 583326,
+      "advertiser": 164878,
+      "name": "geekchic-testcampaign-futurestart",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055902",
+     "id": 1055902,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496840",
+      "id": 520496840,
+      "created_date": "2021-09-01 11:09:46",
+      "creative": 3228490,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:09:46",
+      "location": "https://www.etsy.com/listing/1070928663/neon-dripping-rose-adjustable-fabric?ref=maskfashions",
+      "name": "Neon Dripping Rose",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "red,orange,pink",
+       "material": "cotton",
+       "multiple sizes": "yes",
+       "pattern": "floral",
+       "style": "bold,colorful"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583329",
+      "id": 583329,
+      "advertiser": 164879,
+      "name": "jklm-testcampaign-active-w-end",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055904",
+     "id": 1055904,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496842",
+      "id": 520496842,
+      "created_date": "2021-09-01 11:10:38",
+      "creative": 3228494,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:10:38",
+      "location": "https://www.etsy.com/listing/920161794/red-oil-slick-mask-adjustable-fit-fabric?ref=maskfashions",
+      "name": "Red Oil Slick",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "red",
+       "material": "cotton",
+       "multiple sizes": "yes"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583329",
+      "id": 583329,
+      "advertiser": 164879,
+      "name": "jklm-testcampaign-active-w-end",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055905",
+     "id": 1055905,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496843",
+      "id": 520496843,
+      "created_date": "2021-09-01 11:11:37",
+      "creative": 3228495,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:11:37",
+      "location": "https://www.etsy.com/listing/933857429/skeleton-mask-skull-adjustable-fit?ref=maskfashions",
+      "name": "Skull & Flowers",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "colors": "white,black",
+       "multiple sizes": "yes",
+       "pattern": "floral"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583329",
+      "id": 583329,
+      "advertiser": 164879,
+      "name": "jklm-testcampaign-active-w-end",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    },
+    {
+     "object": "campaign_assignment",
+     "self": "/v2/campaign-assignments/1055908",
+     "id": 1055908,
+     "active": true,
+     "advertisement": {
+      "object": "image_ad_item",
+      "self": "/v2/ad-items/image/520496846",
+      "id": 520496846,
+      "created_date": "2021-09-01 11:12:45",
+      "creative": 3228499,
+      "creative_url": null,
+      "height": 250,
+      "html_alt_text": null,
+      "html_content_below": null,
+      "html_target": "_blank",
+      "last_modified": "2021-09-01 11:12:45",
+      "location": "https://www.etsy.com/listing/1076621189/horse-face-mask-teal-and-horses-mask?ref=maskfashions",
+      "name": "Horses in Turquoise",
+      "tracking_pixel": null,
+      "width": 300,
+      "flexible_type": 0,
+      "is_self_serve": false,
+      "metadata": {
+       "accepts filter": "yes",
+       "colors": "green,pink,purple",
+       "pattern": "animal print"
+      }
+     },
+     "campaign": {
+      "object": "standard_campaign",
+      "self": "/v2/campaigns/standard/583334",
+      "id": 583334,
+      "advertiser": 164880,
+      "name": "noblesteed-testcampaign-ended",
+      "roadblock_tags": null,
+      "flexible_type": 0
+     },
+     "weight": 1,
+     "data_key_target": 0
+    }
+   ]
+   

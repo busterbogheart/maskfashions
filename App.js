@@ -39,7 +39,7 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    console.debug(`\n\n\n__________________SESSION START_____________(release? ${(Config.IS_RELEASE==='true')})__________________`);
+    console.debug(`\n\n\n__________________SESSION START_____________(release? ${(Config.IS_RELEASE === 'true')})__________________`);
 
     this.state = {
       permissionsGranted: Platform.OS === 'ios',
@@ -93,6 +93,180 @@ export default class App extends React.Component {
     this.photoPreviewPath = null;
     this.isRelease = (Config.IS_RELEASE === 'true');
     this.bustCache = (this.isRelease == false);
+  }
+
+  componentDidMount() {
+    console.debug('componentdidmount');
+
+    if (Platform.OS === 'android') {
+      PermissionsAndroid.requestMultiple(
+        [
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          // PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+        ],
+      ).then(result => {
+        if (
+          result['android.permission.CAMERA'].match(/^granted|never_ask_again$/) &&
+          // result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) &&
+          result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
+        ) {
+          console.debug('permissions granted android')
+          // will let DeepAR module load, which dispatches an 'initialized' event
+          this.setState({permissionsGranted: true});
+        } else {
+          this.permissionsNotGranted();
+          this.setState({permissionsGranted: false});
+        }
+      })
+    } else if (Platform.OS === 'ios') {
+
+    }
+
+    this.init();
+
+
+    //const checkConnection = () => {
+    //  NetInfo.fetch().then(state => {
+    //    console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
+    //    let connected = (state.isConnected == true);
+    //    if (connected) {
+
+    //      this.init();
+    //    } else {
+    //      setTimeout(() => {
+    //        checkConnection();
+    //      }, 1000);
+    //      Alert.alert(
+    //        null,
+    //        'No internet connection',
+    //        [{text: 'Retry', onPress: () => checkConnection()}],
+    //        {cancelable: false}
+    //      );
+    //    }
+    //  })
+    //}
+
+    //checkConnection();
+
+    //this.unsubNetInfo = NetInfo.addEventListener(state => {
+    //  console.log(' ##########  connection state: ' + state.isConnected, state.isInternetReachable);
+    //  let connected = (state.isConnected == true && state.isInternetReachable == true);
+    //  if (connected) {
+    //    this.unsubNetInfo();
+    //    this.setState({isConnected:true})
+    //    this.init();
+    //    return;
+    //  } else {
+    //    this.setState({isConnected: false})
+    //  }
+    //});
+  }
+
+  init = () => {
+    this.setupUserLocal().then(uid => {
+      this.showFirstTimeFaceHelp();
+      if (uid != null) {
+        console.debug(`got user: ${uid}`);
+        this.userId = uid;
+      } else {
+        // TODO ??
+        console.warn('uid null from setupuserlocal');
+      }
+    },reason => console.warn('failed: ' + reason));
+
+    this.butler = new AdButler();
+    const _getAdsAndSchema = async () => {
+      return this.butler.getAdItemsWithSchema().then(allAds => {
+        for (let ad of allAds) {
+          this.masterItemList.push({
+            adId: String(ad.id),
+            url: ad.creative_url,
+            name: ad.name,
+            metadata: ad.metadata,
+            advertiser: ad.advertiserName,
+            location: ad.location,
+            isActive: ad.isActive,
+            isFuture: ad.isFuture,
+            isEnded: ad.isEnded,
+            unlimitedRun: ad.unlimitedRun,
+          });
+        }
+        //randomize
+        this.masterItemList = this.masterItemList.map((value) => ({value,sort: Math.random()})).sort((a,b) => a.sort - b.sort).map(({value}) => value);
+        //prioritize & set as first shown list   // sort by a.is_self_serve, a.weight, etc
+        this.filteredItemList = this.masterItemList.sort((a,b) => a.isActive ? -1 : 1);
+        this.preloadAdItemImages();
+        console.debug('<<<<<<<<<<<<< got ads and filter schema');
+        this.setState({adItemsAreLoading: false});
+        let schema = new FilterSchema(this.butler.getFilterSchema());
+        this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
+        this.preloadMaskPNG();
+      })
+    }
+
+    _getAdsAndSchema()
+      .catch(e => {
+        console.error('error fetching ads, trying again',e);
+        //go again
+        _getAdsAndSchema();
+      })
+
+    this.butler.getAdTrackingURLS().then(urls => this.itemTrackingURLs = urls);
+    this.setupAuthListener();
+  }
+
+  // CDN urls should be parsed and pre-loaded for the listview, and also made available 
+  // to Java and objc on local filesystem for the deepar native switchTexture method
+  // CDN url as backup if file doesnt exist localy (then download it local?)
+  // if it's been more than X hours, wipe the /aditems directory and re-download?
+  preloadAdItemImages = async () => {
+    await RNFS.mkdir(this.localAdItemsDir);
+
+    const _downloadOne = (fromUrl,toFile) => {
+      return RNFS.downloadFile({
+        fromUrl,toFile,
+        begin: (status) => {console.log('starting RNFS download ',status.jobId)},
+      })
+    };
+
+    this.masterItemList.forEach(item => {
+      const localDest = this.localAdItemsDir + item.adId + ".jpg";
+      const CDNurl = item.url + (this.bustCache ? '?' + Math.random() : '');
+      RNFS.exists(localDest)
+        .then(doesExist => {
+          if (!doesExist) {
+            _downloadOne(CDNurl,localDest)
+              .promise.then((res) => {
+                console.log(`finished RNFS download, ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
+                if (res.statusCode !== 200) {
+                  // go again
+                  console.log('RNFS download trying again ' + item.adId)
+                  _downloadOne(CDNurl,localDest);
+                }
+              },rejected => {
+                console.warn(rejected,'RNFS download trying again for ' + item.adId);
+                _downloadOne(CDNurl,localDest);
+              })
+              .catch(e => console.error(e));
+          } else {
+            //console.log(`image for ${item.adId} already exists locally`);
+          }
+        })
+    });
+
+    this.masterItemList.forEach(v => {
+      let uri = v.url;
+      //console.debug(`preloading texture ${uri}`);
+      Image.prefetch(uri)
+        .then(
+          successBool => {},
+          failReason => {
+            // connectivity issues cause this to fail
+            console.warn(failReason);
+          })
+        .catch(e => console.error(e))
+    });
   }
 
   didAppear() {
@@ -178,174 +352,6 @@ export default class App extends React.Component {
   hideDrawer = () => this.setState({sidemenuVisible: false});
   showPhotoPreview = () => this.setState({photoPreviewModalVisible: true});
 
-  componentDidMount() {
-    console.debug('componentdidmount');
-
-    if (Platform.OS === 'android') {
-      PermissionsAndroid.requestMultiple(
-        [
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          // PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-        ],
-      ).then(result => {
-        if (
-          result['android.permission.CAMERA'].match(/^granted|never_ask_again$/) &&
-          // result['android.permission.RECORD_AUDIO'].match(/^granted|never_ask_again$/) &&
-          result['android.permission.WRITE_EXTERNAL_STORAGE'].match(/^granted|never_ask_again$/)
-        ) {
-          console.debug('permissions granted android')
-          // will let DeepAR module load, which dispatches an 'initialized' event
-          this.setState({permissionsGranted: true});
-        } else {
-          this.permissionsNotGranted();
-          this.setState({permissionsGranted: false});
-        }
-      })
-    } else if (Platform.OS === 'ios') {
-
-    }
-
-    this.init();
-
-
-    //const checkConnection = () => {
-    //  NetInfo.fetch().then(state => {
-    //    console.log('onetime connection state: ' + state.isConnected,state.isInternetReachable)
-    //    let connected = (state.isConnected == true);
-    //    if (connected) {
-          
-    //      this.init();
-    //    } else {
-    //      setTimeout(() => {
-    //        checkConnection();
-    //      }, 1000);
-    //      Alert.alert(
-    //        null,
-    //        'No internet connection',
-    //        [{text: 'Retry', onPress: () => checkConnection()}],
-    //        {cancelable: false}
-    //      );
-    //    }
-    //  })
-    //}
-
-    //checkConnection();
-
-    //this.unsubNetInfo = NetInfo.addEventListener(state => {
-    //  console.log(' ##########  connection state: ' + state.isConnected, state.isInternetReachable);
-    //  let connected = (state.isConnected == true && state.isInternetReachable == true);
-    //  if (connected) {
-    //    this.unsubNetInfo();
-    //    this.setState({isConnected:true})
-    //    this.init();
-    //    return;
-    //  } else {
-    //    this.setState({isConnected: false})
-    //  }
-    //});
-  }
-
-  init = () => {
-    this.setupUserLocal().then(uid => {
-      this.showFirstTimeFaceHelp();
-      if (uid != null) {
-        console.debug(`got user: ${uid}`);
-        this.userId = uid;
-      } else {
-        // TODO ??
-        console.warn('uid null from setupuserlocal');
-      }
-    },reason => console.warn('failed: ' + reason));
-
-    this.butler = new AdButler();
-    const _getAdsAndSchema = async () => {
-      return this.butler.getAdItemsWithSchema().then(allAds => {
-        for (let ad of allAds) {
-          this.masterItemList.push({
-            adId: String(ad.id),
-            url: ad.creative_url,
-            name: ad.name,
-            metadata: ad.metadata,
-            advertiser: ad.advertiserName,
-            location: ad.location,
-          });
-        }
-        //randomize
-        this.masterItemList = this.masterItemList.map((value) => ({value,sort: Math.random()})).sort((a,b) => a.sort - b.sort).map(({value}) => value);
-        this.preloadAdItemImages();
-        this.filteredItemList = this.masterItemList;
-        console.debug('<<<<<<<<<<<<< got ads and filter schema');
-        this.setState({adItemsAreLoading: false});
-        let schema = new FilterSchema(this.butler.getFilterSchema());
-        this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
-        this.preloadMaskPNG();
-      })
-    }
-
-    _getAdsAndSchema()
-      .catch(e => {
-        console.error('error fetching ads, trying again',e);
-        //go again
-        _getAdsAndSchema();
-      })
-
-    this.butler.getAdTrackingURLS().then(urls => this.itemTrackingURLs = urls);
-    this.setupAuthListener();
-  }
-
-  // CDN urls should be parsed and pre-loaded for the listview, and also made available 
-  // to Java and objc on local filesystem for the deepar native switchTexture method
-  // CDN url as backup if file doesnt exist localy (then download it local?)
-  // if it's been more than X hours, wipe the /aditems directory and re-download?
-  preloadAdItemImages = async () => {
-    await RNFS.mkdir(this.localAdItemsDir);
-
-    const _downloadOne = (fromUrl,toFile) => {
-      return RNFS.downloadFile({
-        fromUrl,toFile,
-        begin: (status) => {console.log('starting RNFS download ',status.jobId)},
-      })
-    };
-
-    this.masterItemList.forEach(item => {
-      const localDest = this.localAdItemsDir + item.adId + ".jpg";
-      const CDNurl = item.url + (this.bustCache ? '?' + Math.random() : '');
-      RNFS.exists(localDest)
-        .then(doesExist => {
-          if (!doesExist) {
-            _downloadOne(CDNurl,localDest)
-              .promise.then((res) => {
-                console.log(`finished RNFS download, ${item.adId} (job ${res.jobId}) with ${res.statusCode}`);
-                if (res.statusCode !== 200) {
-                  // go again
-                  console.log('RNFS download trying again ' + item.adId)
-                  _downloadOne(CDNurl,localDest);
-                }
-              },rejected => {
-                console.warn(rejected,'RNFS download trying again for ' + item.adId);
-                _downloadOne(CDNurl,localDest);
-              })
-              .catch(e => console.error(e));
-          } else {
-            //console.log(`image for ${item.adId} already exists locally`);
-          }
-        })
-    });
-
-    this.masterItemList.forEach(v => {
-      let uri = v.url;
-      //console.debug(`preloading texture ${uri}`);
-      Image.prefetch(uri)
-        .then(
-          successBool => {},
-          failReason => {
-            // connectivity issues cause this to fail
-            console.warn(failReason);
-          })
-        .catch(e => console.error(e))
-    });
-  }
   checkFavorites = async () => {
     // must be authed to read/write firestore, must have valid userId also
     if (this.userId == null) {
@@ -621,7 +627,7 @@ export default class App extends React.Component {
 
   switchToRandomAdItem = () => {
     if (this.filteredItemList.length < 2) return;
-    
+
     let i;
     do {
       i = Math.floor(Math.random() * this.filteredItemList.length);
@@ -896,7 +902,7 @@ export default class App extends React.Component {
               <Text style={{fontSize: 11,lineHeight: 11}}>Stay safe. Look good.</Text>
             </View>
             {this.isRelease == false ?
-              <Text style={{color: '#ffffff99',position: 'absolute',right: 5, fontWeight:'bold'}}>DEV RELEASE</Text>
+              <Text style={{color: '#ffffff99',position: 'absolute',right: 5,fontWeight: 'bold'}}>DEV RELEASE</Text>
               : <></>
             }
           </View>
