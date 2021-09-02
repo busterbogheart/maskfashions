@@ -5,9 +5,9 @@ export default class FilterSchema {
 	#masterSchema = [];
 	#masterCategories = {};
 	#filteredSchema = {};
-	#keywords = [];
+	#brandsArr = [];
 
-	constructor(schema) {
+	constructor(schema, masterItemList) {
 		this.#masterSchema = this.createSchema(schema, true);
 
 		for (let filter of this.#masterSchema) {
@@ -18,6 +18,14 @@ export default class FilterSchema {
 			}
 			this.#masterCategories[filter.name] = childrenArr;
 		}
+
+		for (const ad of masterItemList) {
+			if (!this.#brandsArr.includes(ad.advertiser)) {
+				this.#brandsArr.push(ad.advertiser);
+			}
+		}
+
+		this.#masterCategories['brand'] = this.#brandsArr;
 	}
 
 	// converts AdButler format to multi select format
@@ -52,7 +60,6 @@ export default class FilterSchema {
 
 		return newSchema;
 	}
-
 
 	// textureList is [{metadata: {cat:[], cat:[]},...}, {metadata:{},...}] 
 	filterAndReturnFilteredSchema = (textureList) => {
@@ -91,6 +98,7 @@ export default class FilterSchema {
 				}
 			});
 		}
+
 		this.#filteredSchema = this.createSchema(temp);
 
 		return this.#filteredSchema;

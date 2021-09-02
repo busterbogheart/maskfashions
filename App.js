@@ -199,7 +199,7 @@ export default class App extends React.Component {
         this.preloadAdItemImages();
         console.debug('<<<<<<<<<<<<< got ads and filter schema');
         this.setState({adItemsAreLoading: false});
-        let schema = new FilterSchema(this.butler.getFilterSchema());
+        let schema = new FilterSchema(this.butler.getFilterSchema(), this.masterItemList);
         this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
         this.preloadMaskPNG();
       })

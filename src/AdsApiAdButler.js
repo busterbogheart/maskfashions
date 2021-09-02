@@ -157,6 +157,8 @@ export default class AdsApiAdButler {
       if (this.#advertisers[e.advertiserId] && this.#advertisers[e.advertiserId].name) {
         const adv = this.#advertisers[e.advertiserId];
         e.advertiserName = adv.name;
+        //add brand in metadata for filtering
+        e.metadata.brand = adv.name;
       }
     }
     //console.log(JSON.stringify(this.#allAdItems,null,1))
