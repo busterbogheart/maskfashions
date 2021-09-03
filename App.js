@@ -1,7 +1,7 @@
 "use strict";
 
 import React,{Fragment} from 'react';
-import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking} from 'react-native';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking, ScrollView} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {styles,theme} from './src/styles';
@@ -83,7 +83,7 @@ export default class App extends React.Component {
     this.maskSize = this.screenWidth / 1.7;
     this.localAdItemsDir = RNFS.DocumentDirectoryPath + '/aditems/';
     this.butler;
-    this.sideMenuWidth = this.screenWidth / 2.2;
+    this.sideMenuWidth = this.screenWidth / 2;
     // init session with these, fetch from asyncstorage
     this.firstTimeActions = {
       buyMaskButtonExplanation: false,
@@ -348,8 +348,8 @@ export default class App extends React.Component {
     );
   }
 
-  showSideMenu = () => this.setState({sidemenuVisible: true});
-  hideDrawer = () => this.setState({sidemenuVisible: false});
+  showSideMenu = () => this.setState({sidemenuVisible: true, sideMenuData: null});
+  hideSideMenu = () => this.setState({sidemenuVisible: false});
   showPhotoPreview = () => this.setState({photoPreviewModalVisible: true});
 
   checkFavorites = async () => {
@@ -389,11 +389,17 @@ export default class App extends React.Component {
   }
 
   showAppInfo = () => {
-    const el = <>
-      <Text style={{fontWeight: 'bold'}}>Mask health disclaimer{`\n\n`}</Text>
-      <Text style={{fontWeight: 'bold'}}>CDC info{`\n\n`}</Text>
+    const el = <ScrollView showsVerticalScrollIndicator={false} >
+      <Text style={{fontWeight: 'bold'}}>Mask health disclaimer{`\n`}</Text>
+      <Text style={{fontSize: 13}}>The masks showcased in Mask Fashions are not a replacement for medical-grade Personal Protective Equipment,
+        and in circumstances where medical grade Personal Protective Equipment is recommended, you should consult
+        a health care professional. Remember that use of face masks is not intended to replace other recommended
+        measures to stop the community spread of COVID-19, such as social distancing, washing your hands and refraining
+        from touching your face.  Follow the latest advice of the CDC and your own health care professionals as to how
+        best to keep yourself safe!</Text>
       <Text style={{fontWeight: 'bold'}}>Privacy Policy{`\n\n`}</Text>
-    </>;
+      <Text style={{fontWeight: 'bold'}}>About the app{`\n\n`}</Text>
+    </ScrollView>;
     this.setState({sideMenuData: el});
   }
 
@@ -845,7 +851,7 @@ export default class App extends React.Component {
       return <View style={styles.container} >
         <SideMenu menu={<SideMenuNav app={this} sideMenuData={this.state.sideMenuData} />} bounceBackOnOverdraw={false} openMenuOffset={this.sideMenuWidth}
           menuPosition='left' isOpen={this.state.sidemenuVisible} overlayColor={'#00000066'}
-          onChange={(isOpen) => {this.setState({sidemenuVisible: isOpen,sideMenuData: null})}}
+          onChange={(isOpen) => this.setState({sidemenuVisible: isOpen,sideMenuData: null})}
         >
 
           <Portal name="animated icons">
@@ -902,7 +908,7 @@ export default class App extends React.Component {
               <Text style={{fontSize: 11,lineHeight: 11}}>Stay safe. Look good.</Text>
             </View>
             {this.isRelease == false ?
-              <Text style={{color: '#ffffff99',position: 'absolute',right: 5,fontWeight: 'bold'}}>DEV RELEASE</Text>
+              <Text style={{color: '#ffffffaa',position: 'absolute',right: 5,fontWeight: 'bold'}}>DEV RELEASE</Text>
               : <></>
             }
           </View>

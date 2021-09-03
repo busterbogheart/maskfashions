@@ -28,7 +28,7 @@ export default class AdsApiAdButler {
 
 
   // represents ad items and campaign id relationship
-  fetchCampaigns = async () => {
+  fetchCampaignAssignments = async () => {
     await this.#restAPI('campaign-assignments',true)
       .then(response => response.json())
       .then(json => {
@@ -119,7 +119,7 @@ export default class AdsApiAdButler {
   //ad items give image, meta, url, etc. but no start/end dates
   #restAPI_AdItems = async () => {
     let res = await this.#restAPI('ad-items',true);
-    await this.fetchCampaigns();
+    await this.fetchCampaignAssignments();
     await this.fetchAdvertisers();
     await this.fetchPlacements();
     if (res.status != 200) {
