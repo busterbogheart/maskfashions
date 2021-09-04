@@ -196,7 +196,8 @@
 
 // Called when the engine initialization is complete. Do not call ARView methods before initialization.
 - (void)didInitialize {
-  
+
+  self.onEventSent(@{ @"type": @"initialized", @"value": @""});
   [self setupDeepARViewFrame];
 }
 
@@ -210,7 +211,6 @@
     [_arview setFrame:_frame];
                               
     //[_arview switchEffectWithSlot:@"watermark" path:[[NSBundle mainBundle]  pathForResource:@"watermark" ofType:@""]];
-    self.onEventSent(@{ @"type": @"initialized", @"value": @""});
   }
 }
 

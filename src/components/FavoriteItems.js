@@ -45,12 +45,12 @@ export default FavoriteItems = (props) => {
 										width={maskSize} height={maskSize} source={{uri: item.url}} />
 								</MaskedView>
 							</TouchableOpacity>
-							<View style={{flexDirection: 'row',bottom: 40,opacity: .5}}>
-								<TouchableOpacity onLongPress={() => removeFav(item)} activeOpacity={.1}><Icon style={{paddingHorizontal: 11}} name='heart-remove' color={theme.colors.bad} size={34} /></TouchableOpacity>
+							<View style={{flexDirection: 'row',bottom: 30,opacity: .5}}>
+								<TouchableOpacity onLongPress={() => removeFav(item)} activeOpacity={.1}><Icon style={{paddingHorizontal: 11}} name='heart-remove' color={theme.colors.bad} size={36} /></TouchableOpacity>
 								<TouchableOpacity onPressIn={() => {app.switchTexture(item)}} activeOpacity={.1} delayPressIn={80}><Icon style={{paddingHorizontal: 11}}
 									//name='face-recognition'
 									name='face'
-									color={'#000'} size={34} /></TouchableOpacity>
+									color={'#000'} size={36} /></TouchableOpacity>
 							</View>
 						</View>)
 				})}

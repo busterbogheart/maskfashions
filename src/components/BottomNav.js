@@ -1,7 +1,7 @@
 import React from "react"
 import { Dimensions, Platform, Text, TouchableOpacity, View } from "react-native";
 import { Appbar, useTheme } from "react-native-paper";
-import { createIconSet } from "react-native-vector-icons";
+import IosAndroidIconUtil from "./IosAndroidIconUtil";
 
 const BottomNav = (props) => {
     const theme = useTheme();
@@ -9,17 +9,6 @@ const BottomNav = (props) => {
     const iconSize = 22;
     const navHeight = 48;
     const app = props.app;
-    const glyphmap = {
-        'ios-share':'',
-        'ios-bug':'',
-        'ios-heart':'',
-    };
-    const IosIcons = createIconSet(glyphmap, 'Ionicons', 'Ionicons.ttf');
-    const iconByPlatform = (iosIconName, androidIconName) => {
-        if(Platform.OS == 'android') return androidIconName;
-        else return ({size,color}) => <IosIcons size={size} color={color} name={iosIconName} />
-    };
-
 
     const IconNav = (props) => {
         return (
@@ -35,9 +24,9 @@ const BottomNav = (props) => {
     return (
         <View style={{alignItems:'center', flexDirection:'row', justifyContent:'space-evenly', width: screenWidth, 
         height: navHeight, backgroundColor: theme.colors.secondary }}>
-            <IconNav title='favorites' icon={iconByPlatform('ios-heart','folder-heart')} onPress={ app.checkFavorites } />
-            <IconNav title='share app' onPress={()=>{}} icon= {iconByPlatform('ios-share', 'share-variant')} />
-            <IconNav title='report bug' onPress={()=>{}} icon= {iconByPlatform('ios-bug', 'spider-thread')} />
+            <IconNav title='favorites' icon={IosAndroidIconUtil.byPlatform('ios-heart','folder-heart')} onPress={ app.checkFavorites } />
+            <IconNav title='share app' onPress={()=>{}} icon= {IosAndroidIconUtil.byPlatform('ios-share', 'share-variant')} />
+            <IconNav title='report bug' onPress={()=>{}} icon= {IosAndroidIconUtil.byPlatform('ios-bug', 'spider-thread')} />
             {/* <IconNav title='suggest feature' icon='bullhorn' onPress={()=>{}} /> */}
             <IconNav title='app info' icon='information' onPress={()=>{}} />
         </View>

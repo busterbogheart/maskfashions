@@ -1,12 +1,12 @@
 "use strict";
 
 import React,{Fragment} from 'react';
-import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking, ScrollView} from 'react-native';
+import {Share as RNShare,Text,View,PermissionsAndroid,Platform,FlatList,Image,Alert,TouchableOpacity,Dimensions,Linking,ScrollView} from 'react-native';
 import Share from 'react-native-share';
 import AdButler from './src/AdsApiAdButler';
 import {styles,theme} from './src/styles';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {Portal} from 'react-native-paper';
+import {IconButton, Portal} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DeviceInfo from 'react-native-device-info';
 import firestore,{firebase} from '@react-native-firebase/firestore';
@@ -28,12 +28,12 @@ import CameraFlash from './src/components/CameraFlash';
 import Modal from 'react-native-modal';
 import U from './src/Utilities';
 import IconNav from './src/components/IconNav';
-import {createIconSet} from 'react-native-vector-icons';
 import CameraRoll from '@react-native-community/cameraroll';
 import Snackbar from 'react-native-snackbar';
 import NetInfo from '@react-native-community/netinfo';
 import AdItemTitleText from './src/components/AdItemTitleText';
 import Config from 'react-native-config';
+import IosAndroidIconUtil from './src/components/IosAndroidIconUtil';
 
 export default class App extends React.Component {
 
@@ -96,8 +96,6 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    console.debug('componentdidmount');
-
     if (Platform.OS === 'android') {
       PermissionsAndroid.requestMultiple(
         [
@@ -120,7 +118,7 @@ export default class App extends React.Component {
         }
       })
     } else if (Platform.OS === 'ios') {
-
+      console.log('permissions granted ios')
     }
 
     this.init();
@@ -199,7 +197,7 @@ export default class App extends React.Component {
         this.preloadAdItemImages();
         console.debug('<<<<<<<<<<<<< got ads and filter schema');
         this.setState({adItemsAreLoading: false});
-        let schema = new FilterSchema(this.butler.getFilterSchema(), this.masterItemList);
+        let schema = new FilterSchema(this.butler.getFilterSchema(),this.masterItemList);
         this.multiSelectFilterSchema = schema.filterAndReturnFilteredSchema(this.masterItemList);
         this.preloadMaskPNG();
       })
@@ -348,7 +346,7 @@ export default class App extends React.Component {
     );
   }
 
-  showSideMenu = () => this.setState({sidemenuVisible: true, sideMenuData: null});
+  showSideMenu = () => this.setState({sidemenuVisible: true,sideMenuData: null});
   hideSideMenu = () => this.setState({sidemenuVisible: false});
   showPhotoPreview = () => this.setState({photoPreviewModalVisible: true});
 
@@ -605,6 +603,7 @@ export default class App extends React.Component {
   }
 
   switchToFirstTexture = () => {
+    console.log('switch to first texture');
     // this should not be hit, since DeepAR (and anything else) is not added to DOM until ads are loaded
     if (this.filteredItemList.length == 0) return;
     this.switchTexture(this.filteredItemList[0]);
@@ -790,8 +789,8 @@ export default class App extends React.Component {
   renderItem = ({item,index,sep}) => {
     // TODO check androidrenderingmode software
     return (
-      <TouchableOpacity style={styles.maskScrollItem(this.maskSize)}
-        onPressIn={() => {this.switchTexture(item)}} delayPressIn={90} activeOpacity={.5} >
+      <TouchableOpacity style={styles.maskScrollItem(this.maskSize)} activeOpacity={.5}
+        onPressIn={() => {this.switchTexture(item)}} delayLongPress={5} delayPressOut={5} delayPressIn={70}  >
         <MaskedView key={Number(item.adId)}
           maskElement={
             <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
@@ -809,20 +808,8 @@ export default class App extends React.Component {
     )
   };
 
-  IosIcons = createIconSet({
-    'ios-share': '',
-    'ios-bug': '',
-    'ios-heart': '',
-    'camera-reverse': '',
-  },'Ionicons','Ionicons.ttf');
-
-  iconByPlatform = (iosIconName,androidIconName) => {
-    if (Platform.OS == 'android') return androidIconName;
-    else return ({size,color}) => <IosIcons size={size} color={color} name={iosIconName} />
-  };
-
   render() {
-    console.info(`app render >>>>>>>>>>>>> #${this.renderCount++} ads loaded? ${!this.state.adItemsAreLoading}`);
+    console.info(`app render >>>>>>>>>>>>> #${this.renderCount++} ads loaded? ${!this.state.adItemsAreLoading} ads: ${this.filteredItemList.length}`);
 
     var onEventSent = (event) => {
       const onEventSentCallback = this.props.onEventSent;
@@ -877,7 +864,7 @@ export default class App extends React.Component {
               </Text>
               <TouchableOpacity style={{width: '100%',flexDirection: 'row',justifyContent: 'space-around'}}>
                 <IconNav icon='close' title='Cancel' onPress={() => {this.setState({photoPreviewModalVisible: false}); this.photoPreviewPath = null;}} />
-                <IconNav icon={this.iconByPlatform('ios-share','share-variant')} title='Share' onPress={() => {
+                <IconNav icon={IosAndroidIconUtil.byPlatform('ios-share','share-variant')} title='Share' onPress={() => {
                   Share.open({
                     title: 'Share your Mask Fashion',
                     url: this.photoPreviewPath,
@@ -920,8 +907,8 @@ export default class App extends React.Component {
               <CameraFlash style={{position: 'absolute',width: '100%',height: '100%'}} ref={this.cameraFlashRef} />
               <AdItemTitleText currentAdItem={this.state.currentWornAdItem} />
               <TouchableOpacity delayPressIn={20} onPressIn={this.switchCamera}
-                style={{position: 'absolute',opacity: .4,top: 8,right: 8}}>
-                {<this.IosIcons name='camera-reverse' size={44} color='#fff' />}
+                style={{position: 'absolute',opacity: .4,top: 0,right: 0}}>
+                {<IconButton icon={IosAndroidIconUtil.byPlatform('camera-reverse')} size={48} color='#fff' />}
               </TouchableOpacity>
             </View>
             :
@@ -930,7 +917,8 @@ export default class App extends React.Component {
           <BeltNav app={this} />
 
           <View name="mask scroll" style={styles.maskScroll(this.maskSize)} >
-            <FlatList ref={this.maskScrollRef} decelerationRate={.94} extraData={this.state.forceRenderFlatList}
+            <FlatList ref={this.maskScrollRef} decelerationRate={.99} extraData={this.state.forceRenderFlatList}
+              disableIntervalMomentum={true} disableScrollViewPanResponder={true}
               snapToOffsets={new Array(this.filteredItemList.length).fill(null).map((v,i) => (i * this.maskSize) - (this.screenWidth - this.maskSize) / 2)}
               ListEmptyComponent={
                 <View style={{justifyContent: 'center',alignItems: 'center',alignContent: 'center',width: this.screenWidth / 2}}>
