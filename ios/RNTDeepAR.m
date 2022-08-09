@@ -24,7 +24,7 @@
     _arview = [[ARView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     
     // Set your app licence key for iOS project here (created through developer.deepar.ai)
-    [_arview setLicenseKey:@"cdc74a8eb2bd4024cddc6b353aa9fe479005dfa6cbb3eac2d617098121ba4e6d1dc20db28378820f"];
+    [_arview setLicenseKey:@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"];
     
     _arview.delegate = self;
     [self addSubview:_arview];
